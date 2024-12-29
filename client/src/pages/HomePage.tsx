@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { BreathingGuide } from "@/components/BreathingGuide";
 import { ProgressChart } from "@/components/ProgressChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useBreathing } from "@/hooks/use-breathing";
 import { useUser } from "@/hooks/use-user";
@@ -15,7 +14,6 @@ const breathingPatterns = {
   "box": { name: "Box Breathing (4x4)", sequence: [4, 4, 4, 4] },
   "22": { name: "2-2 Energized Focus", sequence: [2, 2] },
   "555": { name: "5-5-5 Triangle", sequence: [5, 5, 5] },
-  "custom": { name: "Custom Pattern", sequence: [4, 4] }
 };
 
 export default function HomePage() {
@@ -76,48 +74,24 @@ export default function HomePage() {
                 <CardTitle>Breathing Exercise</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <Select
-                    value={selectedPattern}
-                    onValueChange={handlePatternChange}
-                    disabled={isActive}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(breathingPatterns).map(([key, pattern]) => (
-                        <SelectItem key={key} value={key}>
-                          {pattern.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <BreathingGuide 
-                      pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
-                      isActive={isActive}
-                      isPaused={isPaused}
-                      currentPhase={currentPhase}
-                      isZenMode={isZenMode}
-                      isSoundEnabled={isSoundEnabled}
-                      elapsed={elapsedTime}
-                      breathCount={breathCount}
-                      countdown={countdown}
-                      onStart={startSession}
-                      onPause={pauseSession}
-                      onResume={resumeSession}
-                      onStop={endSession}
-                      onToggleZen={handleToggleZen}
-                      onToggleSound={handleToggleSound}
-                    />
-                  </motion.div>
-                </div>
+                <BreathingGuide 
+                  pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
+                  isActive={isActive}
+                  isPaused={isPaused}
+                  currentPhase={currentPhase}
+                  isZenMode={isZenMode}
+                  isSoundEnabled={isSoundEnabled}
+                  elapsed={elapsedTime}
+                  breathCount={breathCount}
+                  countdown={countdown}
+                  onStart={startSession}
+                  onPause={pauseSession}
+                  onResume={resumeSession}
+                  onStop={endSession}
+                  onToggleZen={handleToggleZen}
+                  onToggleSound={handleToggleSound}
+                  onPatternChange={handlePatternChange}
+                />
               </CardContent>
             </Card>
           </ErrorBoundary>
@@ -152,6 +126,7 @@ export default function HomePage() {
               onStop={endSession}
               onToggleZen={handleToggleZen}
               onToggleSound={handleToggleSound}
+              onPatternChange={handlePatternChange}
             />
           </div>
         </ErrorBoundary>

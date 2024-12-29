@@ -24,6 +24,7 @@ interface BreathingGuideProps {
   onStop: () => void;
   onToggleZen: () => void;
   onToggleSound: () => void;
+  onPatternChange: (value: string) => void;
 }
 
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
@@ -48,7 +49,8 @@ export function BreathingGuide({
   onResume,
   onStop,
   onToggleZen,
-  onToggleSound
+  onToggleSound,
+  onPatternChange
 }: BreathingGuideProps) {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -67,50 +69,44 @@ export function BreathingGuide({
     return phaseColors[phase as keyof typeof phaseColors];
   };
 
-  // Calculate animation parameters based on current phase
+  // Animation configuration based on current phase
   const getBreathAnimation = () => {
-    if (!isActive || isPaused) return { scale: 1 };
+    if (!isActive || isPaused) return { scale: 0.4 };
 
     const phase = getPhaseVariant();
-    const minScale = 0.285; // 80px / 280px
-    const maxScale = 1.0; // 280px / 280px
-
-    // Calculate progress for smooth transitions
     const progress = (pattern.sequence[currentPhase] - countdown) / pattern.sequence[currentPhase];
 
     if (phase === "inhale") {
       return {
-        scale: minScale + (progress * (maxScale - minScale)),
+        scale: 0.4 + (progress * 0.6), // 0.4 to 1.0
         transition: {
-          type: "spring",
           duration: 1, // Exactly 1 second per count
+          type: "spring",
           stiffness: 25,
-          damping: 20,
-          mass: 1
+          damping: 20
         }
       };
     }
 
     if (phase === "exhale") {
       return {
-        scale: maxScale - (progress * (maxScale - minScale)),
+        scale: 1.0 - (progress * 0.6), // 1.0 to 0.4
         transition: {
-          type: "spring",
           duration: 1,
+          type: "spring",
           stiffness: 25,
-          damping: 20,
-          mass: 1
+          damping: 20
         }
       };
     }
 
     // Hold phase
     return {
-      scale: maxScale,
+      scale: phase === "inhale" ? 1.0 : 0.4,
       transition: {
-        type: "spring",
         duration: 1,
-        stiffness: 100, // Higher stiffness for stable hold
+        type: "spring",
+        stiffness: 100,
         damping: 30
       }
     };
@@ -127,7 +123,8 @@ export function BreathingGuide({
       )}>
         <div className="space-y-[30px]">
           <Select 
-            value={pattern.name.toLowerCase().replace(/\s+/g, '-')} 
+            value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
+            onValueChange={onPatternChange}
             className="h-[48px]"
           >
             <SelectTrigger>
@@ -174,7 +171,7 @@ export function BreathingGuide({
             "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
-          initial={{ scale: 0.285 }}
+          initial={{ scale: 0.4 }}
           animate={getBreathAnimation()}
         />
 
