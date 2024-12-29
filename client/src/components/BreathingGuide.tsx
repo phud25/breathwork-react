@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, type AnimationProps } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -65,7 +65,7 @@ export function BreathingGuide({
     if (sessionType === "duration") {
       const [minutes, seconds] = durationInput.split(":").map(Number);
       if (!isNaN(minutes) && !isNaN(seconds)) {
-        // Validation happens in handleDurationChange
+        console.log("Duration updated:", { minutes, seconds });
       }
     }
   }, [sessionType, durationInput]);
@@ -99,36 +99,54 @@ export function BreathingGuide({
     return phaseColors[getPhaseVariant() as keyof typeof phaseColors];
   };
 
-  const getPhaseAnimation = () => {
+  const getPhaseAnimation = (): AnimationProps => {
     const phase = getPhaseVariant();
     const phaseDuration = pattern.sequence[currentPhase];
     const isPostInhale = currentPhase === 1;
 
+    console.log("Animation phase:", { phase, phaseDuration, currentPhase });
+
+    if (!isActive || isPaused) {
+      return {
+        initial: { scale: 0.3 },
+        animate: { scale: 0.3 }
+      };
+    }
+
     if (phase === "inhale") {
       return {
-        scale: [0.3, 1],
-        transition: {
-          duration: phaseDuration,
-          ease: "easeInOut"
+        initial: { scale: 0.3 },
+        animate: {
+          scale: 1,
+          transition: {
+            duration: phaseDuration,
+            ease: "easeInOut"
+          }
         }
       };
     }
 
     if (phase === "exhale") {
       return {
-        scale: [1, 0.3],
-        transition: {
-          duration: phaseDuration,
-          ease: "easeInOut"
+        initial: { scale: 1 },
+        animate: {
+          scale: 0.3,
+          transition: {
+            duration: phaseDuration,
+            ease: "easeInOut"
+          }
         }
       };
     }
 
     // Hold phase
     return {
-      scale: isPostInhale ? 1 : 0.3,
-      transition: {
-        duration: phaseDuration
+      initial: { scale: isPostInhale ? 1 : 0.3 },
+      animate: {
+        scale: isPostInhale ? 1 : 0.3,
+        transition: {
+          duration: phaseDuration
+        }
       }
     };
   };
@@ -227,8 +245,7 @@ export function BreathingGuide({
             "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
-          initial={{ scale: 0.3 }}
-          animate={getPhaseAnimation()}
+          {...getPhaseAnimation()}
         />
 
         {/* Inner circle with content */}
