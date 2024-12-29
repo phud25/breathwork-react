@@ -31,6 +31,7 @@ interface BreathingGuideProps {
 }
 
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
+
 const phaseColors = {
   inhale: "from-purple-500/20 to-purple-600/40",
   exhale: "from-purple-600/40 to-purple-500/20",
@@ -76,14 +77,60 @@ export function BreathingGuide({
   };
 
   const getPhaseVariant = () => {
+    // Special case for 2-2 pattern
+    if (pattern.name.includes("2-2") && currentPhase === 1) {
+      return "exhale";
+    }
+
     if (currentPhase === 0) return "inhale";
     if (currentPhase === 2) return "exhale";
     return "hold";
   };
 
+  const getPhaseLabel = () => {
+    // Special case for 2-2 pattern
+    if (pattern.name.includes("2-2")) {
+      return currentPhase === 0 ? "Inhale" : "Exhale";
+    }
+    return phaseLabels[currentPhase];
+  };
+
   const getPhaseColor = () => {
+    return phaseColors[getPhaseVariant() as keyof typeof phaseColors];
+  };
+
+  const getPhaseAnimation = () => {
     const phase = getPhaseVariant();
-    return phaseColors[phase as keyof typeof phaseColors];
+    const phaseDuration = pattern.sequence[currentPhase];
+    const isPostInhale = currentPhase === 1;
+
+    if (phase === "inhale") {
+      return {
+        scale: [0.3, 1],
+        transition: {
+          duration: phaseDuration,
+          ease: "easeInOut"
+        }
+      };
+    }
+
+    if (phase === "exhale") {
+      return {
+        scale: [1, 0.3],
+        transition: {
+          duration: phaseDuration,
+          ease: "easeInOut"
+        }
+      };
+    }
+
+    // Hold phase
+    return {
+      scale: isPostInhale ? 1 : 0.3,
+      transition: {
+        duration: phaseDuration
+      }
+    };
   };
 
   const handleDurationChange = (value: string) => {
@@ -107,14 +154,14 @@ export function BreathingGuide({
 
   return (
     <div className={cn(
-      "flex flex-col items-center justify-center transition-all duration-500",
-      isZenMode ? "h-screen" : "min-h-[600px] py-8"
+      "flex flex-col items-center justify-center max-h-screen transition-all duration-500",
+      isZenMode ? "h-screen" : "min-h-[600px] py-4"
     )}>
       <div className={cn(
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-5">
+        <div className="space-y-4">
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
@@ -131,7 +178,7 @@ export function BreathingGuide({
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%] mb-5">
+          <div className="flex gap-[5%] mb-2">
             <Select
               value={sessionType}
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
@@ -170,7 +217,7 @@ export function BreathingGuide({
       </div>
 
       {/* Fixed size circle container */}
-      <div className="relative w-[300px] h-[300px] mt-5 mb-[15px] flex items-center justify-center">
+      <div className="relative w-[300px] h-[300px] mt-2 mb-[15px] flex items-center justify-center">
         {/* Outer static circle */}
         <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -181,17 +228,7 @@ export function BreathingGuide({
             getPhaseColor()
           )}
           initial={{ scale: 0.3 }}
-          animate={{
-            scale: getPhaseVariant() === "inhale" ? 1 : 0.3,
-            transition: {
-              duration: pattern.sequence[currentPhase],
-              ease: [0.4, 0, 0.2, 1],
-              type: "spring",
-              stiffness: 35,
-              damping: 25,
-              mass: 1.2
-            }
-          }}
+          animate={getPhaseAnimation()}
         />
 
         {/* Inner circle with content */}
@@ -202,7 +239,7 @@ export function BreathingGuide({
                 {countdown}
               </div>
               <div className="text-xs text-primary/80 font-semibold">
-                {phaseLabels[currentPhase]}
+                {getPhaseLabel()}
               </div>
             </div>
           ) : (
