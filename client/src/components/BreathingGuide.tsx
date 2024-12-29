@@ -69,6 +69,13 @@ export function BreathingGuide({
 
   const getCurrentScale = () => {
     if (!isActive || isPaused) return 1;
+    console.log('Getting scale for phase:', { 
+      phase: getPhaseVariant(), 
+      currentPhase, 
+      isActive, 
+      isPaused, 
+      countdown 
+    });
     const phase = getPhaseVariant();
     const minScale = 1;
     const maxScale = 1.85; 
@@ -138,6 +145,19 @@ export function BreathingGuide({
             damping: 15,
             mass: 1,
             duration: isActive && !isPaused ? pattern.sequence[currentPhase] : 0.5,
+          }}
+          onAnimationStart={() => {
+            console.log('Animation started:', { 
+              phase: getPhaseVariant(),
+              scale: getCurrentScale(),
+              duration: pattern.sequence[currentPhase]
+            });
+          }}
+          onAnimationComplete={() => {
+            console.log('Animation completed:', { 
+              phase: getPhaseVariant(),
+              scale: getCurrentScale()
+            });
           }}
         />
 
