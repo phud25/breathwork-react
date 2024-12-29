@@ -58,7 +58,8 @@ export function BreathingGuide({
 }: BreathingGuideProps) {
   const [sessionType, setSessionType] = useState<"breaths" | "duration">("breaths");
   const [breathCountState, setBreathCountState] = useState<number>(15);
-  const [durationInput, setDurationInput] = useState<string>("3:00");
+  const [durationMinutes, setDurationMinutes] = useState<number>(3);
+  const [durationSeconds, setDurationSeconds] = useState<number>(0);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -136,11 +137,17 @@ export function BreathingGuide({
     };
   };
 
-  const handleDurationChange = (value: string) => {
-    if (!/^\d{1,2}:\d{2}$/.test(value)) return;
-    const [minutes, seconds] = value.split(":").map(Number);
-    if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
-      setDurationInput(value);
+  const handleDurationMinutesChange = (value: string) => {
+    const minutes = parseInt(value, 10);
+    if (!isNaN(minutes) && minutes >= 1 && minutes <= 60) {
+      setDurationMinutes(minutes);
+    }
+  };
+
+  const handleDurationSecondsChange = (value: string) => {
+    const seconds = parseInt(value, 10);
+    if (!isNaN(seconds) && seconds >= 0 && seconds < 60) {
+      setDurationSeconds(seconds);
     }
   };
 
@@ -160,14 +167,14 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-[25px]">
+        <div className="space-y-4"> {/* Reduced spacing */}
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px]"
           >
             <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors text-white">
-              <SelectValue placeholder="Select Breathing Pattern" />
+              <SelectValue placeholder="Box Breathing (4x4)" className="text-white" />
             </SelectTrigger>
             <SelectContent className="bg-background border-input">
               <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
@@ -193,15 +200,25 @@ export function BreathingGuide({
             </Select>
 
             {sessionType === "duration" ? (
-              <Input 
-                type="text"
-                value={durationInput}
-                onChange={(e) => handleDurationChange(e.target.value)}
-                className="w-[45%] h-[48px] text-center bg-background"
-                placeholder="3:00"
-                min="1:00"
-                max="60:00"
-              />
+              <div className="w-[45%] flex gap-2">
+                <Input 
+                  type="number"
+                  value={durationMinutes}
+                  onChange={(e) => handleDurationMinutesChange(e.target.value)}
+                  className="w-1/2 h-[48px] text-center bg-background"
+                  min={1}
+                  max={60}
+                />
+                <span className="flex items-center text-white">:</span>
+                <Input 
+                  type="number"
+                  value={durationSeconds.toString().padStart(2, '0')}
+                  onChange={(e) => handleDurationSecondsChange(e.target.value)}
+                  className="w-1/2 h-[48px] text-center bg-background"
+                  min={0}
+                  max={59}
+                />
+              </div>
             ) : (
               <Input 
                 type="number"
@@ -213,95 +230,94 @@ export function BreathingGuide({
             )}
           </div>
         </div>
-      </div>
 
-      {/* Circle container */}
-      <div className="relative w-[300px] h-[300px] mt-2 mb-[15px] flex items-center justify-center">
-        <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
-        <motion.div
-          className={cn(
-            "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
-            getPhaseColor()
-          )}
-          {...getPhaseAnimation()}
-        />
-
-        <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
-          {isActive ? (
-            <div className="text-center pointer-events-none select-none">
-              <div className="text-xl font-mono text-primary font-bold">
-                {countdown}
-              </div>
-              <div className="text-xs text-primary/80 font-semibold">
-                {getPhaseLabel()}
-              </div>
-            </div>
-          ) : (
-            <Button
-              variant="ghost"
-              onClick={onStart}
-              className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
-            >
-              Start
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="w-full max-w-[600px]">
-        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
-          <span>Completed Breaths: {breathCount}</span>
-          <span>Time: {formatTime(elapsed)}</span>
-        </div>
-
-        <div className="flex items-center justify-center gap-[20px]">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent"
-          >
-            {isSoundEnabled ? (
-              <Volume2 className="h-4 w-4" />
-            ) : (
-              <VolumeX className="h-4 w-4" />
+        <div className="relative w-[300px] h-[300px] mt-2 mb-[15px] flex items-center justify-center">
+          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+          <motion.div
+            className={cn(
+              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+              getPhaseColor()
             )}
-          </Button>
+            {...getPhaseAnimation()}
+          />
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleZen}
-            className="h-[48px] hover:bg-transparent"
-          >
-            <Maximize2 className="h-4 w-4" />
-          </Button>
-
-          {isActive && (
-            <>
+          <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+            {isActive ? (
+              <div className="text-center pointer-events-none select-none">
+                <div className="text-xl font-mono text-primary font-bold">
+                  {countdown}
+                </div>
+                <div className="text-xs text-primary/80 font-semibold">
+                  {getPhaseLabel()}
+                </div>
+              </div>
+            ) : (
               <Button
-                variant="outline"
-                size="icon"
-                onClick={isPaused ? onResume : onPause}
-                className="h-[48px] hover:bg-transparent"
+                variant="ghost"
+                onClick={onStart}
+                className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
               >
-                {isPaused ? (
-                  <Play className="h-4 w-4" />
-                ) : (
-                  <Pause className="h-4 w-4" />
-                )}
+                Start
               </Button>
+            )}
+          </div>
+        </div>
 
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={onStop}
-                className="h-[48px]"
-              >
-                <Square className="h-4 w-4" />
-              </Button>
-            </>
-          )}
+        <div className="w-full max-w-[600px]">
+          <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
+            <span>Completed Breaths: {breathCount}</span>
+            <span>Time: {formatTime(elapsed)}</span>
+          </div>
+
+          <div className="flex items-center justify-center gap-[20px]">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleSound}
+              className="h-[48px] hover:bg-transparent"
+            >
+              {isSoundEnabled ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleZen}
+              className="h-[48px] hover:bg-transparent"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+
+            {isActive && (
+              <>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={isPaused ? onResume : onPause}
+                  className="h-[48px] hover:bg-transparent"
+                >
+                  {isPaused ? (
+                    <Play className="h-4 w-4" />
+                  ) : (
+                    <Pause className="h-4 w-4" />
+                  )}
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={onStop}
+                  className="h-[48px]"
+                >
+                  <Square className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
