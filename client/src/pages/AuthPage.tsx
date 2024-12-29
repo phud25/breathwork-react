@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { insertUserSchema } from "@db/schema";
+import type { InsertUser } from "@db/schema";
 
 export default function AuthPage() {
   const { login, register: registerUser } = useUser();
@@ -18,7 +19,7 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
 
-  const form = useForm({
+  const form = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
@@ -28,10 +29,14 @@ export default function AuthPage() {
     }
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: InsertUser) => {
     setIsLoading(true);
     try {
-      const result = await (activeTab === "login" ? login(data) : registerUser(data));
+      const result = await (activeTab === "login" 
+        ? login({ username: data.username, password: data.password })
+        : registerUser(data)
+      );
+
       if (!result.ok) {
         toast({
           variant: "destructive",
@@ -63,7 +68,10 @@ export default function AuthPage() {
             <CardTitle className="text-2xl text-center text-primary">Breathwork</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
+            <Tabs value={activeTab} onValueChange={(value) => {
+              setActiveTab(value as "login" | "register");
+              form.reset();
+            }}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
@@ -129,6 +137,7 @@ export default function AuthPage() {
                       </FormItem>
                     )}
                   />
+
                   <Button 
                     type="submit" 
                     className="w-full"

@@ -11,7 +11,7 @@ type RequestResult = {
 async function handleRequest(
   url: string,
   method: string,
-  body?: InsertUser
+  body?: Partial<InsertUser>
 ): Promise<RequestResult> {
   try {
     const response = await fetch(url, {
@@ -37,51 +37,52 @@ async function handleRequest(
 }
 
 async function fetchUser(): Promise<SelectUser | null> {
-  const response = await fetch('/api/user', {
-    credentials: 'include'
-  });
+  try {
+    const response = await fetch('/api/user', {
+      credentials: 'include'
+    });
 
-  if (!response.ok) {
-    if (response.status === 401) {
-      return null;
+    if (!response.ok) {
+      if (response.status === 401) {
+        return null;
+      }
+
+      throw new Error(`${response.status}: ${await response.text()}`);
     }
 
-    if (response.status >= 500) {
-      throw new Error(`${response.status}: ${response.statusText}`);
-    }
-
-    throw new Error(`${response.status}: ${await response.text()}`);
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return null;
   }
-
-  return response.json();
 }
 
 export function useUser() {
   const queryClient = useQueryClient();
 
-  const { data: user, error, isLoading } = useQuery<SelectUser | null, Error>({
+  const { data: user, error, isLoading } = useQuery<SelectUser | null>({
     queryKey: ['user'],
     queryFn: fetchUser,
     staleTime: Infinity,
     retry: false
   });
 
-  const loginMutation = useMutation<RequestResult, Error, InsertUser>({
-    mutationFn: (userData) => handleRequest('/api/login', 'POST', userData),
+  const loginMutation = useMutation({
+    mutationFn: (userData: Partial<InsertUser>) => handleRequest('/api/login', 'POST', userData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
 
-  const logoutMutation = useMutation<RequestResult, Error>({
+  const logoutMutation = useMutation({
     mutationFn: () => handleRequest('/api/logout', 'POST'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
 
-  const registerMutation = useMutation<RequestResult, Error, InsertUser>({
-    mutationFn: (userData) => handleRequest('/api/register', 'POST', userData),
+  const registerMutation = useMutation({
+    mutationFn: (userData: Partial<InsertUser>) => handleRequest('/api/register', 'POST', userData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
