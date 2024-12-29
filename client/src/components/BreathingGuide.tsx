@@ -68,9 +68,10 @@ export function BreathingGuide({
   };
 
   const getCurrentScale = () => {
+    if (!isActive || isPaused) return 1;
     const phase = getPhaseVariant();
     const minScale = 1;
-    const maxScale = 1.12; 
+    const maxScale = 1.85; 
     if (phase === "inhale") return maxScale;
     if (phase === "exhale") return minScale;
     return currentPhase === 1 ? maxScale : minScale;
@@ -85,7 +86,7 @@ export function BreathingGuide({
         "w-full max-w-md mb-12",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-[30px]"> 
+        <div className="space-y-[30px]">
           <Select defaultValue="478">
             <SelectTrigger>
               <SelectValue placeholder="Select Breathing Pattern" />
