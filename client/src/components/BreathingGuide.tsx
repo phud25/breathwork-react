@@ -33,29 +33,6 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
-const breathTransition = {
-  inhale: {
-    scale: [1, 1.8],
-    transition: {
-      duration: 4,
-      ease: [0.4, 0, 0.2, 1]
-    }
-  },
-  exhale: {
-    scale: [1.8, 1],
-    transition: {
-      duration: 8,
-      ease: [0.4, 0, 0.2, 1]
-    }
-  },
-  hold: {
-    scale: 1.8,
-    transition: {
-      duration: 7
-    }
-  }
-};
-
 export function BreathingGuide({ 
   pattern, 
   isActive, 
@@ -90,9 +67,25 @@ export function BreathingGuide({
     return phaseColors[phase as keyof typeof phaseColors];
   };
 
-  const getBreathTransition = () => {
+  const getCurrentScale = () => {
+    if (!isActive || isPaused) return 1;
+
+    // Calculate exact progress based on countdown
+    const totalCount = pattern.sequence[currentPhase];
+    const progress = (totalCount - countdown) / totalCount;
+
+    // Map progress to circle size
+    const minScale = 0.357; // 100px / 280px
+    const maxScale = 0.928; // 260px / 280px
+
     const phase = getPhaseVariant();
-    return breathTransition[phase as keyof typeof breathTransition];
+    if (phase === "inhale") {
+      return minScale + (progress * (maxScale - minScale));
+    }
+    if (phase === "exhale") {
+      return maxScale - (progress * (maxScale - minScale));
+    }
+    return phase === "hold" ? maxScale : minScale;
   };
 
   return (
@@ -105,6 +98,7 @@ export function BreathingGuide({
         isZenMode && "hidden"
       )}>
         <div className="space-y-[30px]">
+          {/* Single pattern selector */}
           <Select defaultValue="478" className="h-[48px]">
             <SelectTrigger>
               <SelectValue placeholder="Select Breathing Pattern" />
@@ -138,9 +132,10 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="relative w-[400px] h-[400px] mt-[50px] mb-[50px] flex items-center justify-center">
+      {/* Fixed size circle container */}
+      <div className="relative w-[300px] h-[300px] mt-[50px] mb-[50px] flex items-center justify-center">
         {/* Outer static circle */}
-        <div className="absolute w-[360px] h-[360px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+        <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
         {/* Middle animated circle */}
         <motion.div
@@ -149,43 +144,43 @@ export function BreathingGuide({
             getPhaseColor()
           )}
           initial={false}
-          animate={getBreathTransition()}
+          animate={{
+            scale: getCurrentScale(),
+          }}
           transition={{
             type: "spring",
             stiffness: 30,
             damping: 20,
             mass: 1,
-            crossfade: true,
-            ease: "anticipate"
+            duration: 1, // Exactly 1 second per count
+            ease: "linear"
           }}
         />
 
         {/* Inner circle with content */}
-        <div className="relative w-[120px] h-[120px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
-          <div className="w-[100px] h-[100px] flex items-center justify-center">
-            {isActive ? (
-              <div className="text-center pointer-events-none select-none">
-                <div className="text-2xl font-mono text-primary font-bold">
-                  {countdown}
-                </div>
-                <div className="text-xs text-primary/80 font-semibold">
-                  {phaseLabels[currentPhase]}
-                </div>
+        <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+          {isActive ? (
+            <div className="text-center pointer-events-none select-none">
+              <div className="text-xl font-mono text-primary font-bold">
+                {countdown}
               </div>
-            ) : (
-              <Button
-                variant="ghost"
-                onClick={onStart}
-                className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
-              >
-                Start
-              </Button>
-            )}
-          </div>
+              <div className="text-xs text-primary/80 font-semibold">
+                {phaseLabels[currentPhase]}
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={onStart}
+              className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
+            >
+              Start
+            </Button>
+          )}
         </div>
       </div>
 
-      <div className="w-full max-w-[600px] mt-[40px]">
+      <div className="w-full max-w-[600px]">
         <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
