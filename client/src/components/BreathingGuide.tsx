@@ -38,9 +38,9 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
-export function BreathingGuide({ 
-  pattern, 
-  isActive, 
+export function BreathingGuide({
+  pattern,
+  isActive,
   currentPhase,
   isPaused = false,
   isZenMode = false,
@@ -135,95 +135,93 @@ export function BreathingGuide({
   return (
     <div className={cn(
       "flex flex-col items-center justify-center max-h-screen transition-all duration-500",
-      isZenMode ? "h-screen" : "min-h-[600px] py-4"
+      isZenMode ? "h-screen" : "min-h-[600px]"
     )}>
       <div className={cn(
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-4">
-          <Select 
-            value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
-            onValueChange={(value) => onPatternChange(value as PatternType)}
-            defaultValue="box"
+        <Select
+          value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
+          onValueChange={(value) => onPatternChange(value as PatternType)}
+          defaultValue="box"
+        >
+          <SelectTrigger className="h-[48px] bg-background border-input hover:border-primary/50 transition-colors">
+            <SelectValue placeholder="Box Breathing (4x4)" className="text-primary" />
+          </SelectTrigger>
+          <SelectContent className="bg-background border-input">
+            <SelectItem value="478" className="text-primary hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+            <SelectItem value="box" className="text-primary hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+            <SelectItem value="22" className="text-primary hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+            <SelectItem value="555" className="text-primary hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="flex gap-[5%] mt-4">
+          <Select
+            value={sessionType}
+            onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
+            className="w-[50%]"
+            defaultValue="breaths"
           >
-            <SelectTrigger className="h-[48px] bg-background border-input hover:border-primary/50 transition-colors">
-              <SelectValue placeholder="Box Breathing (4x4)" className="text-foreground" />
+            <SelectTrigger className="h-[48px] bg-background border-input hover:border-primary/50">
+              <SelectValue placeholder="Session Type" className="text-primary" />
             </SelectTrigger>
             <SelectContent className="bg-background border-input">
-              <SelectItem value="478" className="text-foreground hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-              <SelectItem value="box" className="text-foreground hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-              <SelectItem value="22" className="text-foreground hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-              <SelectItem value="555" className="text-foreground hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+              <SelectItem value="breaths" className="text-primary hover:bg-primary/10">By Breath Count</SelectItem>
+              <SelectItem value="duration" className="text-primary hover:bg-primary/10">By Duration</SelectItem>
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%]">
-            <Select
-              value={sessionType}
-              onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
-              className="w-[50%]"
-              defaultValue="breaths"
-            >
-              <SelectTrigger className="h-[48px] bg-background border-input hover:border-primary/50">
-                <SelectValue placeholder="Session Type" className="text-foreground" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-input">
-                <SelectItem value="breaths" className="text-foreground hover:bg-primary/10">By Breath Count</SelectItem>
-                <SelectItem value="duration" className="text-foreground hover:bg-primary/10">By Duration</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {sessionType === "duration" ? (
-              <div className="w-[45%] flex gap-2">
-                <Input 
-                  type="number"
-                  value={durationMinutes}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value) && value >= 1 && value <= 60) {
-                      setDurationMinutes(value);
-                    }
-                  }}
-                  className="w-1/2 h-[48px] text-center bg-background text-foreground"
-                  min={1}
-                  max={60}
-                />
-                <span className="flex items-center text-foreground">:</span>
-                <Input 
-                  type="number"
-                  value={durationSeconds.toString().padStart(2, '0')}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value) && value >= 0 && value < 60) {
-                      setDurationSeconds(value);
-                    }
-                  }}
-                  className="w-1/2 h-[48px] text-center bg-background text-foreground"
-                  min={0}
-                  max={59}
-                />
-              </div>
-            ) : (
-              <Input 
+          {sessionType === "duration" ? (
+            <div className="w-[45%] flex gap-2">
+              <Input
                 type="number"
-                value={breathCountState}
+                value={durationMinutes}
                 onChange={(e) => {
                   const value = parseInt(e.target.value, 10);
-                  if (!isNaN(value) && value >= 1) {
-                    setBreathCountState(value);
+                  if (!isNaN(value) && value >= 1 && value <= 60) {
+                    setDurationMinutes(value);
                   }
                 }}
-                className="w-[45%] h-[48px] text-center bg-background text-foreground"
+                className="w-1/2 h-[48px] text-center bg-background text-foreground"
                 min={1}
+                max={60}
               />
-            )}
-          </div>
+              <span className="flex items-center text-foreground">:</span>
+              <Input
+                type="number"
+                value={durationSeconds.toString().padStart(2, '0')}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value, 10);
+                  if (!isNaN(value) && value >= 0 && value < 60) {
+                    setDurationSeconds(value);
+                  }
+                }}
+                className="w-1/2 h-[48px] text-center bg-background text-foreground"
+                min={0}
+                max={59}
+              />
+            </div>
+          ) : (
+            <Input
+              type="number"
+              value={breathCountState}
+              onChange={(e) => {
+                const value = parseInt(e.target.value, 10);
+                if (!isNaN(value) && value >= 1) {
+                  setBreathCountState(value);
+                }
+              }}
+              className="w-[45%] h-[48px] text-center bg-background text-foreground"
+              min={1}
+            />
+          )}
         </div>
 
-        <div className="flex justify-center items-center my-8">
+        <div className="flex justify-center items-center my-6">
           <div className="relative w-[300px] h-[300px] mx-auto">
-            <motion.div 
+            <motion.div
               className="absolute inset-0 m-auto w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20"
             />
             <motion.div
@@ -256,13 +254,13 @@ export function BreathingGuide({
           </div>
         </div>
 
-        <div className="w-full max-w-[600px] mt-6">
+        <div className="w-full max-w-[600px]">
           <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
             <span>Completed Breaths: {breathCount}</span>
             <span>Time: {formatTime(elapsed)}</span>
           </div>
 
-          <div className="flex items-center justify-center gap-[20px]">
+          <div className="flex items-center justify-center gap-4">
             <Button
               variant="outline"
               size="icon"
@@ -318,8 +316,7 @@ export function BreathingGuide({
         <div className="fixed inset-0 bg-background">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative w-[300px] h-[300px] mx-auto">
-              {/* Copy of the breathing animation for zen mode */}
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 m-auto w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20"
               />
               <motion.div

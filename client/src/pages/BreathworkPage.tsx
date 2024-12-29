@@ -1,11 +1,13 @@
 import { useState, useCallback } from "react";
 import { BreathingGuide } from "@/components/BreathingGuide";
 import { ProgressChart } from "@/components/ProgressChart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useUser } from "@/hooks/use-user";
 import { useBreathing } from "@/hooks/use-breathing";
 import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type PatternType = "478" | "box" | "22" | "555";
 
@@ -51,20 +53,23 @@ export default function BreathworkPage() {
       isZenMode ? "p-0" : "p-4"
     )}>
       <div className={cn(
-        "max-w-4xl mx-auto space-y-6",
+        "max-w-4xl mx-auto space-y-4",
         isZenMode && "hidden"
       )}>
         <header className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">Welcome, {user?.firstName}</h1>
+          <h1 className="text-xl font-semibold text-primary">Breath Session</h1>
+          <div className="flex items-center gap-4">
+            <span className="text-lg text-primary">Welcome, {user?.firstName}</span>
+            <Button variant="ghost" size="icon">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </div>
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle>Breath Session</CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <BreathingGuide 
                   pattern={breathingPatterns[selectedPattern]}
                   isActive={isActive}
@@ -87,11 +92,8 @@ export default function BreathworkPage() {
             </Card>
           </ErrorBoundary>
 
-          <Card className={cn(isZenMode && "hidden")}>
-            <CardHeader>
-              <CardTitle>Your Progress</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Card>
+            <CardContent className="pt-6">
               <ProgressChart />
             </CardContent>
           </Card>
