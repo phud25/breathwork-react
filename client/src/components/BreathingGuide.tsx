@@ -69,9 +69,11 @@ export function BreathingGuide({
 
   const getCurrentScale = () => {
     const phase = getPhaseVariant();
-    if (phase === "inhale") return 1.15; // Reduced maximum scale to stay within bounds
-    if (phase === "exhale") return 1;
-    return currentPhase === 1 ? 1.15 : 1;
+    const minScale = 1;
+    const maxScale = 1.12; // Reduced maximum scale for smoother animation
+    if (phase === "inhale") return maxScale;
+    if (phase === "exhale") return minScale;
+    return currentPhase === 1 ? maxScale : minScale;
   };
 
   return (
@@ -84,7 +86,18 @@ export function BreathingGuide({
         "w-full max-w-md mb-12",
         isZenMode && "hidden"
       )}>
-        <div className="mb-[30px]">
+        <div className="space-y-[30px]"> {/* Exact 30px spacing */}
+          <Select defaultValue="breaths">
+            <SelectTrigger>
+              <SelectValue placeholder="Pattern Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="478">4-7-8 Relaxation</SelectItem>
+              <SelectItem value="box">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="555">5-5-5 Triangle</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Select defaultValue="breaths">
             <SelectTrigger>
               <SelectValue placeholder="Session Type" />
@@ -94,15 +107,15 @@ export function BreathingGuide({
               <SelectItem value="duration">By Duration</SelectItem>
             </SelectContent>
           </Select>
-        </div>
 
-        <Input 
-          type="number" 
-          placeholder="Enter breath count"
-          defaultValue="15"
-          className="text-center"
-          min={1}
-        />
+          <Input 
+            type="number" 
+            placeholder="Enter breath count"
+            defaultValue="15"
+            className="text-center"
+            min={1}
+          />
+        </div>
       </div>
 
       {/* Breathing Circle */}
@@ -119,25 +132,26 @@ export function BreathingGuide({
           initial={false}
           animate={isActive && !isPaused ? {
             scale: getCurrentScale(),
-            opacity: 0.5
           } : { 
-            scale: 1, 
-            opacity: 0.4 
+            scale: 1,
           }}
           transition={{
+            type: "spring",
+            stiffness: 25,
+            damping: 15,
+            mass: 1,
             duration: isActive && !isPaused ? pattern.sequence[currentPhase] : 0.5,
-            ease: "linear"
           }}
         />
 
-        {/* Inner circle with content */}
-        <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+        {/* Inner circle with content - reduced size */}
+        <div className="relative w-36 h-36 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
           {isActive ? (
             <div className="text-center pointer-events-none select-none">
-              <div className="text-4xl font-mono text-primary font-bold mb-2">
+              <div className="text-3xl font-mono text-primary font-bold mb-1">
                 {countdown}
               </div>
-              <div className="text-lg text-primary/80 font-semibold">
+              <div className="text-sm text-primary/80 font-semibold">
                 {phaseLabels[currentPhase]}
               </div>
             </div>
@@ -145,9 +159,9 @@ export function BreathingGuide({
             <Button
               variant="ghost"
               onClick={onStart}
-              className="text-xl text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
+              className="text-lg text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
             >
-              Start Session
+              Start
             </Button>
           )}
         </div>
