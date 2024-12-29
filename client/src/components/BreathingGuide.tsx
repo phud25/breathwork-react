@@ -67,25 +67,53 @@ export function BreathingGuide({
     return phaseColors[phase as keyof typeof phaseColors];
   };
 
-  const getCurrentScale = () => {
-    if (!isActive || isPaused) return 1;
-
-    // Calculate exact progress based on countdown
-    const totalCount = pattern.sequence[currentPhase];
-    const progress = (totalCount - countdown) / totalCount;
-
-    // Map progress to circle size
-    const minScale = 0.357; // 100px / 280px
-    const maxScale = 0.928; // 260px / 280px
+  // Calculate animation parameters based on current phase
+  const getBreathAnimation = () => {
+    if (!isActive || isPaused) return { scale: 1 };
 
     const phase = getPhaseVariant();
+    const minScale = 0.285; // 80px / 280px
+    const maxScale = 1.0; // 280px / 280px
+
+    // Calculate progress for smooth transitions
+    const progress = (pattern.sequence[currentPhase] - countdown) / pattern.sequence[currentPhase];
+
     if (phase === "inhale") {
-      return minScale + (progress * (maxScale - minScale));
+      return {
+        scale: minScale + (progress * (maxScale - minScale)),
+        transition: {
+          type: "spring",
+          duration: 1, // Exactly 1 second per count
+          stiffness: 25,
+          damping: 20,
+          mass: 1
+        }
+      };
     }
+
     if (phase === "exhale") {
-      return maxScale - (progress * (maxScale - minScale));
+      return {
+        scale: maxScale - (progress * (maxScale - minScale)),
+        transition: {
+          type: "spring",
+          duration: 1,
+          stiffness: 25,
+          damping: 20,
+          mass: 1
+        }
+      };
     }
-    return phase === "hold" ? maxScale : minScale;
+
+    // Hold phase
+    return {
+      scale: maxScale,
+      transition: {
+        type: "spring",
+        duration: 1,
+        stiffness: 100, // Higher stiffness for stable hold
+        damping: 30
+      }
+    };
   };
 
   return (
@@ -98,14 +126,17 @@ export function BreathingGuide({
         isZenMode && "hidden"
       )}>
         <div className="space-y-[30px]">
-          {/* Single pattern selector */}
-          <Select defaultValue="478" className="h-[48px]">
+          <Select 
+            value={pattern.name.toLowerCase().replace(/\s+/g, '-')} 
+            className="h-[48px]"
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select Breathing Pattern" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="478">4-7-8 Relaxation</SelectItem>
               <SelectItem value="box">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="22">2-2 Energized Focus</SelectItem>
               <SelectItem value="555">5-5-5 Triangle</SelectItem>
             </SelectContent>
           </Select>
@@ -143,18 +174,8 @@ export function BreathingGuide({
             "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
-          initial={false}
-          animate={{
-            scale: getCurrentScale(),
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 30,
-            damping: 20,
-            mass: 1,
-            duration: 1, // Exactly 1 second per count
-            ease: "linear"
-          }}
+          initial={{ scale: 0.285 }}
+          animate={getBreathAnimation()}
         />
 
         {/* Inner circle with content */}
