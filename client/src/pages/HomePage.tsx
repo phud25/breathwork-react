@@ -70,8 +70,8 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardHeader>
-                <CardTitle>Breathing Exercise</CardTitle>
+              <CardHeader className="pb-[15px]">
+                <CardTitle>Breath Session</CardTitle>
               </CardHeader>
               <CardContent>
                 <BreathingGuide 

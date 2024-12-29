@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,10 @@ export function BreathingGuide({
   onToggleSound,
   onPatternChange
 }: BreathingGuideProps) {
+  const [sessionType, setSessionType] = useState<"breaths" | "duration">("breaths");
+  const [durationMinutes, setDurationMinutes] = useState(3);
+  const [durationSeconds, setDurationSeconds] = useState(0);
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -69,47 +74,27 @@ export function BreathingGuide({
     return phaseColors[phase as keyof typeof phaseColors];
   };
 
-  // Animation configuration based on current phase
-  const getBreathAnimation = () => {
-    if (!isActive || isPaused) return { scale: 0.4 };
-
-    const phase = getPhaseVariant();
-    const progress = (pattern.sequence[currentPhase] - countdown) / pattern.sequence[currentPhase];
-
-    if (phase === "inhale") {
-      return {
-        scale: 0.4 + (progress * 0.6), // 0.4 to 1.0
-        transition: {
-          duration: 1, // Exactly 1 second per count
-          type: "spring",
-          stiffness: 25,
-          damping: 20
-        }
-      };
-    }
-
-    if (phase === "exhale") {
-      return {
-        scale: 1.0 - (progress * 0.6), // 1.0 to 0.4
-        transition: {
-          duration: 1,
-          type: "spring",
-          stiffness: 25,
-          damping: 20
-        }
-      };
-    }
-
-    // Hold phase
-    return {
-      scale: phase === "inhale" ? 1.0 : 0.4,
+  const circleAnimation = {
+    initial: { scale: 0.3 },
+    animate: {
+      scale: getPhaseVariant() === "inhale" ? 1 : 0.3,
       transition: {
-        duration: 1,
+        duration: pattern.sequence[currentPhase],
+        ease: [0.4, 0, 0.2, 1],
         type: "spring",
-        stiffness: 100,
-        damping: 30
+        stiffness: 35,
+        damping: 25,
+        mass: 1.2
       }
-    };
+    }
+  };
+
+  const handleDurationChange = (value: string) => {
+    const [minutes, seconds] = value.split(":").map(Number);
+    if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
+      setDurationMinutes(minutes);
+      setDurationSeconds(seconds);
+    }
   };
 
   return (
@@ -121,47 +106,63 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-[30px]">
+        <div className="space-y-5">
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={onPatternChange}
             className="h-[48px]"
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors">
               <SelectValue placeholder="Select Breathing Pattern" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="478">4-7-8 Relaxation</SelectItem>
-              <SelectItem value="box">Box Breathing (4x4)</SelectItem>
-              <SelectItem value="22">2-2 Energized Focus</SelectItem>
-              <SelectItem value="555">5-5-5 Triangle</SelectItem>
+            <SelectContent className="bg-background border-input">
+              <SelectItem value="478" className="hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+              <SelectItem value="box" className="hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="22" className="hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+              <SelectItem value="555" className="hover:bg-primary/10">5-5-5 Triangle</SelectItem>
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%]">
-            <Select defaultValue="breaths" className="w-[50%] h-[48px]">
-              <SelectTrigger>
+          <div className="flex gap-[5%] mb-5">
+            <Select
+              value={sessionType}
+              onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
+              className="w-[50%] h-[48px]"
+            >
+              <SelectTrigger className="bg-background border-input hover:border-primary/50">
                 <SelectValue placeholder="Session Type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-input">
                 <SelectItem value="breaths">By Breath Count</SelectItem>
                 <SelectItem value="duration">By Duration</SelectItem>
               </SelectContent>
             </Select>
 
-            <Input 
-              type="number" 
-              placeholder="Enter count"
-              defaultValue="15"
-              className="w-[45%] h-[48px] text-center"
-              min={1}
-            />
+            {sessionType === "duration" ? (
+              <Input 
+                type="text"
+                value={`${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`}
+                onChange={(e) => handleDurationChange(e.target.value)}
+                className="w-[45%] h-[48px] text-center bg-background"
+                min="1:00"
+                max="60:00"
+                pattern="\d{1,2}:\d{2}"
+              />
+            ) : (
+              <Input 
+                type="number"
+                placeholder="Enter count"
+                defaultValue="15"
+                className="w-[45%] h-[48px] text-center bg-background"
+                min={1}
+              />
+            )}
           </div>
         </div>
       </div>
 
       {/* Fixed size circle container */}
-      <div className="relative w-[300px] h-[300px] mt-[50px] mb-[50px] flex items-center justify-center">
+      <div className="relative w-[300px] h-[300px] mt-5 mb-[15px] flex items-center justify-center">
         {/* Outer static circle */}
         <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -171,8 +172,8 @@ export function BreathingGuide({
             "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
-          initial={{ scale: 0.4 }}
-          animate={getBreathAnimation()}
+          initial={circleAnimation.initial}
+          animate={circleAnimation.animate}
         />
 
         {/* Inner circle with content */}
