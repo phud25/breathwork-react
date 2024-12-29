@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface BreathingGuideProps {
@@ -54,21 +56,6 @@ export function BreathingGuide({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const circleVariants = {
-    inhale: {
-      scale: 2,
-      transition: { duration: pattern.sequence[currentPhase], ease: "easeInOut" }
-    },
-    exhale: {
-      scale: 1,
-      transition: { duration: pattern.sequence[currentPhase], ease: "easeInOut" }
-    },
-    hold: {
-      scale: currentPhase === 1 ? 2 : 1,
-      transition: { duration: pattern.sequence[currentPhase] }
-    }
-  };
-
   const getPhaseVariant = () => {
     if (currentPhase === 0) return "inhale";
     if (currentPhase === 2) return "exhale";
@@ -80,48 +67,82 @@ export function BreathingGuide({
     return phaseColors[phase as keyof typeof phaseColors];
   };
 
+  const getCurrentScale = () => {
+    const phase = getPhaseVariant();
+    if (phase === "inhale") return 1.5;
+    if (phase === "exhale") return 1;
+    return currentPhase === 1 ? 1.5 : 1; // Hold scale based on whether it's after inhale or exhale
+  };
+
   return (
     <div className={cn(
       "flex flex-col items-center justify-center transition-all duration-500",
-      isZenMode ? "h-screen" : "h-[400px]"
+      isZenMode ? "h-screen" : "min-h-[600px]"
     )}>
-      <div className="relative">
+      {/* Session Configuration */}
+      <div className={cn(
+        "w-full max-w-md space-y-4 mb-8",
+        isZenMode && "hidden"
+      )}>
+        <Select defaultValue="breaths">
+          <SelectTrigger>
+            <SelectValue placeholder="Session Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="breaths">By Breath Count</SelectItem>
+            <SelectItem value="duration">By Duration</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Input 
+          type="number" 
+          placeholder="Enter breath count or duration" 
+          className="text-center"
+          min={1}
+        />
+      </div>
+
+      {/* Breathing Circle */}
+      <div className="relative flex items-center justify-center">
         {/* Outer static circle */}
-        <div className="absolute w-48 h-48 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+        <div className="absolute w-64 h-64 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
         {/* Middle animated circle */}
         <motion.div
           className={cn(
-            "absolute w-40 h-40 rounded-full bg-gradient-to-r",
+            "absolute w-56 h-56 rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
           initial={false}
           animate={isActive && !isPaused ? {
-            scale: getPhaseVariant() === "inhale" ? 1.5 : 1,
-            opacity: [0.4, 0.6, 0.4]
-          } : { scale: 1, opacity: 0.4 }}
+            scale: getCurrentScale(),
+            opacity: 0.5
+          } : { 
+            scale: 1, 
+            opacity: 0.4 
+          }}
           transition={{
             duration: isActive && !isPaused ? pattern.sequence[currentPhase] : 0.5,
             ease: "easeInOut"
           }}
         />
 
-        {/* Inner static circle */}
-        <div className="relative w-32 h-32 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+        {/* Inner circle with content */}
+        <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.div
-              key={isActive ? `${currentPhase}-${countdown}` : 'ready'}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              key={isActive ? `phase-${currentPhase}-count-${countdown}` : 'ready'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="text-center"
             >
               {isActive ? (
                 <>
-                  <div className="text-3xl font-mono text-primary font-bold">
+                  <div className="text-4xl font-mono text-primary font-bold mb-2">
                     {countdown}
                   </div>
-                  <div className="text-sm text-primary/80 font-semibold">
+                  <div className="text-lg text-primary/80 font-semibold">
                     {phaseLabels[currentPhase]}
                   </div>
                 </>
@@ -129,7 +150,7 @@ export function BreathingGuide({
                 <Button
                   variant="ghost"
                   onClick={onStart}
-                  className="text-primary hover:text-primary/80"
+                  className="text-xl text-primary hover:text-primary/80"
                 >
                   Start Session
                 </Button>
@@ -139,19 +160,15 @@ export function BreathingGuide({
         </div>
       </div>
 
-      {/* Session info and controls */}
-      <div className="mt-8 space-y-4 text-center">
-        <div className="text-sm text-primary/80 font-mono">
-          {formatTime(elapsed)}
+      {/* Status Display */}
+      <div className="w-full max-w-md mt-8">
+        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
+          <span>Completed Breaths: {breathCount}</span>
+          <span>Time: {formatTime(elapsed)}</span>
         </div>
 
-        {isActive && (
-          <div className="text-sm text-primary/80">
-            Completed Breaths: {breathCount}
-          </div>
-        )}
-
-        <div className="flex items-center justify-center gap-2">
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-4">
           <Button
             variant="outline"
             size="icon"
