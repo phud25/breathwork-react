@@ -49,25 +49,36 @@ export function useBreathing(sequence: number[]) {
     });
   }, [isActive, isPaused, sequence.length]);
 
-  // Countdown timer
+  // Countdown timer with exact 1-second intervals
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
     if (isActive && !isPaused) {
       setCountdown(sequence[currentPhase]);
 
-      timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            progressSequence();
-            return sequence[currentPhase];
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      const startTime = Date.now();
+      const interval = 1000; // 1 second
+
+      const tick = () => {
+        const elapsed = Date.now() - startTime;
+        const remaining = interval - (elapsed % interval);
+
+        timer = setTimeout(() => {
+          setCountdown((prev) => {
+            if (prev <= 1) {
+              progressSequence();
+              return sequence[currentPhase];
+            }
+            return prev - 1;
+          });
+          tick();
+        }, remaining);
+      };
+
+      tick();
     }
 
-    return () => clearInterval(timer);
+    return () => clearTimeout(timer);
   }, [isActive, isPaused, currentPhase, sequence, progressSequence]);
 
   // Update elapsed time

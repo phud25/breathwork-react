@@ -69,19 +69,19 @@ export function BreathingGuide({
 
   const getCurrentScale = () => {
     const phase = getPhaseVariant();
-    if (phase === "inhale") return 1.5;
+    if (phase === "inhale") return 1.25;
     if (phase === "exhale") return 1;
-    return currentPhase === 1 ? 1.5 : 1; // Hold scale based on whether it's after inhale or exhale
+    return currentPhase === 1 ? 1.25 : 1;
   };
 
   return (
     <div className={cn(
       "flex flex-col items-center justify-center transition-all duration-500",
-      isZenMode ? "h-screen" : "min-h-[600px]"
+      isZenMode ? "h-screen" : "min-h-[600px] py-8"
     )}>
       {/* Session Configuration */}
       <div className={cn(
-        "w-full max-w-md space-y-4 mb-8",
+        "w-full max-w-md space-y-4 mb-12",
         isZenMode && "hidden"
       )}>
         <Select defaultValue="breaths">
@@ -96,14 +96,15 @@ export function BreathingGuide({
 
         <Input 
           type="number" 
-          placeholder="Enter breath count or duration" 
+          placeholder="Enter breath count"
+          defaultValue="15"
           className="text-center"
           min={1}
         />
       </div>
 
       {/* Breathing Circle */}
-      <div className="relative flex items-center justify-center">
+      <div className="relative flex items-center justify-center mb-12">
         {/* Outer static circle */}
         <div className="absolute w-64 h-64 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -123,45 +124,35 @@ export function BreathingGuide({
           }}
           transition={{
             duration: isActive && !isPaused ? pattern.sequence[currentPhase] : 0.5,
-            ease: "easeInOut"
+            ease: "linear"
           }}
         />
 
         {/* Inner circle with content */}
         <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={isActive ? `phase-${currentPhase}-count-${countdown}` : 'ready'}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-center"
+          {isActive ? (
+            <div className="text-center">
+              <div className="text-4xl font-mono text-primary font-bold mb-2">
+                {countdown}
+              </div>
+              <div className="text-lg text-primary/80 font-semibold">
+                {phaseLabels[currentPhase]}
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={onStart}
+              className="text-xl text-primary hover:text-primary/80"
             >
-              {isActive ? (
-                <>
-                  <div className="text-4xl font-mono text-primary font-bold mb-2">
-                    {countdown}
-                  </div>
-                  <div className="text-lg text-primary/80 font-semibold">
-                    {phaseLabels[currentPhase]}
-                  </div>
-                </>
-              ) : (
-                <Button
-                  variant="ghost"
-                  onClick={onStart}
-                  className="text-xl text-primary hover:text-primary/80"
-                >
-                  Start Session
-                </Button>
-              )}
-            </motion.div>
-          </AnimatePresence>
+              Start Session
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Status Display */}
-      <div className="w-full max-w-md mt-8">
+      <div className="w-full max-w-md">
         <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
