@@ -9,6 +9,7 @@ export function useBreathing(sequence: number[]) {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [pausedTime, setPausedTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [countdown, setCountdown] = useState(0);
 
   const queryClient = useQueryClient();
 
@@ -48,6 +49,27 @@ export function useBreathing(sequence: number[]) {
     });
   }, [isActive, isPaused, sequence.length]);
 
+  // Countdown timer
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isActive && !isPaused) {
+      setCountdown(sequence[currentPhase]);
+
+      timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            progressSequence();
+            return sequence[currentPhase];
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(timer);
+  }, [isActive, isPaused, currentPhase, sequence, progressSequence]);
+
   // Update elapsed time
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -64,19 +86,6 @@ export function useBreathing(sequence: number[]) {
     return () => clearInterval(timer);
   }, [isActive, isPaused, startTime, pausedTime]);
 
-  // Progress through breathing sequence
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (isActive && !isPaused) {
-      timer = setInterval(() => {
-        progressSequence();
-      }, sequence[currentPhase] * 1000);
-    }
-
-    return () => clearInterval(timer);
-  }, [isActive, isPaused, currentPhase, sequence, progressSequence]);
-
   const startSession = () => {
     setIsActive(true);
     setIsPaused(false);
@@ -85,6 +94,7 @@ export function useBreathing(sequence: number[]) {
     setStartTime(new Date());
     setPausedTime(null);
     setElapsedTime(0);
+    setCountdown(sequence[0]);
   };
 
   const pauseSession = () => {
@@ -111,12 +121,13 @@ export function useBreathing(sequence: number[]) {
     await sessionMutation.mutateAsync({
       pattern: sequence.join("-"),
       duration,
-      breathCount: currentCycle * sequence.length
+      breathCount: currentCycle * sequence.length + currentPhase
     });
 
     setStartTime(null);
     setPausedTime(null);
     setElapsedTime(0);
+    setCountdown(0);
   };
 
   return {
@@ -125,6 +136,7 @@ export function useBreathing(sequence: number[]) {
     currentPhase,
     currentCycle,
     elapsedTime,
+    countdown,
     startSession,
     pauseSession,
     resumeSession,

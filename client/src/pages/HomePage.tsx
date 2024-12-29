@@ -26,7 +26,9 @@ export default function HomePage() {
     isActive,
     isPaused,
     currentPhase,
+    currentCycle,
     elapsedTime,
+    countdown,
     startSession,
     pauseSession,
     resumeSession,
@@ -47,6 +49,9 @@ export default function HomePage() {
   const handleToggleSound = () => {
     setIsSoundEnabled(prev => !prev);
   };
+
+  const breathCount = currentCycle * breathingPatterns[selectedPattern as keyof typeof breathingPatterns].sequence.length + 
+    (currentPhase > 0 ? currentPhase : 0);
 
   return (
     <div className={cn(
@@ -99,6 +104,9 @@ export default function HomePage() {
                     isZenMode={isZenMode}
                     isSoundEnabled={isSoundEnabled}
                     elapsed={elapsedTime}
+                    breathCount={breathCount}
+                    countdown={countdown}
+                    onStart={startSession}
                     onPause={pauseSession}
                     onResume={resumeSession}
                     onStop={endSession}
@@ -131,6 +139,9 @@ export default function HomePage() {
             isZenMode={isZenMode}
             isSoundEnabled={isSoundEnabled}
             elapsed={elapsedTime}
+            breathCount={breathCount}
+            countdown={countdown}
+            onStart={startSession}
             onPause={pauseSession}
             onResume={resumeSession}
             onStop={endSession}

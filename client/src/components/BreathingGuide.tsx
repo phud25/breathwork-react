@@ -14,6 +14,9 @@ interface BreathingGuideProps {
   isZenMode?: boolean;
   isSoundEnabled?: boolean;
   elapsed: number;
+  breathCount: number;
+  countdown: number;
+  onStart: () => void;
   onPause: () => void;
   onResume: () => void;
   onStop: () => void;
@@ -36,6 +39,9 @@ export function BreathingGuide({
   isZenMode = false,
   isSoundEnabled = true,
   elapsed,
+  breathCount,
+  countdown,
+  onStart,
   onPause,
   onResume,
   onStop,
@@ -77,97 +83,119 @@ export function BreathingGuide({
   return (
     <div className={cn(
       "flex flex-col items-center justify-center transition-all duration-500",
-      isZenMode ? "h-screen" : "h-64"
+      isZenMode ? "h-screen" : "h-[400px]"
     )}>
       <div className="relative">
-        {/* Background rings */}
+        {/* Outer static circle */}
+        <div className="absolute w-48 h-48 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+
+        {/* Middle animated circle */}
         <motion.div
           className={cn(
-            "absolute inset-0 rounded-full bg-gradient-to-r opacity-50",
+            "absolute w-40 h-40 rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
           initial={false}
-          animate={{
-            scale: isActive && !isPaused ? [1, 1.5, 1] : 1,
-            opacity: [0.3, 0.5, 0.3]
-          }}
+          animate={isActive && !isPaused ? {
+            scale: getPhaseVariant() === "inhale" ? 1.5 : 1,
+            opacity: [0.4, 0.6, 0.4]
+          } : { scale: 1, opacity: 0.4 }}
           transition={{
-            duration: 4,
-            repeat: Infinity,
+            duration: isActive && !isPaused ? pattern.sequence[currentPhase] : 0.5,
             ease: "easeInOut"
           }}
         />
 
-        {/* Main breathing circle */}
-        <motion.div
-          className="w-32 h-32 rounded-full bg-gradient-to-r from-primary/20 to-primary/40 border-2 border-primary flex items-center justify-center"
-          variants={circleVariants}
-          animate={isActive && !isPaused ? getPhaseVariant() : "hold"}
-        >
+        {/* Inner static circle */}
+        <div className="relative w-32 h-32 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentPhase}
+              key={isActive ? `${currentPhase}-${countdown}` : 'ready'}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="text-center"
             >
-              <div className="text-primary font-semibold">
-                {isActive ? phaseLabels[currentPhase] : "Ready"}
-              </div>
-              <div className="text-sm text-primary/80 font-mono">
-                {formatTime(elapsed)}
-              </div>
+              {isActive ? (
+                <>
+                  <div className="text-3xl font-mono text-primary font-bold">
+                    {countdown}
+                  </div>
+                  <div className="text-sm text-primary/80 font-semibold">
+                    {phaseLabels[currentPhase]}
+                  </div>
+                </>
+              ) : (
+                <Button
+                  variant="ghost"
+                  onClick={onStart}
+                  className="text-primary hover:text-primary/80"
+                >
+                  Start Session
+                </Button>
+              )}
             </motion.div>
           </AnimatePresence>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center gap-2 mt-8">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onToggleSound}
-        >
-          {isSoundEnabled ? (
-            <Volume2 className="h-4 w-4" />
-          ) : (
-            <VolumeX className="h-4 w-4" />
-          )}
-        </Button>
-
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onToggleZen}
-        >
-          <Maximize2 className="h-4 w-4" />
-        </Button>
+      {/* Session info and controls */}
+      <div className="mt-8 space-y-4 text-center">
+        <div className="text-sm text-primary/80 font-mono">
+          {formatTime(elapsed)}
+        </div>
 
         {isActive && (
-          <>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={isPaused ? onResume : onPause}
-            >
-              {isPaused ? (
-                <Play className="h-4 w-4" />
-              ) : (
-                <Pause className="h-4 w-4" />
-              )}
-            </Button>
-
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={onStop}
-            >
-              <Square className="h-4 w-4" />
-            </Button>
-          </>
+          <div className="text-sm text-primary/80">
+            Completed Breaths: {breathCount}
+          </div>
         )}
+
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleSound}
+          >
+            {isSoundEnabled ? (
+              <Volume2 className="h-4 w-4" />
+            ) : (
+              <VolumeX className="h-4 w-4" />
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleZen}
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+
+          {isActive && (
+            <>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={isPaused ? onResume : onPause}
+              >
+                {isPaused ? (
+                  <Play className="h-4 w-4" />
+                ) : (
+                  <Pause className="h-4 w-4" />
+                )}
+              </Button>
+
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={onStop}
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
