@@ -60,16 +60,6 @@ export function BreathingGuide({
   const [breathCountState, setBreathCountState] = useState<number>(15);
   const [durationInput, setDurationInput] = useState<string>("3:00");
 
-  // Initialize duration values from the input string
-  useEffect(() => {
-    if (sessionType === "duration") {
-      const [minutes, seconds] = durationInput.split(":").map(Number);
-      if (!isNaN(minutes) && !isNaN(seconds)) {
-        console.log("Duration updated:", { minutes, seconds });
-      }
-    }
-  }, [sessionType, durationInput]);
-
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -77,7 +67,6 @@ export function BreathingGuide({
   };
 
   const getPhaseVariant = () => {
-    // Special case for 2-2 pattern
     if (pattern.name.includes("2-2") && currentPhase === 1) {
       return "exhale";
     }
@@ -88,7 +77,6 @@ export function BreathingGuide({
   };
 
   const getPhaseLabel = () => {
-    // Special case for 2-2 pattern
     if (pattern.name.includes("2-2")) {
       return currentPhase === 0 ? "Inhale" : "Exhale";
     }
@@ -103,8 +91,6 @@ export function BreathingGuide({
     const phase = getPhaseVariant();
     const phaseDuration = pattern.sequence[currentPhase];
     const isPostInhale = currentPhase === 1;
-
-    console.log("Animation phase:", { phase, phaseDuration, currentPhase });
 
     if (!isActive || isPaused) {
       return {
@@ -139,7 +125,6 @@ export function BreathingGuide({
       };
     }
 
-    // Hold phase
     return {
       initial: { scale: isPostInhale ? 1 : 0.3 },
       animate: {
@@ -152,12 +137,8 @@ export function BreathingGuide({
   };
 
   const handleDurationChange = (value: string) => {
-    // Validate format
     if (!/^\d{1,2}:\d{2}$/.test(value)) return;
-
     const [minutes, seconds] = value.split(":").map(Number);
-
-    // Validate ranges
     if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
       setDurationInput(value);
     }
@@ -179,20 +160,20 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-4">
+        <div className="space-y-[25px]">
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px]"
           >
-            <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors">
+            <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors text-white">
               <SelectValue placeholder="Select Breathing Pattern" />
             </SelectTrigger>
             <SelectContent className="bg-background border-input">
-              <SelectItem value="478" className="hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-              <SelectItem value="box" className="hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-              <SelectItem value="22" className="hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-              <SelectItem value="555" className="hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+              <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+              <SelectItem value="box" className="text-white hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="22" className="text-white hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+              <SelectItem value="555" className="text-white hover:bg-primary/10">5-5-5 Triangle</SelectItem>
             </SelectContent>
           </Select>
 
@@ -234,12 +215,9 @@ export function BreathingGuide({
         </div>
       </div>
 
-      {/* Fixed size circle container */}
+      {/* Circle container */}
       <div className="relative w-[300px] h-[300px] mt-2 mb-[15px] flex items-center justify-center">
-        {/* Outer static circle */}
         <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
-
-        {/* Middle animated circle */}
         <motion.div
           className={cn(
             "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
@@ -248,7 +226,6 @@ export function BreathingGuide({
           {...getPhaseAnimation()}
         />
 
-        {/* Inner circle with content */}
         <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
           {isActive ? (
             <div className="text-center pointer-events-none select-none">

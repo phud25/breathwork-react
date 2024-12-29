@@ -20,7 +20,7 @@ const breathingPatterns: Record<PatternType, { name: string; sequence: number[] 
 
 export default function HomePage() {
   const { user, logout } = useUser();
-  const [selectedPattern, setSelectedPattern] = useState<PatternType>("478");
+  const [selectedPattern, setSelectedPattern] = useState<PatternType>("box");
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
