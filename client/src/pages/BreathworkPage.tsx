@@ -55,13 +55,13 @@ export default function BreathworkPage() {
         isZenMode && "hidden"
       )}>
         <header className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">Welcome, {user?.username}</h1>
+          <h1 className="text-2xl font-bold text-primary">Welcome, {user?.firstName}</h1>
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardHeader className="pb-[15px]">
+              <CardHeader className="pb-3">
                 <CardTitle>Breath Session</CardTitle>
               </CardHeader>
               <CardContent>

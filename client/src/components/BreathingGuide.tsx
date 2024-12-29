@@ -162,14 +162,15 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="mb-6 space-y-6">
+        <div className="space-y-4">
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px]"
+            defaultValue="box"
           >
             <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors">
-              <SelectValue className="text-white" />
+              <SelectValue placeholder="Box Breathing (4x4)" className="text-white" />
             </SelectTrigger>
             <SelectContent className="bg-background border-input">
               <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
@@ -184,6 +185,7 @@ export function BreathingGuide({
               value={sessionType}
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
               className="w-[50%] h-[48px]"
+              defaultValue="breaths"
             >
               <SelectTrigger className="bg-background border-input hover:border-primary/50">
                 <SelectValue placeholder="Session Type" className="text-white" />
@@ -226,18 +228,19 @@ export function BreathingGuide({
           </div>
         </div>
 
-        <div className="flex justify-center items-center">
-          <div className="relative w-[300px] h-[300px]">
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+        <div className="flex justify-center items-center my-8">
+          <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+            <motion.div 
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20"
+            />
             <motion.div
               className={cn(
-                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+                "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r",
                 getPhaseColor()
               )}
               {...getPhaseAnimation()}
             />
-
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
               {isActive ? (
                 <div className="text-center pointer-events-none select-none">
                   <div className="text-xl font-mono text-primary font-bold">
