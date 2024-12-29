@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useBreathing } from "@/hooks/use-breathing";
 import { useUser } from "@/hooks/use-user";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 
 const breathingPatterns = {
@@ -22,6 +23,7 @@ export default function HomePage() {
   const [selectedPattern, setSelectedPattern] = useState("478");
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+
   const { 
     isActive,
     isPaused,
@@ -68,55 +70,57 @@ export default function HomePage() {
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Breathing Exercise</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Select
-                  value={selectedPattern}
-                  onValueChange={handlePatternChange}
-                  disabled={isActive}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(breathingPatterns).map(([key, pattern]) => (
-                      <SelectItem key={key} value={key}>
-                        {pattern.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          <ErrorBoundary>
+            <Card>
+              <CardHeader>
+                <CardTitle>Breathing Exercise</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Select
+                    value={selectedPattern}
+                    onValueChange={handlePatternChange}
+                    disabled={isActive}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(breathingPatterns).map(([key, pattern]) => (
+                        <SelectItem key={key} value={key}>
+                          {pattern.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <BreathingGuide 
-                    pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
-                    isActive={isActive}
-                    isPaused={isPaused}
-                    currentPhase={currentPhase}
-                    isZenMode={isZenMode}
-                    isSoundEnabled={isSoundEnabled}
-                    elapsed={elapsedTime}
-                    breathCount={breathCount}
-                    countdown={countdown}
-                    onStart={startSession}
-                    onPause={pauseSession}
-                    onResume={resumeSession}
-                    onStop={endSession}
-                    onToggleZen={handleToggleZen}
-                    onToggleSound={handleToggleSound}
-                  />
-                </motion.div>
-              </div>
-            </CardContent>
-          </Card>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <BreathingGuide 
+                      pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
+                      isActive={isActive}
+                      isPaused={isPaused}
+                      currentPhase={currentPhase}
+                      isZenMode={isZenMode}
+                      isSoundEnabled={isSoundEnabled}
+                      elapsed={elapsedTime}
+                      breathCount={breathCount}
+                      countdown={countdown}
+                      onStart={startSession}
+                      onPause={pauseSession}
+                      onResume={resumeSession}
+                      onStop={endSession}
+                      onToggleZen={handleToggleZen}
+                      onToggleSound={handleToggleSound}
+                    />
+                  </motion.div>
+                </div>
+              </CardContent>
+            </Card>
+          </ErrorBoundary>
 
           <Card className={cn(isZenMode && "hidden")}>
             <CardHeader>
@@ -130,25 +134,27 @@ export default function HomePage() {
       </div>
 
       {isZenMode && (
-        <div className="fixed inset-0 bg-background">
-          <BreathingGuide 
-            pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
-            isActive={isActive}
-            isPaused={isPaused}
-            currentPhase={currentPhase}
-            isZenMode={isZenMode}
-            isSoundEnabled={isSoundEnabled}
-            elapsed={elapsedTime}
-            breathCount={breathCount}
-            countdown={countdown}
-            onStart={startSession}
-            onPause={pauseSession}
-            onResume={resumeSession}
-            onStop={endSession}
-            onToggleZen={handleToggleZen}
-            onToggleSound={handleToggleSound}
-          />
-        </div>
+        <ErrorBoundary>
+          <div className="fixed inset-0 bg-background">
+            <BreathingGuide 
+              pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
+              isActive={isActive}
+              isPaused={isPaused}
+              currentPhase={currentPhase}
+              isZenMode={isZenMode}
+              isSoundEnabled={isSoundEnabled}
+              elapsed={elapsedTime}
+              breathCount={breathCount}
+              countdown={countdown}
+              onStart={startSession}
+              onPause={pauseSession}
+              onResume={resumeSession}
+              onStop={endSession}
+              onToggleZen={handleToggleZen}
+              onToggleSound={handleToggleSound}
+            />
+          </div>
+        </ErrorBoundary>
       )}
     </div>
   );

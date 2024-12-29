@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 export function useBreathing(sequence: number[]) {
@@ -10,6 +10,10 @@ export function useBreathing(sequence: number[]) {
   const [pausedTime, setPausedTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [countdown, setCountdown] = useState(0);
+
+  // Refs for timing precision
+  const lastTickTime = useRef<number>(0);
+  const animationFrameId = useRef<number>();
 
   const queryClient = useQueryClient();
 
@@ -39,6 +43,7 @@ export function useBreathing(sequence: number[]) {
 
   const progressSequence = useCallback(() => {
     if (!isActive || isPaused) return;
+    console.log('Progressing sequence:', { currentPhase, currentCycle });
 
     setCurrentPhase((prev) => {
       if (prev === sequence.length - 1) {
@@ -49,36 +54,41 @@ export function useBreathing(sequence: number[]) {
     });
   }, [isActive, isPaused, sequence.length]);
 
-  // Countdown timer with exact 1-second intervals
+  // High precision timer using requestAnimationFrame
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    const updateTimer = () => {
+      if (!isActive || isPaused) return;
+
+      const now = performance.now();
+      if (!lastTickTime.current) {
+        lastTickTime.current = now;
+      }
+
+      const delta = now - lastTickTime.current;
+      if (delta >= 1000) { // 1 second has passed
+        setCountdown((prev) => {
+          console.log('Countdown update:', { prev, currentPhase });
+          if (prev <= 1) {
+            progressSequence();
+            return sequence[currentPhase];
+          }
+          return prev - 1;
+        });
+        lastTickTime.current = now;
+      }
+
+      animationFrameId.current = requestAnimationFrame(updateTimer);
+    };
 
     if (isActive && !isPaused) {
-      setCountdown(sequence[currentPhase]);
-
-      const startTime = Date.now();
-      const interval = 1000; // 1 second
-
-      const tick = () => {
-        const elapsed = Date.now() - startTime;
-        const remaining = interval - (elapsed % interval);
-
-        timer = setTimeout(() => {
-          setCountdown((prev) => {
-            if (prev <= 1) {
-              progressSequence();
-              return sequence[currentPhase];
-            }
-            return prev - 1;
-          });
-          tick();
-        }, remaining);
-      };
-
-      tick();
+      animationFrameId.current = requestAnimationFrame(updateTimer);
     }
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
   }, [isActive, isPaused, currentPhase, sequence, progressSequence]);
 
   // Update elapsed time
@@ -97,7 +107,8 @@ export function useBreathing(sequence: number[]) {
     return () => clearInterval(timer);
   }, [isActive, isPaused, startTime, pausedTime]);
 
-  const startSession = () => {
+  const startSession = useCallback(() => {
+    console.log('Starting session');
     setIsActive(true);
     setIsPaused(false);
     setCurrentPhase(0);
@@ -106,23 +117,28 @@ export function useBreathing(sequence: number[]) {
     setPausedTime(null);
     setElapsedTime(0);
     setCountdown(sequence[0]);
-  };
+    lastTickTime.current = 0;
+  }, [sequence]);
 
-  const pauseSession = () => {
+  const pauseSession = useCallback(() => {
+    console.log('Pausing session');
     setIsPaused(true);
     setPausedTime(new Date());
-  };
+  }, []);
 
-  const resumeSession = () => {
+  const resumeSession = useCallback(() => {
+    console.log('Resuming session');
     setIsPaused(false);
     if (pausedTime && startTime) {
       const pauseDuration = Date.now() - pausedTime.getTime();
       setStartTime(new Date(startTime.getTime() + pauseDuration));
       setPausedTime(null);
     }
-  };
+    lastTickTime.current = 0;
+  }, [pausedTime, startTime]);
 
-  const endSession = async () => {
+  const endSession = useCallback(async () => {
+    console.log('Ending session');
     if (!startTime) return;
 
     setIsActive(false);
@@ -139,7 +155,8 @@ export function useBreathing(sequence: number[]) {
     setPausedTime(null);
     setElapsedTime(0);
     setCountdown(0);
-  };
+    lastTickTime.current = 0;
+  }, [startTime, currentCycle, currentPhase, sequence, sessionMutation]);
 
   return {
     isActive,
