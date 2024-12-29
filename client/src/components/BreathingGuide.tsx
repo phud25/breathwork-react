@@ -33,6 +33,29 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
+const breathTransition = {
+  inhale: {
+    scale: [1, 1.8],
+    transition: {
+      duration: 4,
+      ease: [0.4, 0, 0.2, 1]
+    }
+  },
+  exhale: {
+    scale: [1.8, 1],
+    transition: {
+      duration: 8,
+      ease: [0.4, 0, 0.2, 1]
+    }
+  },
+  hold: {
+    scale: 1.8,
+    transition: {
+      duration: 7
+    }
+  }
+};
+
 export function BreathingGuide({ 
   pattern, 
   isActive, 
@@ -67,22 +90,9 @@ export function BreathingGuide({
     return phaseColors[phase as keyof typeof phaseColors];
   };
 
-  const getCurrentScale = () => {
-    if (!isActive || isPaused) return 1;
+  const getBreathTransition = () => {
     const phase = getPhaseVariant();
-    const minScale = 1;
-    const maxScale = 1.85;
-
-    // Calculate progress based on countdown and total phase duration
-    const progress = (pattern.sequence[currentPhase] - countdown) / pattern.sequence[currentPhase];
-
-    if (phase === "inhale") {
-      return minScale + (progress * (maxScale - minScale));
-    }
-    if (phase === "exhale") {
-      return maxScale - (progress * (maxScale - minScale));
-    }
-    return currentPhase === 1 ? maxScale : minScale;
+    return breathTransition[phase as keyof typeof breathTransition];
   };
 
   return (
@@ -91,12 +101,11 @@ export function BreathingGuide({
       isZenMode ? "h-screen" : "min-h-[600px] py-8"
     )}>
       <div className={cn(
-        "w-full max-w-md mb-12",
+        "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
         <div className="space-y-[30px]">
-          {/* Single pattern selector */}
-          <Select defaultValue="478">
+          <Select defaultValue="478" className="h-[48px]">
             <SelectTrigger>
               <SelectValue placeholder="Select Breathing Pattern" />
             </SelectTrigger>
@@ -107,9 +116,8 @@ export function BreathingGuide({
             </SelectContent>
           </Select>
 
-          {/* Mode selector and input in single row */}
-          <div className="flex gap-4">
-            <Select defaultValue="breaths" className="flex-1">
+          <div className="flex gap-[5%]">
+            <Select defaultValue="breaths" className="w-[50%] h-[48px]">
               <SelectTrigger>
                 <SelectValue placeholder="Session Type" />
               </SelectTrigger>
@@ -123,73 +131,72 @@ export function BreathingGuide({
               type="number" 
               placeholder="Enter count"
               defaultValue="15"
-              className="w-32 text-center"
+              className="w-[45%] h-[48px] text-center"
               min={1}
             />
           </div>
         </div>
       </div>
 
-      {/* Breathing circle with proper margins */}
-      <div className="relative flex items-center justify-center mb-12 mt-8">
+      <div className="relative w-[400px] h-[400px] mt-[50px] mb-[50px] flex items-center justify-center">
         {/* Outer static circle */}
-        <div className="absolute w-64 h-64 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+        <div className="absolute w-[360px] h-[360px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
         {/* Middle animated circle */}
         <motion.div
           className={cn(
-            "absolute w-56 h-56 rounded-full bg-gradient-to-r",
+            "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
           initial={false}
-          animate={{
-            scale: getCurrentScale(),
-          }}
+          animate={getBreathTransition()}
           transition={{
             type: "spring",
-            stiffness: 25,
-            damping: 15,
+            stiffness: 30,
+            damping: 20,
             mass: 1,
-            duration: isActive && !isPaused ? pattern.sequence[currentPhase] : 0.5,
+            crossfade: true,
+            ease: "anticipate"
           }}
         />
 
         {/* Inner circle with content */}
-        <div className="relative w-24 h-24 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
-          {isActive ? (
-            <div className="text-center pointer-events-none select-none">
-              <div className="text-2xl font-mono text-primary font-bold">
-                {countdown}
+        <div className="relative w-[120px] h-[120px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+          <div className="w-[100px] h-[100px] flex items-center justify-center">
+            {isActive ? (
+              <div className="text-center pointer-events-none select-none">
+                <div className="text-2xl font-mono text-primary font-bold">
+                  {countdown}
+                </div>
+                <div className="text-xs text-primary/80 font-semibold">
+                  {phaseLabels[currentPhase]}
+                </div>
               </div>
-              <div className="text-xs text-primary/80 font-semibold">
-                {phaseLabels[currentPhase]}
-              </div>
-            </div>
-          ) : (
-            <Button
-              variant="ghost"
-              onClick={onStart}
-              className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
-            >
-              Start
-            </Button>
-          )}
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={onStart}
+                className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
+              >
+                Start
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Status and controls with proper spacing */}
-      <div className="w-full max-w-md mt-4">
+      <div className="w-full max-w-[600px] mt-[40px]">
         <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
         </div>
 
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-[20px]">
           <Button
             variant="outline"
             size="icon"
             onClick={onToggleSound}
-            className="hover:bg-transparent"
+            className="h-[48px] hover:bg-transparent"
           >
             {isSoundEnabled ? (
               <Volume2 className="h-4 w-4" />
@@ -202,7 +209,7 @@ export function BreathingGuide({
             variant="outline"
             size="icon"
             onClick={onToggleZen}
-            className="hover:bg-transparent"
+            className="h-[48px] hover:bg-transparent"
           >
             <Maximize2 className="h-4 w-4" />
           </Button>
@@ -213,7 +220,7 @@ export function BreathingGuide({
                 variant="outline"
                 size="icon"
                 onClick={isPaused ? onResume : onPause}
-                className="hover:bg-transparent"
+                className="h-[48px] hover:bg-transparent"
               >
                 {isPaused ? (
                   <Play className="h-4 w-4" />
@@ -226,6 +233,7 @@ export function BreathingGuide({
                 variant="destructive"
                 size="icon"
                 onClick={onStop}
+                className="h-[48px]"
               >
                 <Square className="h-4 w-4" />
               </Button>
