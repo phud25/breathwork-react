@@ -128,12 +128,7 @@ export function BreathingGuide({
 
     return {
       initial: { scale: isPostInhale ? 1 : 0.3 },
-      animate: {
-        scale: isPostInhale ? 1 : 0.3,
-        transition: {
-          duration: phaseDuration
-        }
-      }
+      animate: { scale: isPostInhale ? 1 : 0.3 }
     };
   };
 
@@ -167,7 +162,7 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="mb-6"> {/* Container for top section */}
+        <div className="mb-6 space-y-6">
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
@@ -184,7 +179,7 @@ export function BreathingGuide({
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%] mt-4">
+          <div className="flex gap-[5%]">
             <Select
               value={sessionType}
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
@@ -232,17 +227,17 @@ export function BreathingGuide({
         </div>
 
         <div className="flex justify-center items-center">
-          <div className="relative w-[300px] h-[300px] flex items-center justify-center">
-            <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+          <div className="relative w-[300px] h-[300px]">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
             <motion.div
               className={cn(
-                "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r",
                 getPhaseColor()
               )}
               {...getPhaseAnimation()}
             />
 
-            <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
               {isActive ? (
                 <div className="text-center pointer-events-none select-none">
                   <div className="text-xl font-mono text-primary font-bold">
