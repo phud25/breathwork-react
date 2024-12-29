@@ -9,7 +9,9 @@ import { useUser } from "@/hooks/use-user";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 
-const breathingPatterns = {
+type PatternType = "478" | "box" | "22" | "555";
+
+const breathingPatterns: Record<PatternType, { name: string; sequence: number[] }> = {
   "478": { name: "4-7-8 Relaxation", sequence: [4, 7, 8] },
   "box": { name: "Box Breathing (4x4)", sequence: [4, 4, 4, 4] },
   "22": { name: "2-2 Energized Focus", sequence: [2, 2] },
@@ -18,7 +20,7 @@ const breathingPatterns = {
 
 export default function HomePage() {
   const { user, logout } = useUser();
-  const [selectedPattern, setSelectedPattern] = useState("478");
+  const [selectedPattern, setSelectedPattern] = useState<PatternType>("478");
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
@@ -33,9 +35,9 @@ export default function HomePage() {
     pauseSession,
     resumeSession,
     endSession
-  } = useBreathing(breathingPatterns[selectedPattern as keyof typeof breathingPatterns].sequence);
+  } = useBreathing(breathingPatterns[selectedPattern].sequence);
 
-  const handlePatternChange = useCallback((value: string) => {
+  const handlePatternChange = useCallback((value: PatternType) => {
     if (isActive) {
       endSession();
     }
@@ -50,7 +52,7 @@ export default function HomePage() {
     setIsSoundEnabled(prev => !prev);
   };
 
-  const breathCount = currentCycle * breathingPatterns[selectedPattern as keyof typeof breathingPatterns].sequence.length + 
+  const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length + 
     (currentPhase > 0 ? currentPhase : 0);
 
   return (
@@ -75,7 +77,7 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <BreathingGuide 
-                  pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
+                  pattern={breathingPatterns[selectedPattern]}
                   isActive={isActive}
                   isPaused={isPaused}
                   currentPhase={currentPhase}
@@ -111,7 +113,7 @@ export default function HomePage() {
         <ErrorBoundary>
           <div className="fixed inset-0 bg-background">
             <BreathingGuide 
-              pattern={breathingPatterns[selectedPattern as keyof typeof breathingPatterns]}
+              pattern={breathingPatterns[selectedPattern]}
               isActive={isActive}
               isPaused={isPaused}
               currentPhase={currentPhase}

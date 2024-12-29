@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+
+type PatternType = "478" | "box" | "22" | "555";
 
 interface BreathingGuideProps {
   pattern: {
@@ -25,7 +27,7 @@ interface BreathingGuideProps {
   onStop: () => void;
   onToggleZen: () => void;
   onToggleSound: () => void;
-  onPatternChange: (value: string) => void;
+  onPatternChange: (value: PatternType) => void;
 }
 
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
@@ -54,8 +56,18 @@ export function BreathingGuide({
   onPatternChange
 }: BreathingGuideProps) {
   const [sessionType, setSessionType] = useState<"breaths" | "duration">("breaths");
-  const [durationMinutes, setDurationMinutes] = useState(3);
-  const [durationSeconds, setDurationSeconds] = useState(0);
+  const [breathCountState, setBreathCountState] = useState<number>(15);
+  const [durationInput, setDurationInput] = useState<string>("3:00");
+
+  // Initialize duration values from the input string
+  useEffect(() => {
+    if (sessionType === "duration") {
+      const [minutes, seconds] = durationInput.split(":").map(Number);
+      if (!isNaN(minutes) && !isNaN(seconds)) {
+        // Validation happens in handleDurationChange
+      }
+    }
+  }, [sessionType, durationInput]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -74,26 +86,22 @@ export function BreathingGuide({
     return phaseColors[phase as keyof typeof phaseColors];
   };
 
-  const circleAnimation = {
-    initial: { scale: 0.3 },
-    animate: {
-      scale: getPhaseVariant() === "inhale" ? 1 : 0.3,
-      transition: {
-        duration: pattern.sequence[currentPhase],
-        ease: [0.4, 0, 0.2, 1],
-        type: "spring",
-        stiffness: 35,
-        damping: 25,
-        mass: 1.2
-      }
+  const handleDurationChange = (value: string) => {
+    // Validate format
+    if (!/^\d{1,2}:\d{2}$/.test(value)) return;
+
+    const [minutes, seconds] = value.split(":").map(Number);
+
+    // Validate ranges
+    if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
+      setDurationInput(value);
     }
   };
 
-  const handleDurationChange = (value: string) => {
-    const [minutes, seconds] = value.split(":").map(Number);
-    if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
-      setDurationMinutes(minutes);
-      setDurationSeconds(seconds);
+  const handleBreathCountChange = (value: string) => {
+    const count = parseInt(value, 10);
+    if (!isNaN(count) && count >= 1) {
+      setBreathCountState(count);
     }
   };
 
@@ -109,7 +117,7 @@ export function BreathingGuide({
         <div className="space-y-5">
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
-            onValueChange={onPatternChange}
+            onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px]"
           >
             <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors">
@@ -141,18 +149,18 @@ export function BreathingGuide({
             {sessionType === "duration" ? (
               <Input 
                 type="text"
-                value={`${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`}
+                value={durationInput}
                 onChange={(e) => handleDurationChange(e.target.value)}
                 className="w-[45%] h-[48px] text-center bg-background"
+                placeholder="3:00"
                 min="1:00"
                 max="60:00"
-                pattern="\d{1,2}:\d{2}"
               />
             ) : (
               <Input 
                 type="number"
-                placeholder="Enter count"
-                defaultValue="15"
+                value={breathCountState}
+                onChange={(e) => handleBreathCountChange(e.target.value)}
                 className="w-[45%] h-[48px] text-center bg-background"
                 min={1}
               />
@@ -172,8 +180,18 @@ export function BreathingGuide({
             "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
             getPhaseColor()
           )}
-          initial={circleAnimation.initial}
-          animate={circleAnimation.animate}
+          initial={{ scale: 0.3 }}
+          animate={{
+            scale: getPhaseVariant() === "inhale" ? 1 : 0.3,
+            transition: {
+              duration: pattern.sequence[currentPhase],
+              ease: [0.4, 0, 0.2, 1],
+              type: "spring",
+              stiffness: 35,
+              damping: 25,
+              mass: 1.2
+            }
+          }}
         />
 
         {/* Inner circle with content */}
