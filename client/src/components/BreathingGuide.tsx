@@ -81,9 +81,10 @@ export function BreathingGuide({
     )}>
       {/* Session Configuration */}
       <div className={cn(
-        "w-full max-w-md space-y-4 mb-12",
+        "w-full max-w-md mb-12",
         isZenMode && "hidden"
       )}>
+        <div className="mb-5">
         <Select defaultValue="breaths">
           <SelectTrigger>
             <SelectValue placeholder="Session Type" />
@@ -93,6 +94,7 @@ export function BreathingGuide({
             <SelectItem value="duration">By Duration</SelectItem>
           </SelectContent>
         </Select>
+        </div>
 
         <Input 
           type="number" 
