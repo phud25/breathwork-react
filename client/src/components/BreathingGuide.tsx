@@ -69,18 +69,19 @@ export function BreathingGuide({
 
   const getCurrentScale = () => {
     if (!isActive || isPaused) return 1;
-    console.log('Getting scale for phase:', { 
-      phase: getPhaseVariant(), 
-      currentPhase, 
-      isActive, 
-      isPaused, 
-      countdown 
-    });
     const phase = getPhaseVariant();
     const minScale = 1;
-    const maxScale = 1.85; 
-    if (phase === "inhale") return maxScale;
-    if (phase === "exhale") return minScale;
+    const maxScale = 1.85;
+
+    // Calculate progress based on countdown and total phase duration
+    const progress = (pattern.sequence[currentPhase] - countdown) / pattern.sequence[currentPhase];
+
+    if (phase === "inhale") {
+      return minScale + (progress * (maxScale - minScale));
+    }
+    if (phase === "exhale") {
+      return maxScale - (progress * (maxScale - minScale));
+    }
     return currentPhase === 1 ? maxScale : minScale;
   };
 
@@ -94,6 +95,7 @@ export function BreathingGuide({
         isZenMode && "hidden"
       )}>
         <div className="space-y-[30px]">
+          {/* Single pattern selector */}
           <Select defaultValue="478">
             <SelectTrigger>
               <SelectValue placeholder="Select Breathing Pattern" />
@@ -105,6 +107,7 @@ export function BreathingGuide({
             </SelectContent>
           </Select>
 
+          {/* Mode selector and input in single row */}
           <div className="flex gap-4">
             <Select defaultValue="breaths" className="flex-1">
               <SelectTrigger>
@@ -127,9 +130,12 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="relative flex items-center justify-center mb-12">
+      {/* Breathing circle with proper margins */}
+      <div className="relative flex items-center justify-center mb-12 mt-8">
+        {/* Outer static circle */}
         <div className="absolute w-64 h-64 rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
+        {/* Middle animated circle */}
         <motion.div
           className={cn(
             "absolute w-56 h-56 rounded-full bg-gradient-to-r",
@@ -146,21 +152,9 @@ export function BreathingGuide({
             mass: 1,
             duration: isActive && !isPaused ? pattern.sequence[currentPhase] : 0.5,
           }}
-          onAnimationStart={() => {
-            console.log('Animation started:', { 
-              phase: getPhaseVariant(),
-              scale: getCurrentScale(),
-              duration: pattern.sequence[currentPhase]
-            });
-          }}
-          onAnimationComplete={() => {
-            console.log('Animation completed:', { 
-              phase: getPhaseVariant(),
-              scale: getCurrentScale()
-            });
-          }}
         />
 
+        {/* Inner circle with content */}
         <div className="relative w-24 h-24 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
           {isActive ? (
             <div className="text-center pointer-events-none select-none">
@@ -183,7 +177,8 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="w-full max-w-md">
+      {/* Status and controls with proper spacing */}
+      <div className="w-full max-w-md mt-4">
         <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
