@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -69,9 +69,9 @@ export function BreathingGuide({
 
   const getCurrentScale = () => {
     const phase = getPhaseVariant();
-    if (phase === "inhale") return 1.25;
+    if (phase === "inhale") return 1.15; // Reduced maximum scale to stay within bounds
     if (phase === "exhale") return 1;
-    return currentPhase === 1 ? 1.25 : 1;
+    return currentPhase === 1 ? 1.15 : 1;
   };
 
   return (
@@ -84,16 +84,16 @@ export function BreathingGuide({
         "w-full max-w-md mb-12",
         isZenMode && "hidden"
       )}>
-        <div className="mb-5">
-        <Select defaultValue="breaths">
-          <SelectTrigger>
-            <SelectValue placeholder="Session Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="breaths">By Breath Count</SelectItem>
-            <SelectItem value="duration">By Duration</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="mb-[30px]">
+          <Select defaultValue="breaths">
+            <SelectTrigger>
+              <SelectValue placeholder="Session Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="breaths">By Breath Count</SelectItem>
+              <SelectItem value="duration">By Duration</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Input 
@@ -133,7 +133,7 @@ export function BreathingGuide({
         {/* Inner circle with content */}
         <div className="relative w-48 h-48 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
           {isActive ? (
-            <div className="text-center">
+            <div className="text-center pointer-events-none select-none">
               <div className="text-4xl font-mono text-primary font-bold mb-2">
                 {countdown}
               </div>
@@ -145,7 +145,7 @@ export function BreathingGuide({
             <Button
               variant="ghost"
               onClick={onStart}
-              className="text-xl text-primary hover:text-primary/80"
+              className="text-xl text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
             >
               Start Session
             </Button>
@@ -166,6 +166,7 @@ export function BreathingGuide({
             variant="outline"
             size="icon"
             onClick={onToggleSound}
+            className="hover:bg-transparent"
           >
             {isSoundEnabled ? (
               <Volume2 className="h-4 w-4" />
@@ -178,6 +179,7 @@ export function BreathingGuide({
             variant="outline"
             size="icon"
             onClick={onToggleZen}
+            className="hover:bg-transparent"
           >
             <Maximize2 className="h-4 w-4" />
           </Button>
@@ -188,6 +190,7 @@ export function BreathingGuide({
                 variant="outline"
                 size="icon"
                 onClick={isPaused ? onResume : onPause}
+                className="hover:bg-transparent"
               >
                 {isPaused ? (
                   <Play className="h-4 w-4" />
