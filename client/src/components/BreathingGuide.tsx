@@ -11,9 +11,9 @@ type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
 
 const phaseColors = {
-  inhale: "from-purple-500/20 to-purple-600/40",
-  exhale: "from-purple-600/40 to-purple-500/20",
-  hold: "from-purple-500/30 to-purple-500/30"
+  inhale: "from-purple-500/20 via-purple-600/30 to-purple-700/40",
+  exhale: "from-purple-700/40 via-purple-600/30 to-purple-500/20",
+  hold: "from-indigo-600/30 to-indigo-700/40"
 };
 
 const getPhaseLabel = (patternName: string, phase: number) => {
@@ -98,7 +98,7 @@ export function BreathingGuide({
     if (pattern.name === "Breath of Fire") {
       return {
         initial: { scale: phase === "inhale" ? 0.3 : 1 },
-        animate: { 
+        animate: {
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
             duration: 0.5,
@@ -175,18 +175,21 @@ export function BreathingGuide({
             pattern.name === "2-4 Ha Breath" ? "24ha" :
             pattern.name === "Breath of Fire" ? "fire" : "22"}
           onValueChange={(value) => onPatternChange(value as PatternType)}
-          className="h-[48px] w-full"
         >
-          <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
-            <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
+          <SelectTrigger
+            className="h-[48px] w-full bg-white/5 border-purple-500/10 backdrop-blur-md
+            transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
+            focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+          >
+            <SelectValue placeholder="Select Breathing Pattern" />
           </SelectTrigger>
-          <SelectContent className="bg-slate-800 border-slate-600">
-            <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-            <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-            <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-            <SelectItem value="555" className="text-[#F5F5DC] hover:bg-primary/10">5-5-5 Triangle</SelectItem>
-            <SelectItem value="24ha" className="text-[#F5F5DC] hover:bg-primary/10">2-4 Ha Breath</SelectItem>
-            <SelectItem value="fire" className="text-[#F5F5DC] hover:bg-primary/10">Breath of Fire</SelectItem>
+          <SelectContent className="bg-slate-800/90 backdrop-blur-md border-purple-500/10">
+            <SelectItem value="478" className="text-white hover:bg-purple-500/10">4-7-8 Relaxation</SelectItem>
+            <SelectItem value="box" className="text-white hover:bg-purple-500/10">Box Breathing (4x4)</SelectItem>
+            <SelectItem value="22" className="text-white hover:bg-purple-500/10">2-2 Energized Focus</SelectItem>
+            <SelectItem value="555" className="text-white hover:bg-purple-500/10">5-5-5 Triangle</SelectItem>
+            <SelectItem value="24ha" className="text-white hover:bg-purple-500/10">2-4 Ha Breath</SelectItem>
+            <SelectItem value="fire" className="text-white hover:bg-purple-500/10">Breath of Fire</SelectItem>
           </SelectContent>
         </Select>
 
@@ -194,14 +197,18 @@ export function BreathingGuide({
           <Select
             value={sessionType}
             onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
-            className="w-[50%] h-[48px]"
+            className="w-[50%]"
           >
-            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-              <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
+            <SelectTrigger
+              className="h-[48px] bg-white/5 border-purple-500/10 backdrop-blur-md
+              transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
+              focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+            >
+              <SelectValue placeholder="Session Type" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600">
-              <SelectItem value="breaths" className="text-[#F5F5DC] hover:bg-primary/10">By Breath Count</SelectItem>
-              <SelectItem value="duration" className="text-[#F5F5DC] hover:bg-primary/10">By Duration</SelectItem>
+            <SelectContent className="bg-slate-800/90 backdrop-blur-md border-purple-500/10">
+              <SelectItem value="breaths" className="text-white hover:bg-purple-500/10">By Breath Count</SelectItem>
+              <SelectItem value="duration" className="text-white hover:bg-purple-500/10">By Duration</SelectItem>
             </SelectContent>
           </Select>
 
@@ -209,17 +216,21 @@ export function BreathingGuide({
             <Select
               value={durationInput}
               onValueChange={setDurationInput}
-              className="w-[45%] h-[48px]"
+              className="w-[45%]"
             >
-              <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-                <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
+              <SelectTrigger
+                className="h-[48px] bg-white/5 border-purple-500/10 backdrop-blur-md
+                transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
+                focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+              >
+                <SelectValue placeholder="3:00" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
+              <SelectContent className="bg-slate-800/90 backdrop-blur-md border-purple-500/10 max-h-[200px]">
                 {durationOptions.map((option) => (
                   <SelectItem
                     key={option.value}
                     value={option.value}
-                    className="text-[#F5F5DC] hover:bg-primary/10"
+                    className="text-white hover:bg-purple-500/10"
                   >
                     {option.label}
                   </SelectItem>
@@ -231,7 +242,9 @@ export function BreathingGuide({
               type="number"
               value={breathCountState}
               onChange={(e) => handleBreathCountChange(e.target.value)}
-              className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-[#F5F5DC] focus:ring-primary/50"
+              className="w-[45%] h-[48px] text-center bg-white/5 border-purple-500/10 backdrop-blur-md
+                transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
+                focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
               min={1}
             />
           )}
@@ -240,25 +253,28 @@ export function BreathingGuide({
 
       <div className="mt-0 mb-0">
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
-          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 via-purple-600/20 to-purple-700/30
+            shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-500" />
 
           <motion.div
             className={cn(
-              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r shadow-[0_0_30px_rgba(139,92,246,0.3)]",
               phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors]
             )}
             {...getPhaseAnimation()}
           />
 
-          <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+          <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40
+            border-2 border-purple-500/50 shadow-[0_0_15px_rgba(139,92,246,0.3)]
+            flex items-center justify-center backdrop-blur-sm">
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
                 {pattern.name !== "Breath of Fire" && (
-                  <div className="text-xl font-mono text-[#F5F5DC] font-bold">
+                  <div className="text-xl font-mono text-white font-bold">
                     {countdown}
                   </div>
                 )}
-                <div className="text-xs text-[#F5F5DC] font-semibold">
+                <div className="text-xs text-white font-semibold">
                   {getPhaseLabel(pattern.name, currentPhase)}
                 </div>
               </div>
@@ -266,13 +282,12 @@ export function BreathingGuide({
               <Button
                 variant="ghost"
                 onClick={onStart}
-                className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-colors duration-200"
+                className="text-sm text-white hover:text-white/80 hover:bg-transparent transition-colors duration-200"
               >
                 Start
               </Button>
             )}
           </div>
-
           {sessionCompleted && !isActive && (
             <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-2 rounded bg-black/50 text-white text-center whitespace-nowrap">
               Session Complete! Tap Start to begin another session
@@ -282,7 +297,7 @@ export function BreathingGuide({
       </div>
 
       <div className="w-full max-w-[600px] -mt-1">
-        <div className="flex justify-between items-center text-sm text-primary/80 mb-4 mt-2">
+        <div className="flex justify-between items-center text-sm text-purple-400/80 mb-4 mt-2">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
         </div>
@@ -292,7 +307,9 @@ export function BreathingGuide({
             variant="outline"
             size="icon"
             onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent"
+            className="h-[48px] bg-white/5 border-purple-500/20 backdrop-blur-md
+              transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60
+              hover:transform hover:-translate-y-0.5"
           >
             {isSoundEnabled ? (
               <Volume2 className="h-4 w-4" />
@@ -305,7 +322,9 @@ export function BreathingGuide({
             variant="outline"
             size="icon"
             onClick={onToggleZen}
-            className="h-[48px] hover:bg-transparent"
+            className="h-[48px] bg-white/5 border-purple-500/20 backdrop-blur-md
+              transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60
+              hover:transform hover:-translate-y-0.5"
           >
             <Maximize2 className="h-4 w-4" />
           </Button>
@@ -316,7 +335,9 @@ export function BreathingGuide({
                 variant="outline"
                 size="icon"
                 onClick={isPaused ? onResume : onPause}
-                className="h-[48px] hover:bg-transparent"
+                className="h-[48px] bg-white/5 border-purple-500/20 backdrop-blur-md
+                  transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60
+                  hover:transform hover:-translate-y-0.5"
               >
                 {isPaused ? (
                   <Play className="h-4 w-4" />
@@ -329,7 +350,9 @@ export function BreathingGuide({
                 variant="destructive"
                 size="icon"
                 onClick={onStop}
-                className="h-[48px]"
+                className="h-[48px] bg-red-500/10 border-red-500/20 backdrop-blur-md
+                  transition-all duration-200 hover:bg-red-500/20 hover:border-red-500/60
+                  hover:transform hover:-translate-y-0.5"
               >
                 <Square className="h-4 w-4" />
               </Button>
