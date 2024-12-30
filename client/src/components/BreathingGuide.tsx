@@ -16,6 +16,15 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
+// Time formatting functions
+const formatTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+
+const formatHoldTime = formatTime;
+
 const getPhaseLabel = (patternName: string, phase: number) => {
   if (patternName === "2-4 Ha Breath") {
     return phase === 0 ? "Inhale" : "Ha";
@@ -98,12 +107,6 @@ export function BreathingGuide({
       }
     };
   }, [holdInterval]);
-
-  const formatHoldTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
 
   const getPhaseAnimation = (): AnimationProps => {
     const phase = getPhaseVariant(pattern.name, currentPhase);
