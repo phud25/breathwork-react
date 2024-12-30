@@ -172,14 +172,14 @@ export function BreathingGuide({
 
   return (
     <div className={cn(
-      "flex flex-col items-center justify-center max-h-screen transition-all duration-500",
-      isZenMode ? "h-screen" : "min-h-[600px] py-4"
+      "flex flex-col items-center justify-center max-h-[100vh] transition-all duration-500",
+      isZenMode ? "h-screen p-0" : "min-h-[600px] p-4"
     )}>
       <div className={cn(
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-4">
+        <div className="space-y-2"> 
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
@@ -196,7 +196,7 @@ export function BreathingGuide({
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%] mb-2">
+          <div className="flex gap-[5%] mb-1"> 
             <Select
               value={sessionType}
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
@@ -234,8 +234,8 @@ export function BreathingGuide({
         </div>
       </div>
 
-      {/* Fixed size circle container */}
-      <div className="relative w-[300px] h-[300px] mt-2 mb-[15px] flex items-center justify-center">
+      {/* Fixed size circle container with reduced margins */}
+      <div className="relative w-[300px] h-[300px] mt-1 mb-2 flex items-center justify-center">
         {/* Outer static circle */}
         <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -272,7 +272,7 @@ export function BreathingGuide({
       </div>
 
       <div className="w-full max-w-[600px]">
-        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
+        <div className="flex justify-between items-center text-sm text-primary/80 mb-2">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
         </div>
