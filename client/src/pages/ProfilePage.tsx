@@ -2,12 +2,19 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
+import { useSessions, useSessionStats } from "@/hooks/use-sessions";
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
+import { SessionList } from "@/components/SessionList";
+import { Loader2 } from "lucide-react";
 
 export default function ProfilePage() {
   const { user } = useUser();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const { data: sessions, isLoading: isLoadingSessions } = useSessions(selectedDate);
+  const { data: stats, isLoading: isLoadingStats } = useSessionStats();
+
+  const isLoading = isLoadingSessions || isLoadingStats;
 
   return (
     <>
@@ -38,19 +45,31 @@ export default function ProfilePage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">Current Streak</p>
-                <p className="text-2xl font-bold">3 days</p>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats?.currentStreak || 0} days</p>
+                )}
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">Longest Streak</p>
-                <p className="text-2xl font-bold">7 days</p>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats?.longestStreak || 0} days</p>
+                )}
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">Total Sessions</p>
-                <p className="text-2xl font-bold">24</p>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats?.totalSessions || 0}</p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -75,8 +94,13 @@ export default function ProfilePage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {/* Session list will be implemented later */}
-                    <p className="text-sm text-muted-foreground">No sessions for this date.</p>
+                    {isLoadingSessions ? (
+                      <div className="flex items-center justify-center h-[300px]">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    ) : (
+                      <SessionList sessions={sessions || []} />
+                    )}
                   </CardContent>
                 </Card>
               </div>
