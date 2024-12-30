@@ -99,7 +99,7 @@ export default function HomePage() {
 
           <Card className={cn(isZenMode && "hidden")}>
             <CardHeader>
-              <CardTitle>Your Progress</CardTitle>
+              <CardTitle>Daily Tracking</CardTitle>
             </CardHeader>
             <CardContent>
               <ProgressChart />

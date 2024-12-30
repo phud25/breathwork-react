@@ -58,32 +58,40 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       serveStatic(app);
     }
 
-    // ALWAYS serve the app on port 5000
-    // this serves both the API and the client
-    const PORT = 5000;
+    const startServer = (port: number) => {
+      return new Promise((resolve, reject) => {
+        server.listen(port, "0.0.0.0")
+          .once('listening', () => {
+            log(`Server running on port ${port}`);
+            resolve(true);
+          })
+          .once('error', (err: any) => {
+            if (err.code === 'EADDRINUSE') {
+              log(`Port ${port} is in use, trying next port`);
+              resolve(false);
+            } else {
+              reject(err);
+            }
+          });
+      });
+    };
 
-    // Add error handling for server startup
-    server.on('error', (error: any) => {
-      if (error.code === 'EADDRINUSE') {
-        log(`Port ${PORT} is in use, please free it up and restart the server`);
-        process.exit(1);
-      } else {
-        log(`Failed to start server: ${error.message}`);
-        process.exit(1);
+    // Try ports starting from 5000
+    let port = 5000;
+    while (port < 5010) {
+      if (await startServer(port)) {
+        break;
       }
-    });
+      port++;
+    }
 
-    // Proper server shutdown handling
+    // Handle server shutdown
     process.on('SIGTERM', () => {
       log('SIGTERM received, shutting down gracefully');
       server.close(() => {
         log('Server closed');
         process.exit(0);
       });
-    });
-
-    server.listen(PORT, "0.0.0.0", () => {
-      log(`Server running on port ${PORT}`);
     });
   } catch (error: any) {
     log(`Failed to start application: ${error.message}`);

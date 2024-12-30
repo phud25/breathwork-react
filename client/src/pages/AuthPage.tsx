@@ -58,7 +58,7 @@ export default function AuthPage() {
       >
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-center text-primary">Breathwork</CardTitle>
+            <CardTitle className="text-2xl text-center text-primary">Patterns Breathwork</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
@@ -95,8 +95,8 @@ export default function AuthPage() {
                       </FormItem>
                     )}
                   />
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full"
                     disabled={isLoading}
                   >
