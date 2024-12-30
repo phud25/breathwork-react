@@ -34,9 +34,18 @@ interface BreathingGuideProps {
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
 
 const phaseColors = {
-  inhale: "from-purple-500/20 to-purple-600/40",
-  exhale: "from-purple-600/40 to-purple-500/20",
-  hold: "from-purple-500/30 to-purple-500/30"
+  inhale: {
+    bg: "bg-gradient-to-b from-purple-900/30 to-purple-600/20",
+    circle: "from-purple-500/20 to-purple-600/40"
+  },
+  exhale: {
+    bg: "bg-gradient-to-b from-purple-600/20 to-purple-900/30",
+    circle: "from-purple-600/40 to-purple-500/20"
+  },
+  hold: {
+    bg: "bg-gradient-to-b from-purple-700/25 to-purple-700/25",
+    circle: "from-purple-500/30 to-purple-500/30"
+  }
 };
 
 const durationOptions = Array.from({ length: 119 }, (_, i) => {
@@ -105,7 +114,11 @@ export function BreathingGuide({
   };
 
   const getPhaseColor = () => {
-    return phaseColors[getPhaseVariant() as keyof typeof phaseColors];
+    return phaseColors[getPhaseVariant() as keyof typeof phaseColors].circle;
+  };
+
+  const getBackgroundColor = () => {
+    return phaseColors[getPhaseVariant() as keyof typeof phaseColors].bg;
   };
 
   const getPhaseAnimation = (): AnimationProps => {
@@ -167,22 +180,22 @@ export function BreathingGuide({
   return (
     <div className={cn(
       "flex flex-col items-center justify-start transition-all duration-500",
-      isZenMode ? "h-screen p-0" : "min-h-[600px]"
+      isZenMode ? "h-screen p-0" : "min-h-[600px]",
+      getBackgroundColor()
     )}>
       <div className={cn(
         "w-full max-w-[600px] mx-auto space-y-3 transition-opacity duration-300",
         isZenMode ? "opacity-0 hidden" : "opacity-100"
       )}>
         <Select
-          value={pattern.name === "2-2 Energized Focus" ? "22" :
+          defaultValue={pattern.name === "2-2 Energized Focus" ? "22" :
             pattern.name === "4-7-8 Relaxation" ? "478" :
             pattern.name === "Box Breathing (4x4)" ? "box" :
             pattern.name === "5-5-5 Triangle" ? "555" : "22"}
           onValueChange={(value) => onPatternChange(value as PatternType)}
-          className="h-[48px] w-full"
         >
-          <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
-            <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
+          <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors h-[48px]">
+            <SelectValue placeholder="Select Breathing Pattern" />
           </SelectTrigger>
           <SelectContent className="bg-slate-800 border-slate-600 pb-4">
             <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
@@ -194,12 +207,11 @@ export function BreathingGuide({
 
         <div className="flex gap-[5%]">
           <Select
-            value={sessionType}
+            defaultValue={sessionType}
             onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
-            className="w-[50%] h-[48px]"
           >
-            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-              <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
+            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors h-[48px] w-[50%]">
+              <SelectValue placeholder="Session Type" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
               <SelectItem value="breaths" className="text-[#F5F5DC] hover:bg-primary/10">By Breath Count</SelectItem>
@@ -209,12 +221,11 @@ export function BreathingGuide({
 
           {sessionType === "duration" ? (
             <Select
-              value={durationInput}
+              defaultValue={durationInput}
               onValueChange={setDurationInput}
-              className="w-[45%] h-[48px]"
             >
-              <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-                <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
+              <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors h-[48px] w-[45%]">
+                <SelectValue placeholder="3:00" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
                 {durationOptions.map((option) => (
