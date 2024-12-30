@@ -24,7 +24,7 @@ export default function HomePage() {
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
-  const { 
+  const {
     isActive,
     isPaused,
     currentPhase,
@@ -53,7 +53,7 @@ export default function HomePage() {
     setIsSoundEnabled(prev => !prev);
   };
 
-  const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length + 
+  const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length +
     (currentPhase > 0 ? currentPhase : 0);
 
   return (
@@ -66,18 +66,15 @@ export default function HomePage() {
         isZenMode && "hidden"
       )}>
         <header className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">Welcome, {user?.username}</h1>
+          <h1 className="text-2xl font-bold text-primary">Breath Session</h1>
           <Button variant="outline" onClick={() => logout()}>Logout</Button>
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="mb-0">Breath Session</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <BreathingGuide 
+              <CardContent className="pt-6">
+                <BreathingGuide
                   pattern={breathingPatterns[selectedPattern]}
                   isActive={isActive}
                   isPaused={isPaused}
@@ -113,7 +110,7 @@ export default function HomePage() {
       {isZenMode && (
         <ErrorBoundary>
           <div className="fixed inset-0 bg-background">
-            <BreathingGuide 
+            <BreathingGuide
               pattern={breathingPatterns[selectedPattern]}
               isActive={isActive}
               isPaused={isPaused}
