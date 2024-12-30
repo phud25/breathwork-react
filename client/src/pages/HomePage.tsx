@@ -1,120 +1,61 @@
-import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { BreathingGuide } from "@/components/BreathingGuide";
-import { ProgressChart } from "@/components/ProgressChart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Navigation } from "@/components/Navigation";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useBreathing } from "@/hooks/use-breathing";
-import { useUser } from "@/hooks/use-user";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { cn } from "@/lib/utils";
-
-type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
-
-const breathingPatterns: Record<PatternType, { name: string; sequence: number[] }> = {
-  "478": { name: "4-7-8 Relaxation", sequence: [4, 7, 8] },
-  "box": { name: "Box Breathing (4x4)", sequence: [4, 4, 4, 4] },
-  "22": { name: "2-2 Energized Focus", sequence: [2, 2] },
-  "555": { name: "5-5-5 Triangle", sequence: [5, 5, 5] },
-  "24ha": { name: "2-4 Ha Breath", sequence: [2, 4] },
-  "fire": { name: "Breath of Fire", sequence: [0.5, 0.5] },
-};
+import { Wind, Brain, User } from "lucide-react";
+import { Link } from "wouter";
 
 export default function HomePage() {
-  const { user, logout } = useUser();
-  const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
-  const [isZenMode, setIsZenMode] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
-
-  const {
-    isActive,
-    isPaused,
-    currentPhase,
-    currentCycle,
-    elapsedTime,
-    countdown,
-    sessionCompleted,
-    startSession,
-    pauseSession,
-    resumeSession,
-    endSession
-  } = useBreathing(breathingPatterns[selectedPattern].sequence);
-
-  const handlePatternChange = useCallback((value: PatternType) => {
-    if (isActive) {
-      endSession();
-    }
-    setSelectedPattern(value);
-  }, [isActive, endSession]);
-
-  const handleToggleZen = () => {
-    setIsZenMode(prev => !prev);
-  };
-
-  const handleToggleSound = () => {
-    setIsSoundEnabled(prev => !prev);
-  };
-
-  const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length +
-    (currentPhase > 0 ? currentPhase : 0);
-
   return (
-    <div className={cn(
-      "min-h-screen bg-background transition-all duration-500",
-      isZenMode ? "p-0" : "p-4"
-    )}>
-      <div className={cn(
-        "max-w-4xl mx-auto space-y-5",
-        isZenMode && "hidden"
-      )}>
-        <header className={cn(
-          "flex justify-between items-center mb-3 transition-opacity duration-300",
-          isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
-        )}>
-          <h1 className="text-2xl font-bold text-primary">Breath Session</h1>
-          <Button variant="outline" onClick={() => logout()}>Logout</Button>
-        </header>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <ErrorBoundary>
-            <Card>
-              <CardContent className="pt-4 pb-6">
-                <BreathingGuide
-                  pattern={breathingPatterns[selectedPattern]}
-                  isActive={isActive}
-                  isPaused={isPaused}
-                  currentPhase={currentPhase}
-                  isZenMode={isZenMode}
-                  isSoundEnabled={isSoundEnabled}
-                  elapsed={elapsedTime}
-                  breathCount={breathCount}
-                  countdown={countdown}
-                  sessionCompleted={sessionCompleted}
-                  onStart={startSession}
-                  onPause={pauseSession}
-                  onResume={resumeSession}
-                  onStop={endSession}
-                  onToggleZen={handleToggleZen}
-                  onToggleSound={handleToggleSound}
-                  onPatternChange={handlePatternChange}
-                />
+    <>
+      <Navigation />
+      <main className="min-h-screen pt-24 pb-8 px-4 bg-background">
+        <div className="container max-w-6xl mx-auto grid gap-6 md:grid-cols-3">
+          <Link href="/breathwork">
+            <Card className="group cursor-pointer transition-all hover:border-primary/50">
+              <CardHeader>
+                <Wind className="h-8 w-8 text-primary mb-2" />
+                <CardTitle>Breathwork Sessions</CardTitle>
+                <CardDescription>
+                  Explore guided breathing exercises designed to enhance focus, relaxation, and energy levels.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">Start Session</Button>
               </CardContent>
             </Card>
-          </ErrorBoundary>
+          </Link>
 
-          <Card className={cn(
-            "transition-opacity duration-300",
-            isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
-          )}>
-            <CardHeader>
-              <CardTitle>Daily Tracking</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ProgressChart />
-            </CardContent>
-          </Card>
+          <Link href="/trance">
+            <Card className="group cursor-pointer transition-all hover:border-primary/50">
+              <CardHeader>
+                <Brain className="h-8 w-8 text-primary mb-2" />
+                <CardTitle>Guided Trance</CardTitle>
+                <CardDescription>
+                  Experience deep meditative states with guided trance sessions for enhanced mindfulness.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">Begin Journey</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/profile">
+            <Card className="group cursor-pointer transition-all hover:border-primary/50">
+              <CardHeader>
+                <User className="h-8 w-8 text-primary mb-2" />
+                <CardTitle>Profile</CardTitle>
+                <CardDescription>
+                  Track your progress, view session history, and customize your experience.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">View Profile</Button>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
-      </div>
-    </div>
+      </main>
+    </>
   );
 }
