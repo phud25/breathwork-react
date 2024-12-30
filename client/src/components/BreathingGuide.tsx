@@ -166,7 +166,7 @@ export function BreathingGuide({
 
   return (
     <div className={cn(
-      "flex flex-col items-center justify-start gap-5 transition-all duration-500",
+      "flex flex-col items-center justify-start transition-all duration-500",
       isZenMode ? "h-screen p-0" : "min-h-[600px]"
     )}>
       <div className={cn(
@@ -192,7 +192,7 @@ export function BreathingGuide({
           </SelectContent>
         </Select>
 
-        <div className="flex gap-[5%] mb-1">
+        <div className="flex gap-[5%]">
           <Select
             value={sessionType}
             onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
@@ -240,7 +240,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center mt-5 mb-5">
+      <div className="mt-8 mb-5">
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
           <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -281,8 +281,8 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="w-full max-w-[600px] space-y-4">
-        <div className="flex justify-between items-center text-sm text-primary/80">
+      <div className="w-full max-w-[600px] mt-5">
+        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
         </div>
