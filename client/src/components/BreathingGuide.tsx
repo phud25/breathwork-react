@@ -45,16 +45,6 @@ const getPhaseVariant = (patternName: string, phase: number) => {
   return "hold";
 };
 
-const durationOptions = Array.from({ length: 119 }, (_, i) => {
-  const totalSeconds = (i + 2) * 30;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return {
-    value: `${minutes}:${seconds.toString().padStart(2, '0')}`,
-    label: `${minutes}:${seconds.toString().padStart(2, '0')}`
-  };
-});
-
 export function BreathingGuide({
   pattern,
   isActive,
@@ -84,10 +74,9 @@ export function BreathingGuide({
   const [showVolumeControl, setShowVolumeControl] = useState(false);
   const [volume, setVolume] = useState(0.5);
 
-  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: volume * 0.6 });
-  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: volume });
-  const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: volume });
-
+  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? volume * 0.6 : 0 });
+  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? volume : 0 });
+  const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: isSoundEnabled ? volume : 0 });
 
   useEffect(() => {
     if (isActive && isSoundEnabled && !isPaused && !isHolding) {
@@ -104,7 +93,7 @@ export function BreathingGuide({
         backgroundMusic.fadeIn();
         sessionAudio.play();
       }
-    } else {
+    } else if (!isActive) {
       backgroundMusic.stop();
       sessionAudio.stop();
     }
@@ -118,6 +107,18 @@ export function BreathingGuide({
     };
   }, []);
 
+  useEffect(() => {
+    if (!isSoundEnabled) {
+      backgroundMusic.setVolume(0);
+      breathSound.setVolume(0);
+      sessionAudio.setVolume(0);
+    } else {
+      backgroundMusic.setVolume(volume * 0.6);
+      breathSound.setVolume(volume);
+      sessionAudio.setVolume(volume);
+    }
+  }, [isSoundEnabled, volume]);
+
   const startHold = () => {
     if (!isActive || isHolding) return;
     setIsHolding(true);
@@ -126,6 +127,12 @@ export function BreathingGuide({
       setHoldTime(prev => prev + 1);
     }, 1000);
     setHoldInterval(interval);
+
+    // Keep the audio playing during hold
+    if (isSoundEnabled) {
+      backgroundMusic.play();
+      sessionAudio.play();
+    }
   };
 
   const endHold = () => {
@@ -141,43 +148,22 @@ export function BreathingGuide({
     onResume();
   };
 
-  const handleStart = () => {
-    sessionAudio.play();
-    backgroundMusic.fadeIn(1000);
-    onStart();
+  const handleBreathCountChange = (value: string) => {
+    const count = parseInt(value, 10);
+    if (!isNaN(count) && count >= 1) {
+      setBreathCountState(count);
+    }
   };
 
-  const handlePause = () => {
-    backgroundMusic.fadeOut(500);
-    sessionAudio.pause();
-    onPause();
-  };
+  const handleVolumeChange = (value: number) => {
+    const newVolume = value / 100;
+    setVolume(newVolume);
 
-  const handleResume = () => {
-    backgroundMusic.fadeIn(500);
-    sessionAudio.play();
-    onResume();
-  };
-
-  const handleStop = () => {
-    backgroundMusic.fadeOut(1000);
-    sessionAudio.stop();
-    onStop();
-  };
-
-  const handleToggleSound = () => {
-    const newState = !isSoundEnabled;
-    setIsSoundEnabled(newState);
-    if (newState) {
-      backgroundMusic.setVolume(volume * 0.6);
-      sessionAudio.setVolume(volume);
-      if (isActive && !isPaused) {
-        backgroundMusic.fadeIn(500);
-        sessionAudio.play();
-      }
-    } else {
-      backgroundMusic.fadeOut(500);
-      sessionAudio.pause();
+    // Toggle sound based on volume
+    if (newVolume === 0 && isSoundEnabled) {
+      onToggleSound();
+    } else if (newVolume > 0 && !isSoundEnabled) {
+      onToggleSound();
     }
   };
 
@@ -249,12 +235,13 @@ export function BreathingGuide({
     };
   };
 
-  const handleBreathCountChange = (value: string) => {
-    const count = parseInt(value, 10);
-    if (!isNaN(count) && count >= 1) {
-      setBreathCountState(count);
-    }
-  };
+  const durationOptions = Array.from({ length: 119 }, (_, i) => {
+    const totalSeconds = (i + 2) * 30;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return { value, label: value };
+  });
 
   return (
     <div className={cn(
@@ -266,14 +253,13 @@ export function BreathingGuide({
         isZenMode ? "opacity-0 pointer-events-none absolute" : "opacity-100"
       )}>
         <Select
+          onValueChange={(value) => onPatternChange(value as PatternType)}
           value={pattern.name === "2-2 Energized Focus" ? "22" :
             pattern.name === "4-7-8 Relaxation" ? "478" :
             pattern.name === "Box Breathing (4x4)" ? "box" :
             pattern.name === "5-5-5 Triangle" ? "555" :
             pattern.name === "2-4 Ha Breath" ? "24ha" :
             pattern.name === "Breath of Fire" ? "fire" : "22"}
-          onValueChange={(value) => onPatternChange(value as PatternType)}
-          className="h-[48px] w-full"
         >
           <SelectTrigger className="bg-transparent border-slate-600 text-[#F5F5DC] hover:border-primary/50 focus:border-primary/50 transition-colors">
             <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
@@ -292,7 +278,6 @@ export function BreathingGuide({
           <Select
             value={sessionType}
             onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
-            className="w-[50%] h-[48px]"
           >
             <SelectTrigger className="bg-transparent border-slate-600 hover:border-primary/50 focus:border-primary/50 transition-colors">
               <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
@@ -307,7 +292,6 @@ export function BreathingGuide({
             <Select
               value={durationInput}
               onValueChange={setDurationInput}
-              className="w-[45%] h-[48px]"
             >
               <SelectTrigger className="bg-transparent border-slate-600 hover:border-primary/50 focus:border-primary/50 transition-colors">
                 <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
@@ -375,7 +359,7 @@ export function BreathingGuide({
             ) : (
               <Button
                 variant="ghost"
-                onClick={handleStart}
+                onClick={onStart}
                 className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-colors duration-200"
               >
                 Start
@@ -419,14 +403,7 @@ export function BreathingGuide({
                   <p className="text-sm mb-2">Volume</p>
                   <Slider
                     value={[volume * 100]}
-                    onValueChange={([value]) => {
-                      setVolume(value / 100);
-                      if (!isSoundEnabled && value > 0) {
-                        handleToggleSound();
-                      } else if (isSoundEnabled && value === 0) {
-                        handleToggleSound();
-                      }
-                    }}
+                    onValueChange={([value]) => handleVolumeChange(value)}
                     max={100}
                     step={1}
                   />
@@ -452,7 +429,7 @@ export function BreathingGuide({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={isPaused ? handleResume : handlePause}
+                onClick={isPaused ? onResume : onPause}
                 className="h-[48px] hover:bg-transparent"
                 disabled={isHolding}
               >
@@ -466,7 +443,7 @@ export function BreathingGuide({
               <Button
                 variant="destructive"
                 size="icon"
-                onClick={handleStop}
+                onClick={onStop}
                 className="h-[48px]"
               >
                 <Square className="h-4 w-4" />
