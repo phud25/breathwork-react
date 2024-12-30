@@ -238,7 +238,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className={cn("flex-1 flex items-center", isZenMode ? "h-full w-full" : "mt-0 mb-0")}>
+      <div className={cn("flex-1 flex items-center justify-center", isZenMode ? "h-full" : "py-8")}>
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
           <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -282,11 +282,11 @@ export function BreathingGuide({
       </div>
 
       <div className={cn(
-        "w-full max-w-[600px] transition-all duration-300",
-        isZenMode ? "absolute bottom-8" : "-mt-1"
+        "w-full max-w-[600px]",
+        isZenMode ? "absolute bottom-8" : ""
       )}>
         <div className={cn(
-          "flex justify-between items-center text-sm text-primary/80 mb-4 mt-2",
+          "flex justify-between items-center text-sm text-primary/80 mb-4",
           isZenMode ? "opacity-0 pointer-events-none absolute" : "opacity-100"
         )}>
           <span>Completed Breaths: {breathCount}</span>

@@ -115,17 +115,20 @@ export default function ProfilePage() {
                   className="rounded-md border"
                   classNames={{
                     day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center",
                     day_disabled: "text-muted-foreground opacity-50",
                     day_today: "bg-accent text-accent-foreground",
                     cell: "text-center h-9 w-9 p-0 relative [&:has([aria-selected].day)]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                    head_cell: "text-center text-muted-foreground",
+                    head_cell: "text-muted-foreground font-normal text-center p-0",
                     nav: "space-x-1 flex items-center justify-center",
                     nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
                     table: "w-full border-collapse space-y-1",
                     caption: "flex justify-center pt-1 relative items-center",
                     caption_label: "text-sm font-medium",
                     months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                    tbody: "flex flex-col gap-1",
+                    head: "flex gap-1",
+                    row: "flex w-full mt-2 gap-1",
                   }}
                 />
                 <Card>
