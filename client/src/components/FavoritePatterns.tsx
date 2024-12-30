@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -25,22 +24,31 @@ interface FavoritePatternsProps {
     sequence: number[];
   };
   onPatternSelect: (pattern: { name: string; sequence: number[] }) => void;
+  breathCount: number;
+  duration: number;
 }
 
-export function FavoritePatterns({ currentPattern, onPatternSelect }: FavoritePatternsProps) {
+export function FavoritePatterns({ 
+  currentPattern, 
+  onPatternSelect,
+  breathCount,
+  duration 
+}: FavoritePatternsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [patternName, setPatternName] = useState("");
   const { favorites, saveFavorite, deleteFavorite } = useFavorites();
   const { toast } = useToast();
 
   const handleSave = async () => {
     try {
+      const patternName = `${currentPattern.name} (${
+        breathCount ? `${breathCount} breaths` : `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}`
+      })`;
+
       await saveFavorite({
         name: patternName,
         sequence: currentPattern.sequence,
       });
       setIsOpen(false);
-      setPatternName("");
       toast({
         title: "Pattern saved",
         description: "Your breathing pattern has been saved to favorites.",
@@ -71,7 +79,7 @@ export function FavoritePatterns({ currentPattern, onPatternSelect }: FavoritePa
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" size="icon" className="h-[48px] hover:bg-transparent">
@@ -83,55 +91,52 @@ export function FavoritePatterns({ currentPattern, onPatternSelect }: FavoritePa
             <DialogTitle>Save Pattern</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            <Input
-              placeholder="Pattern name"
-              value={patternName}
-              onChange={(e) => setPatternName(e.target.value)}
-            />
-            <Button onClick={handleSave} disabled={!patternName}>Save</Button>
+            <Button onClick={handleSave}>Save Current Pattern</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {favorites && favorites.length > 0 && (
-        <Select
-          onValueChange={(value) => {
-            const pattern = favorites.find((f) => f.id === parseInt(value));
-            if (pattern) {
-              onPatternSelect({
-                name: pattern.name,
-                sequence: pattern.sequence as number[],
-              });
-            }
-          }}
-        >
-          <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors h-[48px]">
-            <SelectValue placeholder="Saved Patterns" className="text-white" />
-          </SelectTrigger>
-          <SelectContent className="bg-slate-800 border-slate-600">
-            {favorites.map((pattern) => (
-              <div key={pattern.id} className="flex items-center justify-between">
-                <SelectItem
-                  value={pattern.id.toString()}
-                  className="text-white hover:bg-primary/10 flex-grow"
-                >
-                  {pattern.name}
-                </SelectItem>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(pattern.id);
-                  }}
-                  className="h-8 w-8"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="w-full mt-[35px]">
+          <Select
+            onValueChange={(value) => {
+              const pattern = favorites.find((f) => f.id === parseInt(value));
+              if (pattern) {
+                onPatternSelect({
+                  name: pattern.name,
+                  sequence: pattern.sequence as number[],
+                });
+              }
+            }}
+          >
+            <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors h-[48px]">
+              <SelectValue placeholder="Saved Patterns" className="text-white" />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-800 border-slate-600">
+              {favorites.map((pattern) => (
+                <div key={pattern.id} className="flex items-center justify-between">
+                  <SelectItem
+                    value={pattern.id.toString()}
+                    className="text-white hover:bg-primary/10 flex-grow"
+                  >
+                    {pattern.name}
+                  </SelectItem>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(pattern.id);
+                    }}
+                    className="h-8 w-8"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       )}
     </div>
   );
