@@ -173,13 +173,13 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-2 mt-[35px]">
+        <div className="space-y-2 mt-[-45px]">
           <Select
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px] w-full"
           >
-            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors text-[#F5F5DC]">
+            <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
               <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
