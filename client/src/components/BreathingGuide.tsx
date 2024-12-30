@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, type AnimationProps } from "framer-motion";
-import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand } from "lucide-react";
+import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Volume1 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { useAudio } from "@/hooks/use-audio";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -16,7 +18,6 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
-// Time formatting functions
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
@@ -80,6 +81,35 @@ export function BreathingGuide({
   const [isHolding, setIsHolding] = useState(false);
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
+  const [showVolumeControl, setShowVolumeControl] = useState(false);
+
+  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: 0.3 });
+  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: 0.5 });
+
+  useEffect(() => {
+    if (isActive && isSoundEnabled && !isPaused && !isHolding) {
+      breathSound.play();
+    }
+  }, [currentPhase, isActive, isSoundEnabled, isPaused, isHolding]);
+
+  useEffect(() => {
+    if (isActive && isSoundEnabled) {
+      if (isPaused) {
+        backgroundMusic.fadeOut();
+      } else {
+        backgroundMusic.fadeIn();
+      }
+    } else {
+      backgroundMusic.stop();
+    }
+  }, [isActive, isPaused, isSoundEnabled]);
+
+  useEffect(() => {
+    return () => {
+      backgroundMusic.stop();
+      breathSound.stop();
+    };
+  }, []);
 
   const startHold = () => {
     if (!isActive || isHolding) return;
@@ -104,13 +134,13 @@ export function BreathingGuide({
     onResume();
   };
 
-  useEffect(() => {
-    return () => {
-      if (holdInterval) {
-        clearInterval(holdInterval);
-      }
-    };
-  }, [holdInterval]);
+  const handleToggleSound = () => {
+    onToggleSound();
+    if (!isSoundEnabled) {
+      backgroundMusic.stop();
+      breathSound.stop();
+    }
+  };
 
   const getPhaseAnimation = (): AnimationProps => {
     const phase = getPhaseVariant(pattern.name, currentPhase);
@@ -334,10 +364,50 @@ export function BreathingGuide({
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowVolumeControl(!showVolumeControl)}
+              className="h-[48px] hover:bg-transparent"
+            >
+              {isSoundEnabled ? (
+                showVolumeControl ? <Volume1 className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )}
+            </Button>
+
+            {showVolumeControl && (
+              <div className="absolute bottom-full mb-2 p-4 bg-background border rounded-lg shadow-lg">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm mb-2">Background Music</p>
+                    <Slider
+                      value={[backgroundMusic.volume * 100]}
+                      onValueChange={([value]) => backgroundMusic.setVolume(value / 100)}
+                      max={100}
+                      step={1}
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm mb-2">Breath Sounds</p>
+                    <Slider
+                      value={[breathSound.volume * 100]}
+                      onValueChange={([value]) => breathSound.setVolume(value / 100)}
+                      max={100}
+                      step={1}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <Button
             variant="outline"
             size="icon"
-            onClick={onToggleSound}
+            onClick={handleToggleSound}
             className="h-[48px] hover:bg-transparent"
           >
             {isSoundEnabled ? (
@@ -345,15 +415,6 @@ export function BreathingGuide({
             ) : (
               <VolumeX className="h-4 w-4" />
             )}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleZen}
-            className="h-[48px] hover:bg-transparent"
-          >
-            <Maximize2 className="h-4 w-4" />
           </Button>
 
           {isActive && (
