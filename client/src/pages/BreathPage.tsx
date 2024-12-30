@@ -60,7 +60,7 @@ export default function BreathPage() {
       <Navigation />
       <main className={cn(
         "min-h-screen bg-background transition-all duration-500",
-        isZenMode ? "p-0" : "pt-24 px-4 pb-8"
+        isZenMode ? "p-0" : "pt-14 px-4 pb-8"
       )}>
         <div className={cn(
           "container max-w-4xl mx-auto space-y-5",
@@ -69,7 +69,7 @@ export default function BreathPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
               <Card>
-                <CardContent className="pt-4 pb-6">
+                <CardContent className="py-4">
                   <BreathingGuide
                     pattern={breathingPatterns[selectedPattern]}
                     isActive={isActive}

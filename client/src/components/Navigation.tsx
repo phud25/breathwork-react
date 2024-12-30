@@ -17,11 +17,20 @@ export function Navigation() {
   const { logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
 
+  const getHeaderText = (path: string) => {
+    switch (path) {
+      case '/breathwork':
+        return 'Breathwork Sessions';
+      default:
+        return 'Patterns Breathwork';
+    }
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border">
+    <header className="fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
       <nav className="container h-full flex items-center justify-between">
         <Link href="/">
-          <a className="text-lg font-semibold text-primary">Patterns</a>
+          <a className="text-lg font-semibold text-primary">{getHeaderText(location)}</a>
         </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
