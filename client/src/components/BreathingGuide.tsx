@@ -18,18 +18,59 @@ const phaseColors = {
 
 // Define ripple animation variants
 const rippleVariants = {
-  active: {
-    scale: [1, 1.1, 1.2],
-    opacity: [0.3, 0.2, 0],
+  inhale: {
+    scale: [1, 1.1],
+    opacity: [0.3, 0],
     transition: {
       duration: 2,
       repeat: Infinity,
       ease: "linear"
     }
   },
-  inactive: {
+  exhale: {
+    scale: [1.1, 1],
+    opacity: [0.3, 0],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "linear"
+    }
+  },
+  hold: {
     scale: 1,
-    opacity: 0
+    opacity: 0,
+    transition: {
+      duration: 0.3
+    }
+  }
+};
+
+// Define inner ripple variants
+const innerRippleVariants = {
+  inhale: {
+    scale: [0.8, 1],
+    opacity: [0.4, 0],
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "linear"
+    }
+  },
+  exhale: {
+    scale: [1, 0.8],
+    opacity: [0.4, 0],
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "linear"
+    }
+  },
+  hold: {
+    scale: 1,
+    opacity: 0,
+    transition: {
+      duration: 0.3
+    }
   }
 };
 
@@ -264,23 +305,45 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="mt-0 mb-0">
-        <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+      <div className="mt-8 mb-12">
+        <div className="relative w-[285px] h-[285px] flex items-center justify-center">
           {/* Background circle */}
-          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 via-purple-600/20 to-purple-700/30 transition-all duration-500" />
+          <div className="absolute w-[265px] h-[265px] rounded-full bg-gradient-to-r from-purple-500/10 via-purple-600/20 to-purple-700/30 transition-all duration-500" />
 
-          {/* Ripple circles */}
+          {/* Outer ripple circles */}
           {[0, 1, 2].map((index) => (
             <motion.div
-              key={`ripple-${index}`}
+              key={`outer-ripple-${index}`}
               className={cn(
-                "absolute w-[280px] h-[280px] rounded-full border border-purple-500/20",
+                "absolute w-[265px] h-[265px] rounded-full border border-purple-500/20",
               )}
-              initial="inactive"
-              animate={isActive && !isPaused ? "active" : "inactive"}
+              initial="hold"
+              animate={isActive && !isPaused ? 
+                getPhaseVariant(pattern.name, currentPhase) === "inhale" ? "inhale" :
+                getPhaseVariant(pattern.name, currentPhase) === "exhale" ? "exhale" : 
+                "hold" : "hold"}
               variants={rippleVariants}
               transition={{
-                delay: index * 0.5,
+                delay: index * 0.4,
+              }}
+            />
+          ))}
+
+          {/* Inner ripple circles */}
+          {[0, 1].map((index) => (
+            <motion.div
+              key={`inner-ripple-${index}`}
+              className={cn(
+                "absolute w-[265px] h-[265px] rounded-full border border-purple-500/20",
+              )}
+              initial="hold"
+              animate={isActive && !isPaused ? 
+                getPhaseVariant(pattern.name, currentPhase) === "inhale" ? "inhale" :
+                getPhaseVariant(pattern.name, currentPhase) === "exhale" ? "exhale" : 
+                "hold" : "hold"}
+              variants={innerRippleVariants}
+              transition={{
+                delay: index * 0.3,
               }}
             />
           ))}
@@ -288,13 +351,13 @@ export function BreathingGuide({
           {/* Breathing animation circle */}
           <motion.div
             className={cn(
-              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+              "absolute w-[265px] h-[265px] rounded-full bg-gradient-to-r overflow-hidden",
               phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors]
             )}
             {...getPhaseAnimation()}
           />
 
-          <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40
+          <div className="relative w-[75px] h-[75px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40
             border-2 border-purple-500/50 flex items-center justify-center backdrop-blur-sm">
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
