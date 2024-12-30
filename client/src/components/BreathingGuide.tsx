@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-export type PatternType = "478" | "box" | "22" | "555";
+type PatternType = "478" | "box" | "22" | "555";
 
 interface BreathingGuideProps {
   pattern: {
@@ -27,7 +27,7 @@ interface BreathingGuideProps {
   onStop: () => void;
   onToggleZen: () => void;
   onToggleSound: () => void;
-  onPatternChange: (pattern: PatternType) => void;
+  onPatternChange: (value: PatternType) => void;
 }
 
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
@@ -132,6 +132,27 @@ export function BreathingGuide({
     };
   };
 
+  const handleDurationMinutesChange = (value: string) => {
+    const minutes = parseInt(value, 10);
+    if (!isNaN(minutes) && minutes >= 1 && minutes <= 60) {
+      setDurationMinutes(minutes);
+    }
+  };
+
+  const handleDurationSecondsChange = (value: string) => {
+    const seconds = parseInt(value, 10);
+    if (!isNaN(seconds) && seconds >= 0 && seconds < 60) {
+      setDurationSeconds(seconds);
+    }
+  };
+
+  const handleBreathCountChange = (value: string) => {
+    const count = parseInt(value, 10);
+    if (!isNaN(count) && count >= 1) {
+      setBreathCountState(count);
+    }
+  };
+
   return (
     <div className={cn(
       "flex flex-col items-center justify-center max-h-screen transition-all duration-500",
@@ -141,20 +162,20 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-4">
+        <div className="mb-6 space-y-6">
           <Select 
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
-            defaultValue="box"
+            className="h-[48px]"
           >
-            <SelectTrigger className="h-[48px] bg-background border-input hover:border-primary/50 transition-colors">
-              <SelectValue placeholder="Box Breathing (4x4)" className="text-foreground" />
+            <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors">
+              <SelectValue className="text-white" />
             </SelectTrigger>
             <SelectContent className="bg-background border-input">
-              <SelectItem value="478" className="text-foreground hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-              <SelectItem value="box" className="text-foreground hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-              <SelectItem value="22" className="text-foreground hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-              <SelectItem value="555" className="text-foreground hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+              <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+              <SelectItem value="box" className="text-white hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="22" className="text-white hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+              <SelectItem value="555" className="text-white hover:bg-primary/10">5-5-5 Triangle</SelectItem>
             </SelectContent>
           </Select>
 
@@ -162,15 +183,14 @@ export function BreathingGuide({
             <Select
               value={sessionType}
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
-              className="w-[50%]"
-              defaultValue="breaths"
+              className="w-[50%] h-[48px]"
             >
-              <SelectTrigger className="h-[48px] bg-background border-input hover:border-primary/50">
-                <SelectValue placeholder="Session Type" className="text-foreground" />
+              <SelectTrigger className="bg-background border-input hover:border-primary/50">
+                <SelectValue placeholder="Session Type" className="text-white" />
               </SelectTrigger>
               <SelectContent className="bg-background border-input">
-                <SelectItem value="breaths" className="text-foreground hover:bg-primary/10">By Breath Count</SelectItem>
-                <SelectItem value="duration" className="text-foreground hover:bg-primary/10">By Duration</SelectItem>
+                <SelectItem value="breaths" className="text-white hover:bg-primary/10">By Breath Count</SelectItem>
+                <SelectItem value="duration" className="text-white hover:bg-primary/10">By Duration</SelectItem>
               </SelectContent>
             </Select>
 
@@ -179,27 +199,17 @@ export function BreathingGuide({
                 <Input 
                   type="number"
                   value={durationMinutes}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value) && value >= 1 && value <= 60) {
-                      setDurationMinutes(value);
-                    }
-                  }}
-                  className="w-1/2 h-[48px] text-center bg-background text-foreground"
+                  onChange={(e) => handleDurationMinutesChange(e.target.value)}
+                  className="w-1/2 h-[48px] text-center bg-background text-white"
                   min={1}
                   max={60}
                 />
-                <span className="flex items-center text-foreground">:</span>
+                <span className="flex items-center text-white">:</span>
                 <Input 
                   type="number"
                   value={durationSeconds.toString().padStart(2, '0')}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value, 10);
-                    if (!isNaN(value) && value >= 0 && value < 60) {
-                      setDurationSeconds(value);
-                    }
-                  }}
-                  className="w-1/2 h-[48px] text-center bg-background text-foreground"
+                  onChange={(e) => handleDurationSecondsChange(e.target.value)}
+                  className="w-1/2 h-[48px] text-center bg-background text-white"
                   min={0}
                   max={59}
                 />
@@ -208,32 +218,26 @@ export function BreathingGuide({
               <Input 
                 type="number"
                 value={breathCountState}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value, 10);
-                  if (!isNaN(value) && value >= 1) {
-                    setBreathCountState(value);
-                  }
-                }}
-                className="w-[45%] h-[48px] text-center bg-background text-foreground"
+                onChange={(e) => handleBreathCountChange(e.target.value)}
+                className="w-[45%] h-[48px] text-center bg-background text-white"
                 min={1}
               />
             )}
           </div>
         </div>
 
-        <div className="flex justify-center items-center my-8">
-          <div className="relative w-[300px] h-[300px] mx-auto">
-            <motion.div 
-              className="absolute inset-0 m-auto w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20"
-            />
+        <div className="flex justify-center items-center">
+          <div className="relative w-[300px] h-[300px]">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
             <motion.div
               className={cn(
-                "absolute inset-0 m-auto w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r",
                 getPhaseColor()
               )}
               {...getPhaseAnimation()}
             />
-            <div className="absolute inset-0 m-auto w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
               {isActive ? (
                 <div className="text-center pointer-events-none select-none">
                   <div className="text-xl font-mono text-primary font-bold">
@@ -313,36 +317,6 @@ export function BreathingGuide({
           </div>
         </div>
       </div>
-
-      {isZenMode && (
-        <div className="fixed inset-0 bg-background">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-[300px] h-[300px] mx-auto">
-              {/* Copy of the breathing animation for zen mode */}
-              <motion.div 
-                className="absolute inset-0 m-auto w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20"
-              />
-              <motion.div
-                className={cn(
-                  "absolute inset-0 m-auto w-[280px] h-[280px] rounded-full bg-gradient-to-r",
-                  getPhaseColor()
-                )}
-                {...getPhaseAnimation()}
-              />
-              <div className="absolute inset-0 m-auto w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
-                <div className="text-center pointer-events-none select-none">
-                  <div className="text-xl font-mono text-primary font-bold">
-                    {countdown}
-                  </div>
-                  <div className="text-xs text-primary/80 font-semibold">
-                    {getPhaseLabel()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
