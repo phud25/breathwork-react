@@ -4,7 +4,6 @@ import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/hooks/use-audio";
 
@@ -71,12 +70,11 @@ export function BreathingGuide({
   const [isHolding, setIsHolding] = useState(false);
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
-  const [showVolumeControl, setShowVolumeControl] = useState(false);
-  const [volume, setVolume] = useState(0.5);
 
-  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? volume * 0.6 : 0 });
-  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? volume : 0 });
-  const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: isSoundEnabled ? volume : 0 });
+  const fixedVolume = 0.5; // Fixed volume at 50%
+  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
+  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? fixedVolume : 0 });
+  const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume : 0 });
 
   useEffect(() => {
     if (isActive && isSoundEnabled && !isPaused && !isHolding) {
@@ -113,11 +111,11 @@ export function BreathingGuide({
       breathSound.setVolume(0);
       sessionAudio.setVolume(0);
     } else {
-      backgroundMusic.setVolume(volume * 0.6);
-      breathSound.setVolume(volume);
-      sessionAudio.setVolume(volume);
+      backgroundMusic.setVolume(fixedVolume * 0.6);
+      breathSound.setVolume(fixedVolume);
+      sessionAudio.setVolume(fixedVolume);
     }
-  }, [isSoundEnabled, volume]);
+  }, [isSoundEnabled]);
 
   const startHold = () => {
     if (!isActive || isHolding) return;
@@ -155,17 +153,13 @@ export function BreathingGuide({
     }
   };
 
-  const handleVolumeChange = (value: number) => {
-    const newVolume = value / 100;
-    setVolume(newVolume);
-
-    // Toggle sound based on volume
-    if (newVolume === 0 && isSoundEnabled) {
-      onToggleSound();
-    } else if (newVolume > 0 && !isSoundEnabled) {
-      onToggleSound();
-    }
-  };
+  const durationOptions = Array.from({ length: 119 }, (_, i) => {
+    const totalSeconds = (i + 2) * 30;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return { value, label: value };
+  });
 
   const getPhaseAnimation = (): AnimationProps => {
     const phase = getPhaseVariant(pattern.name, currentPhase);
@@ -234,14 +228,6 @@ export function BreathingGuide({
       }
     };
   };
-
-  const durationOptions = Array.from({ length: 119 }, (_, i) => {
-    const totalSeconds = (i + 2) * 30;
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    const value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    return { value, label: value };
-  });
 
   return (
     <div className={cn(
@@ -387,30 +373,14 @@ export function BreathingGuide({
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">
-          <div className="relative">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setShowVolumeControl(!showVolumeControl)}
-              className="h-[48px] hover:bg-transparent"
-            >
-              {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            </Button>
-
-            {showVolumeControl && (
-              <div className="absolute bottom-full mb-2 p-4 bg-background border rounded-lg shadow-lg">
-                <div>
-                  <p className="text-sm mb-2">Volume</p>
-                  <Slider
-                    value={[volume * 100]}
-                    onValueChange={([value]) => handleVolumeChange(value)}
-                    max={100}
-                    step={1}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleSound}
+            className="h-[48px] hover:bg-transparent"
+          >
+            {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+          </Button>
 
           {isActive && (
             <>
