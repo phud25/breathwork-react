@@ -162,13 +162,14 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="mb-6 space-y-6">
+        <div className="mb-[25px] space-y-6"> {/* Adjusted spacing */}
           <Select 
+            defaultValue="box"
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px]"
           >
-            <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors">
+            <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors text-white">
               <SelectValue className="text-white" />
             </SelectTrigger>
             <SelectContent className="bg-background border-input">
@@ -226,7 +227,7 @@ export function BreathingGuide({
           </div>
         </div>
 
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center mb-6">
           <div className="relative w-[300px] h-[300px]">
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
             <motion.div
@@ -260,7 +261,7 @@ export function BreathingGuide({
           </div>
         </div>
 
-        <div className="w-full max-w-[600px] mt-6">
+        <div className="w-full max-w-[600px]">
           <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
             <span>Completed Breaths: {breathCount}</span>
             <span>Time: {formatTime(elapsed)}</span>
