@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, json, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
@@ -27,6 +27,15 @@ export const achievements = pgTable("achievements", {
   metadata: json("metadata")
 });
 
+export const favoritePatterns = pgTable("favorite_patterns", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  name: text("name").notNull(),
+  sequence: json("sequence").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  isQuickSave: boolean("is_quick_save").default(false).notNull()
+});
+
 export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export type User = typeof users.$inferSelect;
@@ -37,3 +46,6 @@ export type NewSession = typeof sessions.$inferInsert;
 
 export type Achievement = typeof achievements.$inferSelect;
 export type NewAchievement = typeof achievements.$inferInsert;
+
+export type FavoritePattern = typeof favoritePatterns.$inferSelect;
+export type NewFavoritePattern = typeof favoritePatterns.$inferInsert;
