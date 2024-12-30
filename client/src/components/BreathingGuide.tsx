@@ -39,9 +39,8 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
-// Generate duration options (1:00 to 60:00 in 30-second increments)
 const durationOptions = Array.from({ length: 119 }, (_, i) => {
-  const totalSeconds = (i + 2) * 30; // Start from 1:00 (60 seconds)
+  const totalSeconds = (i + 2) * 30;
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return {
@@ -175,20 +174,19 @@ export function BreathingGuide({
         isZenMode && "hidden"
       )}>
         <div className="space-y-2">
-          <div className="text-xl font-semibold text-primary mb-[35px]">Breath Session</div>
           <Select
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px] w-full"
           >
             <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-              <SelectValue placeholder="Select Breathing Pattern" className="text-white" />
+              <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
-              <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-              <SelectItem value="box" className="text-white hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-              <SelectItem value="22" className="text-white hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-              <SelectItem value="555" className="text-white hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+              <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+              <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+              <SelectItem value="555" className="text-[#F5F5DC] hover:bg-primary/10">5-5-5 Triangle</SelectItem>
             </SelectContent>
           </Select>
 
@@ -199,11 +197,11 @@ export function BreathingGuide({
               className="w-[50%] h-[48px]"
             >
               <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-                <SelectValue placeholder="Session Type" className="text-white" />
+                <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600">
-                <SelectItem value="breaths" className="text-white hover:bg-primary/10">By Breath Count</SelectItem>
-                <SelectItem value="duration" className="text-white hover:bg-primary/10">By Duration</SelectItem>
+                <SelectItem value="breaths" className="text-[#F5F5DC] hover:bg-primary/10">By Breath Count</SelectItem>
+                <SelectItem value="duration" className="text-[#F5F5DC] hover:bg-primary/10">By Duration</SelectItem>
               </SelectContent>
             </Select>
 
@@ -214,14 +212,14 @@ export function BreathingGuide({
                 className="w-[45%] h-[48px]"
               >
                 <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-                  <SelectValue placeholder="3:00" className="text-white" />
+                  <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
                   {durationOptions.map((option) => (
                     <SelectItem
                       key={option.value}
                       value={option.value}
-                      className="text-white hover:bg-primary/10"
+                      className="text-[#F5F5DC] hover:bg-primary/10"
                     >
                       {option.label}
                     </SelectItem>
@@ -233,7 +231,7 @@ export function BreathingGuide({
                 type="number"
                 value={breathCountState}
                 onChange={(e) => handleBreathCountChange(e.target.value)}
-                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-white focus:ring-primary/50"
+                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-[#F5F5DC] focus:ring-primary/50"
                 min={1}
               />
             )}
