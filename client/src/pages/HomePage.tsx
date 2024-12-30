@@ -1,80 +1,138 @@
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { BreathingGuide } from "@/components/BreathingGuide";
+import { ProgressChart } from "@/components/ProgressChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Wind, Brain, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useBreathing } from "@/hooks/use-breathing";
 import { useUser } from "@/hooks/use-user";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
+
+type PatternType = "478" | "box" | "22" | "555";
+
+const breathingPatterns: Record<PatternType, { name: string; sequence: number[] }> = {
+  "478": { name: "4-7-8 Relaxation", sequence: [4, 7, 8] },
+  "box": { name: "Box Breathing (4x4)", sequence: [4, 4, 4, 4] },
+  "22": { name: "2-2 Energized Focus", sequence: [2, 2] },
+  "555": { name: "5-5-5 Triangle", sequence: [5, 5, 5] },
+};
 
 export default function HomePage() {
   const { user, logout } = useUser();
+  const [selectedPattern, setSelectedPattern] = useState<PatternType>("478");
+  const [isZenMode, setIsZenMode] = useState(false);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const { 
+    isActive,
+    isPaused,
+    currentPhase,
+    currentCycle,
+    elapsedTime,
+    countdown,
+    startSession,
+    pauseSession,
+    resumeSession,
+    endSession
+  } = useBreathing(breathingPatterns[selectedPattern].sequence);
 
-  const navigationCards = [
-    {
-      title: "Breathwork Sessions",
-      description: "Start a guided breathing exercise session",
-      icon: Wind,
-      href: "/breathwork",
-    },
-    {
-      title: "Guided Trance",
-      description: "Begin a meditation journey",
-      icon: Brain,
-      href: "/trance",
-    },
-    {
-      title: "User Profile",
-      description: "View your progress and achievements",
-      icon: User,
-      href: "/profile",
-    },
-  ];
+  const handlePatternChange = useCallback((value: PatternType) => {
+    if (isActive) {
+      endSession();
+    }
+    setSelectedPattern(value);
+  }, [isActive, endSession]);
+
+  const handleToggleZen = () => {
+    setIsZenMode(prev => !prev);
+  };
+
+  const handleToggleSound = () => {
+    setIsSoundEnabled(prev => !prev);
+  };
+
+  const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length + 
+    (currentPhase > 0 ? currentPhase : 0);
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-primary">Patterns Breathwork</h1>
-          <button 
-            onClick={() => logout()}
-            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            Logout
-          </button>
+    <div className={cn(
+      "min-h-screen bg-background transition-all duration-500",
+      isZenMode ? "p-0" : "p-4"
+    )}>
+      <div className={cn(
+        "max-w-4xl mx-auto space-y-6",
+        isZenMode && "hidden"
+      )}>
+        <header className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-primary">Welcome, {user?.username}</h1>
+          <Button variant="outline" onClick={() => logout()}>Logout</Button>
         </header>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {navigationCards.map((card, index) => (
-            <Link key={card.href} href={card.href}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="h-full"
-              >
-                <Card className="cursor-pointer h-full transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5">
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <card.icon className="h-6 w-6 text-primary" />
-                      <CardTitle>{card.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{card.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Link>
-          ))}
+        <div className="grid md:grid-cols-2 gap-6">
+          <ErrorBoundary>
+            <Card>
+              <CardHeader className="pb-[15px]">
+                <CardTitle>Breath Session</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BreathingGuide 
+                  pattern={breathingPatterns[selectedPattern]}
+                  isActive={isActive}
+                  isPaused={isPaused}
+                  currentPhase={currentPhase}
+                  isZenMode={isZenMode}
+                  isSoundEnabled={isSoundEnabled}
+                  elapsed={elapsedTime}
+                  breathCount={breathCount}
+                  countdown={countdown}
+                  onStart={startSession}
+                  onPause={pauseSession}
+                  onResume={resumeSession}
+                  onStop={endSession}
+                  onToggleZen={handleToggleZen}
+                  onToggleSound={handleToggleSound}
+                  onPatternChange={handlePatternChange}
+                />
+              </CardContent>
+            </Card>
+          </ErrorBoundary>
+
+          <Card className={cn(isZenMode && "hidden")}>
+            <CardHeader>
+              <CardTitle>Your Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ProgressChart />
+            </CardContent>
+          </Card>
         </div>
       </div>
+
+      {isZenMode && (
+        <ErrorBoundary>
+          <div className="fixed inset-0 bg-background">
+            <BreathingGuide 
+              pattern={breathingPatterns[selectedPattern]}
+              isActive={isActive}
+              isPaused={isPaused}
+              currentPhase={currentPhase}
+              isZenMode={isZenMode}
+              isSoundEnabled={isSoundEnabled}
+              elapsed={elapsedTime}
+              breathCount={breathCount}
+              countdown={countdown}
+              onStart={startSession}
+              onPause={pauseSession}
+              onResume={resumeSession}
+              onStop={endSession}
+              onToggleZen={handleToggleZen}
+              onToggleSound={handleToggleSound}
+              onPatternChange={handlePatternChange}
+            />
+          </div>
+        </ErrorBoundary>
+      )}
     </div>
   );
 }

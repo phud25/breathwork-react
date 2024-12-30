@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, type AnimationProps } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -58,8 +58,17 @@ export function BreathingGuide({
 }: BreathingGuideProps) {
   const [sessionType, setSessionType] = useState<"breaths" | "duration">("breaths");
   const [breathCountState, setBreathCountState] = useState<number>(15);
-  const [durationMinutes, setDurationMinutes] = useState<number>(3);
-  const [durationSeconds, setDurationSeconds] = useState<number>(0);
+  const [durationInput, setDurationInput] = useState<string>("3:00");
+
+  // Initialize duration values from the input string
+  useEffect(() => {
+    if (sessionType === "duration") {
+      const [minutes, seconds] = durationInput.split(":").map(Number);
+      if (!isNaN(minutes) && !isNaN(seconds)) {
+        console.log("Duration updated:", { minutes, seconds });
+      }
+    }
+  }, [sessionType, durationInput]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -68,6 +77,7 @@ export function BreathingGuide({
   };
 
   const getPhaseVariant = () => {
+    // Special case for 2-2 pattern
     if (pattern.name.includes("2-2") && currentPhase === 1) {
       return "exhale";
     }
@@ -78,6 +88,7 @@ export function BreathingGuide({
   };
 
   const getPhaseLabel = () => {
+    // Special case for 2-2 pattern
     if (pattern.name.includes("2-2")) {
       return currentPhase === 0 ? "Inhale" : "Exhale";
     }
@@ -91,6 +102,9 @@ export function BreathingGuide({
   const getPhaseAnimation = (): AnimationProps => {
     const phase = getPhaseVariant();
     const phaseDuration = pattern.sequence[currentPhase];
+    const isPostInhale = currentPhase === 1;
+
+    console.log("Animation phase:", { phase, phaseDuration, currentPhase });
 
     if (!isActive || isPaused) {
       return {
@@ -125,24 +139,27 @@ export function BreathingGuide({
       };
     }
 
-    const isPostInhale = currentPhase === 1;
+    // Hold phase
     return {
       initial: { scale: isPostInhale ? 1 : 0.3 },
-      animate: { scale: isPostInhale ? 1 : 0.3 }
+      animate: {
+        scale: isPostInhale ? 1 : 0.3,
+        transition: {
+          duration: phaseDuration
+        }
+      }
     };
   };
 
-  const handleDurationMinutesChange = (value: string) => {
-    const minutes = parseInt(value, 10);
-    if (!isNaN(minutes) && minutes >= 1 && minutes <= 60) {
-      setDurationMinutes(minutes);
-    }
-  };
+  const handleDurationChange = (value: string) => {
+    // Validate format
+    if (!/^\d{1,2}:\d{2}$/.test(value)) return;
 
-  const handleDurationSecondsChange = (value: string) => {
-    const seconds = parseInt(value, 10);
-    if (!isNaN(seconds) && seconds >= 0 && seconds < 60) {
-      setDurationSeconds(seconds);
+    const [minutes, seconds] = value.split(":").map(Number);
+
+    // Validate ranges
+    if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
+      setDurationInput(value);
     }
   };
 
@@ -162,160 +179,152 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="mb-6"> {/* Container for top section */}
+        <div className="space-y-4">
           <Select 
-            defaultValue="box"
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px]"
           >
             <SelectTrigger className="bg-background border-input hover:border-primary/50 transition-colors">
-              <SelectValue className="text-white" />
+              <SelectValue placeholder="Select Breathing Pattern" />
             </SelectTrigger>
             <SelectContent className="bg-background border-input">
-              <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-              <SelectItem value="box" className="text-white hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-              <SelectItem value="22" className="text-white hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-              <SelectItem value="555" className="text-white hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+              <SelectItem value="478" className="hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+              <SelectItem value="box" className="hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="22" className="hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+              <SelectItem value="555" className="hover:bg-primary/10">5-5-5 Triangle</SelectItem>
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%] mt-6">
+          <div className="flex gap-[5%] mb-2">
             <Select
               value={sessionType}
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
               className="w-[50%] h-[48px]"
             >
               <SelectTrigger className="bg-background border-input hover:border-primary/50">
-                <SelectValue placeholder="Session Type" className="text-white" />
+                <SelectValue placeholder="Session Type" />
               </SelectTrigger>
               <SelectContent className="bg-background border-input">
-                <SelectItem value="breaths" className="text-white hover:bg-primary/10">By Breath Count</SelectItem>
-                <SelectItem value="duration" className="text-white hover:bg-primary/10">By Duration</SelectItem>
+                <SelectItem value="breaths">By Breath Count</SelectItem>
+                <SelectItem value="duration">By Duration</SelectItem>
               </SelectContent>
             </Select>
 
             {sessionType === "duration" ? (
-              <div className="w-[45%] flex gap-2">
-                <Input 
-                  type="number"
-                  value={durationMinutes}
-                  onChange={(e) => handleDurationMinutesChange(e.target.value)}
-                  className="w-1/2 h-[48px] text-center bg-background text-white"
-                  min={1}
-                  max={60}
-                />
-                <span className="flex items-center text-white">:</span>
-                <Input 
-                  type="number"
-                  value={durationSeconds.toString().padStart(2, '0')}
-                  onChange={(e) => handleDurationSecondsChange(e.target.value)}
-                  className="w-1/2 h-[48px] text-center bg-background text-white"
-                  min={0}
-                  max={59}
-                />
-              </div>
+              <Input 
+                type="text"
+                value={durationInput}
+                onChange={(e) => handleDurationChange(e.target.value)}
+                className="w-[45%] h-[48px] text-center bg-background"
+                placeholder="3:00"
+                min="1:00"
+                max="60:00"
+              />
             ) : (
               <Input 
                 type="number"
                 value={breathCountState}
                 onChange={(e) => handleBreathCountChange(e.target.value)}
-                className="w-[45%] h-[48px] text-center bg-background text-white"
+                className="w-[45%] h-[48px] text-center bg-background"
                 min={1}
               />
             )}
           </div>
         </div>
+      </div>
 
-        <div className="flex justify-center items-center">
-          <div className="relative w-[300px] h-[300px]">
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
-            <motion.div
-              className={cn(
-                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r",
-                getPhaseColor()
-              )}
-              {...getPhaseAnimation()}
-            />
+      {/* Fixed size circle container */}
+      <div className="relative w-[300px] h-[300px] mt-2 mb-[15px] flex items-center justify-center">
+        {/* Outer static circle */}
+        <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
-              {isActive ? (
-                <div className="text-center pointer-events-none select-none">
-                  <div className="text-xl font-mono text-primary font-bold">
-                    {countdown}
-                  </div>
-                  <div className="text-xs text-primary/80 font-semibold">
-                    {getPhaseLabel()}
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  variant="ghost"
-                  onClick={onStart}
-                  className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
-                >
-                  Start
-                </Button>
-              )}
+        {/* Middle animated circle */}
+        <motion.div
+          className={cn(
+            "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+            getPhaseColor()
+          )}
+          {...getPhaseAnimation()}
+        />
+
+        {/* Inner circle with content */}
+        <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+          {isActive ? (
+            <div className="text-center pointer-events-none select-none">
+              <div className="text-xl font-mono text-primary font-bold">
+                {countdown}
+              </div>
+              <div className="text-xs text-primary/80 font-semibold">
+                {getPhaseLabel()}
+              </div>
             </div>
-          </div>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={onStart}
+              className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
+            >
+              Start
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="w-full max-w-[600px]">
+        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
+          <span>Completed Breaths: {breathCount}</span>
+          <span>Time: {formatTime(elapsed)}</span>
         </div>
 
-        <div className="w-full max-w-[600px] mt-6">
-          <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
-            <span>Completed Breaths: {breathCount}</span>
-            <span>Time: {formatTime(elapsed)}</span>
-          </div>
-
-          <div className="flex items-center justify-center gap-[20px]">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onToggleSound}
-              className="h-[48px] hover:bg-transparent"
-            >
-              {isSoundEnabled ? (
-                <Volume2 className="h-4 w-4" />
-              ) : (
-                <VolumeX className="h-4 w-4" />
-              )}
-            </Button>
-
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onToggleZen}
-              className="h-[48px] hover:bg-transparent"
-            >
-              <Maximize2 className="h-4 w-4" />
-            </Button>
-
-            {isActive && (
-              <>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={isPaused ? onResume : onPause}
-                  className="h-[48px] hover:bg-transparent"
-                >
-                  {isPaused ? (
-                    <Play className="h-4 w-4" />
-                  ) : (
-                    <Pause className="h-4 w-4" />
-                  )}
-                </Button>
-
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={onStop}
-                  className="h-[48px]"
-                >
-                  <Square className="h-4 w-4" />
-                </Button>
-              </>
+        <div className="flex items-center justify-center gap-[20px]">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleSound}
+            className="h-[48px] hover:bg-transparent"
+          >
+            {isSoundEnabled ? (
+              <Volume2 className="h-4 w-4" />
+            ) : (
+              <VolumeX className="h-4 w-4" />
             )}
-          </div>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleZen}
+            className="h-[48px] hover:bg-transparent"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+
+          {isActive && (
+            <>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={isPaused ? onResume : onPause}
+                className="h-[48px] hover:bg-transparent"
+              >
+                {isPaused ? (
+                  <Play className="h-4 w-4" />
+                ) : (
+                  <Pause className="h-4 w-4" />
+                )}
+              </Button>
+
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={onStop}
+                className="h-[48px]"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -2,7 +2,6 @@ import { Switch, Route } from "wouter";
 import { Loader2 } from "lucide-react";
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
-import BreathworkPage from "./pages/BreathworkPage";
 import { useUser } from "./hooks/use-user";
 
 function App() {
@@ -23,16 +22,6 @@ function App() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
-      <Route path="/breathwork" component={BreathworkPage} />
-      <Route path="/trance">
-        {() => <div>Trance Page (Coming Soon)</div>}
-      </Route>
-      <Route path="/profile">
-        {() => <div>Profile Page (Coming Soon)</div>}
-      </Route>
-      <Route>
-        {() => <HomePage />}
-      </Route>
     </Switch>
   );
 }
