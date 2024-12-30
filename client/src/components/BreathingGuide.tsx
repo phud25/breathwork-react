@@ -50,7 +50,7 @@ export function BreathingGuide({
   currentPhase,
   isPaused = false,
   isZenMode = false,
-  isSoundEnabled = true,
+  isSoundEnabled = false,
   elapsed,
   breathCount,
   countdown,
@@ -84,7 +84,7 @@ export function BreathingGuide({
 
   useEffect(() => {
     if (isActive && isSoundEnabled) {
-      if (isPaused) {
+      if (isPaused && !isHolding) {
         backgroundMusic.fadeOut();
         sessionAudio.pause();
       } else {
@@ -95,7 +95,7 @@ export function BreathingGuide({
       backgroundMusic.stop();
       sessionAudio.stop();
     }
-  }, [isActive, isPaused, isSoundEnabled]);
+  }, [isActive, isPaused, isSoundEnabled, isHolding]);
 
   useEffect(() => {
     return () => {
@@ -126,7 +126,6 @@ export function BreathingGuide({
     }, 1000);
     setHoldInterval(interval);
 
-    // Keep the audio playing during hold
     if (isSoundEnabled) {
       backgroundMusic.play();
       sessionAudio.play();
