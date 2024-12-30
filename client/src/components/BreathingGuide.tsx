@@ -173,9 +173,9 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-2 mt-[-45px]">
+        <div className="space-y-2 mt-[-85px]">
           <Select
-            value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
+            value="22"
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px] w-full"
           >
