@@ -95,16 +95,16 @@ export function BreathingGuide({
 
     if (!isActive || isPaused) {
       return {
-        initial: { scale: 0.3 },
-        animate: { scale: 0.3 }
+        initial: { scale: 0.4 },
+        animate: { scale: 0.4 }
       };
     }
 
     if (phase === "inhale") {
       return {
-        initial: { scale: 0.3 },
+        initial: { scale: 0.4 },
         animate: {
-          scale: 1,
+          scale: 0.95,
           transition: {
             duration: phaseDuration,
             ease: "easeInOut"
@@ -115,9 +115,9 @@ export function BreathingGuide({
 
     if (phase === "exhale") {
       return {
-        initial: { scale: 1 },
+        initial: { scale: 0.95 },
         animate: {
-          scale: 0.3,
+          scale: 0.4,
           transition: {
             duration: phaseDuration,
             ease: "easeInOut"
@@ -127,8 +127,8 @@ export function BreathingGuide({
     }
 
     return {
-      initial: { scale: isPostInhale ? 1 : 0.3 },
-      animate: { scale: isPostInhale ? 1 : 0.3 }
+      initial: { scale: isPostInhale ? 0.95 : 0.4 },
+      animate: { scale: isPostInhale ? 0.95 : 0.4 }
     };
   };
 
@@ -228,19 +228,25 @@ export function BreathingGuide({
 
         <div className="flex flex-col items-center justify-center mb-6">
           <div className="relative w-[300px] h-[300px] mx-auto">
+            {/* Static outer circle - largest */}
             <div 
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20"
             />
+
+            {/* Animated middle circle - scales between inner and outer */}
             <motion.div
               className={cn(
-                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] rounded-full bg-gradient-to-r",
                 getPhaseColor()
               )}
               style={{
-                transformOrigin: 'center center'
+                transformOrigin: 'center',
+                transform: 'translate(-50%, -50%)'
               }}
               {...getPhaseAnimation()}
             />
+
+            {/* Static inner circle - smallest */}
             <div 
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center"
             >
