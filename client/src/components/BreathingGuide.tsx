@@ -21,6 +21,7 @@ interface BreathingGuideProps {
   elapsed: number;
   breathCount: number;
   countdown: number;
+  sessionCompleted?: boolean;
   onStart: () => void;
   onPause: () => void;
   onResume: () => void;
@@ -59,6 +60,7 @@ export function BreathingGuide({
   elapsed,
   breathCount,
   countdown,
+  sessionCompleted = false,
   onStart,
   onPause,
   onResume,
@@ -111,8 +113,6 @@ export function BreathingGuide({
     const phase = getPhaseVariant();
     const phaseDuration = pattern.sequence[currentPhase];
     const isPostInhale = currentPhase === 1;
-
-    console.log("Animation phase:", { phase, phaseDuration, currentPhase });
 
     if (!isActive || isPaused) {
       return {
@@ -267,10 +267,16 @@ export function BreathingGuide({
               onClick={onStart}
               className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
             >
-              {breathCount > 0 ? "Session Complete!\nTap to Start Again" : "Start"}
+              Start
             </Button>
           )}
         </div>
+
+        {sessionCompleted && !isActive && (
+          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-2 rounded bg-black/50 text-white text-center whitespace-nowrap">
+            Session Complete! Tap Start to begin another session
+          </div>
+        )}
       </div>
 
       <div className="w-full max-w-[600px]">

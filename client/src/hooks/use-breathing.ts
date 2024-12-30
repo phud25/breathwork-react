@@ -12,6 +12,7 @@ export function useBreathing(sequence: number[]) {
   const [countdown, setCountdown] = useState(0);
   const [targetBreaths, setTargetBreaths] = useState<number | null>(null);
   const [targetDuration, setTargetDuration] = useState<number | null>(null);
+  const [sessionCompleted, setSessionCompleted] = useState(false);
 
   // Refs for timing precision
   const lastTickTime = useRef<number>(0);
@@ -49,11 +50,13 @@ export function useBreathing(sequence: number[]) {
 
     const breathCount = currentCycle * sequence.length + currentPhase;
     if (targetBreaths && breathCount >= targetBreaths) {
+      setSessionCompleted(true);
       endSession();
       return;
     }
 
     if (targetDuration && elapsedTime >= targetDuration) {
+      setSessionCompleted(true);
       endSession();
       return;
     }
@@ -135,6 +138,7 @@ export function useBreathing(sequence: number[]) {
     setPausedTime(null);
     setElapsedTime(0);
     setCountdown(sequence[0]);
+    setSessionCompleted(false);
     lastTickTime.current = 0;
   }, [sequence]);
 
@@ -183,6 +187,7 @@ export function useBreathing(sequence: number[]) {
     currentCycle,
     elapsedTime,
     countdown,
+    sessionCompleted,
     startSession,
     pauseSession,
     resumeSession,

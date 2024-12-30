@@ -31,6 +31,7 @@ export default function HomePage() {
     currentCycle,
     elapsedTime,
     countdown,
+    sessionCompleted,
     startSession,
     pauseSession,
     resumeSession,
@@ -86,6 +87,7 @@ export default function HomePage() {
                   elapsed={elapsedTime}
                   breathCount={breathCount}
                   countdown={countdown}
+                  sessionCompleted={sessionCompleted}
                   onStart={startSession}
                   onPause={pauseSession}
                   onResume={resumeSession}
@@ -121,6 +123,7 @@ export default function HomePage() {
               elapsed={elapsedTime}
               breathCount={breathCount}
               countdown={countdown}
+              sessionCompleted={sessionCompleted}
               onStart={startSession}
               onPause={pauseSession}
               onResume={resumeSession}
