@@ -172,9 +172,10 @@ export function BreathingGuide({
       isZenMode ? "h-screen p-0" : "min-h-[600px] p-4"
     )}>
       <div className={cn(
-        "w-full max-w-[600px] mx-auto -mt-[125px]",
+        "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
+        <h2 className="text-xl font-semibold text-primary mb-[30px]">Breath Session</h2>
         <div className="space-y-2">
           <Select
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}

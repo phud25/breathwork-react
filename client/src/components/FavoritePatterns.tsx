@@ -28,11 +28,11 @@ interface FavoritePatternsProps {
   duration: number;
 }
 
-export function FavoritePatterns({ 
-  currentPattern, 
+export function FavoritePatterns({
+  currentPattern,
   onPatternSelect,
   breathCount,
-  duration 
+  duration
 }: FavoritePatternsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { favorites, saveFavorite, deleteFavorite } = useFavorites();
@@ -97,7 +97,7 @@ export function FavoritePatterns({
       </Dialog>
 
       {favorites && favorites.length > 0 && (
-        <div className="w-full mt-[35px]">
+        <div className="absolute bottom-[30px] left-0 right-0 px-4">
           <Select
             onValueChange={(value) => {
               const pattern = favorites.find((f) => f.id === parseInt(value));
