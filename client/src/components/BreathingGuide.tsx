@@ -91,7 +91,6 @@ export function BreathingGuide({
   const getPhaseAnimation = (): AnimationProps => {
     const phase = getPhaseVariant();
     const phaseDuration = pattern.sequence[currentPhase];
-    const isPostInhale = currentPhase === 1;
 
     if (!isActive || isPaused) {
       return {
@@ -126,6 +125,7 @@ export function BreathingGuide({
       };
     }
 
+    const isPostInhale = currentPhase === 1;
     return {
       initial: { scale: isPostInhale ? 1 : 0.3 },
       animate: { scale: isPostInhale ? 1 : 0.3 }
@@ -162,8 +162,9 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="mb-6 space-y-6">
+        <div className="mb-6"> {/* Container for top section */}
           <Select 
+            defaultValue="box"
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px]"
@@ -179,7 +180,7 @@ export function BreathingGuide({
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%]">
+          <div className="flex gap-[5%] mt-6">
             <Select
               value={sessionType}
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
