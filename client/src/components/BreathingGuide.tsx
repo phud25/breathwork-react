@@ -83,10 +83,11 @@ export function BreathingGuide({
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
   const [showVolumeControl, setShowVolumeControl] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
-  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: volume * 0.6 });
-  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: volume });
-  const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: volume });
+  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? volume * 0.6 : 0 });
+  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? volume : 0 });
+  const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: isSoundEnabled ? volume : 0 });
 
 
   useEffect(() => {
@@ -121,7 +122,6 @@ export function BreathingGuide({
   const startHold = () => {
     if (!isActive || isHolding) return;
     setIsHolding(true);
-    onPause();
     const interval = setInterval(() => {
       setHoldTime(prev => prev + 1);
     }, 1000);
