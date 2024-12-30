@@ -31,7 +31,7 @@ export default function ProfilePage() {
     longestHold: 0
   });
 
-  const avgHoldTime = todayStats.totalHolds > 0 
+  const avgHoldTime = todayStats.totalHolds > 0
     ? Math.round(todayStats.totalHoldTime / todayStats.totalHolds)
     : 0;
 
@@ -104,96 +104,61 @@ export default function ProfilePage() {
 
           {/* Stats Section */}
           <div className="grid gap-4">
-            {/* Streak Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-sm text-muted-foreground">Current Streak</p>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stats?.currentStreak || 0} days</p>
-                  )}
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-sm text-muted-foreground">Longest Streak</p>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stats?.longestStreak || 0} days</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Stats Card */}
+            {/* Current Streak Card */}
             <Card>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-4 gap-4">
+              <CardHeader>
+                <CardTitle>Current Streak Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Sessions</p>
+                    <p className="text-sm text-muted-foreground">Sessions</p>
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <p className="text-2xl font-bold">{stats?.totalSessions || 0}</p>
+                      <p className="text-2xl font-bold">{stats?.currentStreak || 0} days</p>
                     )}
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Breaths</p>
+                    <p className="text-sm text-muted-foreground">Breaths</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{stats?.todayStats?.totalBreaths || 0}</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Minutes</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{Math.round(stats?.totalMinutes || 0)}</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Hold Time</p>
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <p className="text-2xl font-bold">
-                        {sessions?.reduce((acc, session) => acc + session.breathCount, 0) || 0}
+                        {Math.floor((stats?.todayStats?.totalHoldTime || 0) / 60)}:
+                        {((stats?.todayStats?.totalHoldTime || 0) % 60).toString().padStart(2, '0')}
                       </p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Minutes</p>
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <p className="text-2xl font-bold">{stats?.totalMinutes || 0}</p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Holds</p>
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <p className="text-2xl font-bold">{todayStats.totalHolds}</p>
                     )}
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Hold Stats Card */}
+            {/* Longest Streak Card */}
             <Card>
-              <CardHeader>
-                <CardTitle>Breath Hold Stats</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Average Hold Time</p>
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <p className="text-2xl font-bold">{Math.floor(avgHoldTime / 60)}:{(avgHoldTime % 60).toString().padStart(2, '0')}</p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Longest Hold</p>
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <p className="text-2xl font-bold">{Math.floor(todayStats.longestHold / 60)}:{(todayStats.longestHold % 60).toString().padStart(2, '0')}</p>
-                    )}
-                  </div>
-                </div>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">Longest Streak</p>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats?.longestStreak || 0} days</p>
+                )}
               </CardContent>
             </Card>
           </div>

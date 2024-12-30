@@ -104,11 +104,38 @@ export function registerRoutes(app: Express): Server {
       longestStreak = currentCount;
     }
 
+    // Calculate daily stats for today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const todayStats = await db.select({
+      totalBreaths: sql<number>`sum(breath_count)`,
+      totalHolds: sql<number>`sum(hold_count)`,
+      totalHoldTime: sql<number>`sum(total_hold_time)`,
+      longestHold: sql<number>`max(longest_hold)`,
+    })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.userId, req.user.id),
+        gte(sessions.completedAt, todayStart),
+        lte(sessions.completedAt, todayEnd)
+      )
+    );
+
     res.json({
       totalSessions: Number(stats[0].totalSessions),
       totalMinutes: Math.round(Number(stats[0].totalMinutes)),
       currentStreak,
-      longestStreak
+      longestStreak,
+      todayStats: {
+        totalBreaths: Number(todayStats[0].totalBreaths) || 0,
+        totalHolds: Number(todayStats[0].totalHolds) || 0,
+        totalHoldTime: Number(todayStats[0].totalHoldTime) || 0,
+        longestHold: Number(todayStats[0].longestHold) || 0
+      }
     });
   });
 

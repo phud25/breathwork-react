@@ -118,7 +118,7 @@ export default function BreathPage() {
                     <p className="text-2xl font-bold">{Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 mb-8">
                   <div>
                     <p className="text-sm text-muted-foreground">Holds</p>
                     <p className="text-2xl font-bold">{holdStats.holdCount}</p>
