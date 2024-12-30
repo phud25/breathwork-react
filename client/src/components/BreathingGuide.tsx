@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { FavoritePatterns } from "@/components/FavoritePatterns";
 
 type PatternType = "478" | "box" | "22" | "555";
 
@@ -175,7 +174,6 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <h2 className="text-xl font-semibold text-primary mb-[30px]">Breath Session</h2>
         <div className="space-y-2">
           <Select
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
@@ -288,12 +286,6 @@ export function BreathingGuide({
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">
-          <FavoritePatterns
-            currentPattern={pattern}
-            onPatternSelect={pattern => {
-              onPatternChange(pattern.name.toLowerCase().replace(/\s+/g, '-') as PatternType);
-            }}
-          />
           <Button
             variant="outline"
             size="icon"
