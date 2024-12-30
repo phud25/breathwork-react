@@ -171,7 +171,7 @@ export function BreathingGuide({
       isZenMode ? "h-screen p-0" : "min-h-[600px] p-4"
     )}>
       <div className={cn(
-        "w-full max-w-[600px] mx-auto -mt-[75px]",
+        "w-full max-w-[600px] mx-auto -mt-[125px]",
         isZenMode && "hidden"
       )}>
         <div className="space-y-2">
@@ -181,7 +181,7 @@ export function BreathingGuide({
             className="h-[48px]"
           >
             <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors">
-              <SelectValue className="text-white" placeholder="Select Breathing Pattern" />
+              <SelectValue className="text-white text-base" placeholder="Select Breathing Pattern" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
               <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
@@ -198,7 +198,7 @@ export function BreathingGuide({
               className="w-[50%] h-[48px]"
             >
               <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors">
-                <SelectValue placeholder="Session Type" />
+                <SelectValue className="text-white text-base" placeholder="Session Type" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600">
                 <SelectItem value="breaths" className="text-white hover:bg-primary/10">By Breath Count</SelectItem>
@@ -213,7 +213,7 @@ export function BreathingGuide({
                 className="w-[45%] h-[48px]"
               >
                 <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors text-center">
-                  <SelectValue placeholder="3:00" />
+                  <SelectValue className="text-white text-base" placeholder="3:00" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
                   {durationOptions.map((option) => (
@@ -267,7 +267,7 @@ export function BreathingGuide({
               onClick={onStart}
               className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
             >
-              Start
+              {breathCount > 0 ? "Session Complete!\nTap to Start Again" : "Start"}
             </Button>
           )}
         </div>

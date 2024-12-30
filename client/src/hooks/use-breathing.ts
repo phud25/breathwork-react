@@ -10,6 +10,8 @@ export function useBreathing(sequence: number[]) {
   const [pausedTime, setPausedTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [countdown, setCountdown] = useState(0);
+  const [targetBreaths, setTargetBreaths] = useState<number | null>(null);
+  const [targetDuration, setTargetDuration] = useState<number | null>(null);
 
   // Refs for timing precision
   const lastTickTime = useRef<number>(0);
@@ -40,6 +42,22 @@ export function useBreathing(sequence: number[]) {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
     },
   });
+
+  // Check if session should end based on targets
+  useEffect(() => {
+    if (!isActive) return;
+
+    const breathCount = currentCycle * sequence.length + currentPhase;
+    if (targetBreaths && breathCount >= targetBreaths) {
+      endSession();
+      return;
+    }
+
+    if (targetDuration && elapsedTime >= targetDuration) {
+      endSession();
+      return;
+    }
+  }, [currentCycle, currentPhase, elapsedTime, targetBreaths, targetDuration, isActive]);
 
   const progressSequence = useCallback(() => {
     if (!isActive || isPaused) return;
@@ -168,6 +186,8 @@ export function useBreathing(sequence: number[]) {
     startSession,
     pauseSession,
     resumeSession,
-    endSession
+    endSession,
+    setTargetBreaths,
+    setTargetDuration
   };
 }
