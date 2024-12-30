@@ -137,7 +137,7 @@ export default function BreathPage() {
                         <p className="text-2xl font-bold">{holdStats.holdCount}</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Breath Time</p>
                         <p className="text-2xl font-bold">
@@ -150,6 +150,12 @@ export default function BreathPage() {
                           {Math.floor(holdStats.totalHoldTime / 60)}:{(holdStats.totalHoldTime % 60).toString().padStart(2, '0')}
                         </p>
                       </div>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-sm text-muted-foreground">Average Hold</p>
+                      <p className="text-2xl font-bold">
+                        {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
+                      </p>
                     </div>
                   </TabsContent>
 
@@ -172,7 +178,7 @@ export default function BreathPage() {
                         )}
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Breath Time</p>
                         {isLoadingStats ? (
@@ -194,9 +200,21 @@ export default function BreathPage() {
                         )}
                       </div>
                     </div>
+                    <div className="mt-4">
+                      <p className="text-sm text-muted-foreground">Average Hold</p>
+                      {isLoadingStats ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <p className="text-2xl font-bold">
+                          {Math.floor(dailyAvgHold / 60)}:{(dailyAvgHold % 60).toString().padStart(2, '0')}
+                        </p>
+                      )}
+                    </div>
                   </TabsContent>
                 </Tabs>
-                <ProgressChart />
+                <div className="mt-8">
+                  <ProgressChart />
+                </div>
               </CardContent>
             </Card>
           </div>
