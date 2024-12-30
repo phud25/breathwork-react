@@ -72,10 +72,10 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardHeader className="pb-[8px]">
-                <CardTitle>Breath Session</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="mb-0">Breath Session</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 <BreathingGuide 
                   pattern={breathingPatterns[selectedPattern]}
                   isActive={isActive}

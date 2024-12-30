@@ -149,9 +149,7 @@ export function BreathingGuide({
 
   const handleDurationChange = (value: string) => {
     if (!/^\d{1,2}:\d{2}$/.test(value)) return;
-
     const [minutes, seconds] = value.split(":").map(Number);
-
     if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
       setDurationInput(value);
     }
@@ -196,7 +194,7 @@ export function BreathingGuide({
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
               className="w-[50%] h-[48px]"
             >
-              <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50">
+              <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors">
                 <SelectValue placeholder="Session Type" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600">
@@ -210,7 +208,7 @@ export function BreathingGuide({
                 type="text"
                 value={durationInput}
                 onChange={(e) => handleDurationChange(e.target.value)}
-                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-white"
+                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-white focus:ring-primary/50"
                 placeholder="3:00"
                 min="1:00"
                 max="60:00"
@@ -220,7 +218,7 @@ export function BreathingGuide({
                 type="number"
                 value={breathCountState}
                 onChange={(e) => handleBreathCountChange(e.target.value)}
-                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-white"
+                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-white focus:ring-primary/50"
                 min={1}
               />
             )}
