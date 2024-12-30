@@ -73,7 +73,10 @@ export function useBreathing(sequence: number[]) {
       }
       return prev + 1;
     });
-  }, [isActive, isPaused, sequence.length]);
+
+    // Set the countdown for the next phase
+    setCountdown(sequence[currentPhase]);
+  }, [isActive, isPaused, sequence.length, currentPhase, sequence]);
 
   // High precision timer using requestAnimationFrame
   useEffect(() => {
@@ -88,10 +91,9 @@ export function useBreathing(sequence: number[]) {
       const delta = now - lastTickTime.current;
       if (delta >= 1000) { // 1 second has passed
         setCountdown((prev) => {
-          console.log('Countdown update:', { prev, currentPhase });
           if (prev <= 1) {
             progressSequence();
-            return sequence[currentPhase];
+            return sequence[(currentPhase + 1) % sequence.length];
           }
           return prev - 1;
         });
