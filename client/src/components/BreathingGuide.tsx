@@ -236,6 +236,9 @@ export function BreathingGuide({
                 "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r",
                 getPhaseColor()
               )}
+              style={{
+                transformOrigin: 'center center'
+              }}
               {...getPhaseAnimation()}
             />
             <div 
