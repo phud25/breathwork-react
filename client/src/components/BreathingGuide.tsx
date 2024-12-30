@@ -175,6 +175,7 @@ export function BreathingGuide({
         isZenMode && "hidden"
       )}>
         <div className="space-y-2">
+          <div className="text-xl font-semibold text-primary mb-[35px]">Breath Session</div>
           <Select
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
@@ -197,8 +198,8 @@ export function BreathingGuide({
               onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
               className="w-[50%] h-[48px]"
             >
-              <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors">
-                <SelectValue className="text-white text-base" placeholder="Session Type" />
+              <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
+                <SelectValue placeholder="Session Type" className="text-white" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600">
                 <SelectItem value="breaths" className="text-white hover:bg-primary/10">By Breath Count</SelectItem>
@@ -212,8 +213,8 @@ export function BreathingGuide({
                 onValueChange={setDurationInput}
                 className="w-[45%] h-[48px]"
               >
-                <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors text-center">
-                  <SelectValue className="text-white text-base" placeholder="3:00" />
+                <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
+                  <SelectValue placeholder="3:00" className="text-white" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
                   {durationOptions.map((option) => (
@@ -239,7 +240,6 @@ export function BreathingGuide({
           </div>
         </div>
       </div>
-
       <div className="relative w-[300px] h-[300px] mt-1 mb-2 flex items-center justify-center">
         <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
