@@ -102,7 +102,13 @@ export function BreathingGuide({
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
             duration: 0.5,
-            ease: "easeInOut"
+            ease: "linear"
+          }
+        },
+        exit: {
+          scale: phase === "inhale" ? 1 : 0.3,
+          transition: {
+            duration: 0,
           }
         }
       };
