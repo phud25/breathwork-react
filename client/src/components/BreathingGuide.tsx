@@ -281,7 +281,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="w-full max-w-[600px] -mt-6">
+      <div className="w-full max-w-[600px] -mt-3">
         <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
