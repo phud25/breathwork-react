@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { ZenParticles } from "./ZenParticles";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -282,6 +283,14 @@ export function BreathingGuide({
             )}
             {...(isHolding ? {} : getPhaseAnimation())}
           />
+
+          {isActive && !isHolding && (
+            <ZenParticles
+              isActive={isActive}
+              isInhaling={getPhaseVariant(pattern.name, currentPhase) === "inhale"}
+              intensity={pattern.name === "Breath of Fire" ? 2 : 1}
+            />
+          )}
 
           <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
             {isActive ? (
