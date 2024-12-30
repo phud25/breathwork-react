@@ -109,7 +109,7 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="Enter your username" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -119,26 +119,26 @@ export default function AuthPage() {
                   {activeTab === "register" && (
                     <>
                       <FormField
-                        control={currentForm.control}
+                        control={registerForm.control}
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>First Name</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input placeholder="Enter your first name" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                       <FormField
-                        control={currentForm.control}
+                        control={registerForm.control}
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Last Name</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input placeholder="Enter your last name" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -154,7 +154,11 @@ export default function AuthPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" {...field} />
+                          <Input 
+                            type="password" 
+                            placeholder="Enter your password"
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
