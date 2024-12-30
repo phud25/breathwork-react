@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useLocation } from "wouter";
 import { useUser } from "@/hooks/use-user";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { loginSchema } from "@db/schema";
+import { loginSchema, insertUserSchema } from "@db/schema";
 import type { NewUser } from "@db/schema";
 
 type LoginFormData = {
@@ -24,6 +24,7 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [showPassword, setShowPassword] = useState(false);
   const [_, setLocation] = useLocation();
 
   const loginForm = useForm<LoginFormData>({
@@ -35,7 +36,7 @@ export default function AuthPage() {
   });
 
   const registerForm = useForm<NewUser>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -72,6 +73,10 @@ export default function AuthPage() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <motion.div
@@ -91,6 +96,7 @@ export default function AuthPage() {
                 setActiveTab(value as "login" | "register");
                 loginForm.reset();
                 registerForm.reset();
+                setShowPassword(false);
               }}
             >
               <TabsList className="grid w-full grid-cols-2">
@@ -125,14 +131,29 @@ export default function AuthPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="password" 
-                              placeholder="Enter your password"
-                              autoComplete="current-password"
-                              {...field} 
-                            />
-                          </FormControl>
+                          <div className="relative">
+                            <FormControl>
+                              <Input 
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter your password"
+                                autoComplete="current-password"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={togglePasswordVisibility}
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <Eye className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </Button>
+                          </div>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -211,14 +232,29 @@ export default function AuthPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="password" 
-                              placeholder="Enter your password"
-                              autoComplete="new-password"
-                              {...field} 
-                            />
-                          </FormControl>
+                          <div className="relative">
+                            <FormControl>
+                              <Input 
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter your password"
+                                autoComplete="new-password"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={togglePasswordVisibility}
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <Eye className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </Button>
+                          </div>
                           <FormMessage />
                         </FormItem>
                       )}
