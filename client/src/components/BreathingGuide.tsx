@@ -287,7 +287,7 @@ export function BreathingGuide({
           <span>Time: {formatTime(elapsed)}</span>
         </div>
 
-        <div className="flex items-center justify-center gap-[20px] pb-10">
+        <div className="flex items-center justify-center gap-[20px] pb-10 -mb-[100px]">
           <Button
             variant="outline"
             size="icon"
