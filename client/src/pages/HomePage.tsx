@@ -9,13 +9,14 @@ import { useUser } from "@/hooks/use-user";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 
-type PatternType = "478" | "box" | "22" | "555";
+type PatternType = "478" | "box" | "22" | "555" | "24ha";
 
 const breathingPatterns: Record<PatternType, { name: string; sequence: number[] }> = {
   "478": { name: "4-7-8 Relaxation", sequence: [4, 7, 8] },
   "box": { name: "Box Breathing (4x4)", sequence: [4, 4, 4, 4] },
   "22": { name: "2-2 Energized Focus", sequence: [2, 2] },
   "555": { name: "5-5-5 Triangle", sequence: [5, 5, 5] },
+  "24ha": { name: "2-4 Ha Breath", sequence: [2, 4] },
 };
 
 export default function HomePage() {

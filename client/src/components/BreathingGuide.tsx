@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-type PatternType = "478" | "box" | "22" | "555";
+type PatternType = "478" | "box" | "22" | "555" | "24ha";
 
 interface BreathingGuideProps {
   pattern: {
@@ -177,7 +177,8 @@ export function BreathingGuide({
           value={pattern.name === "2-2 Energized Focus" ? "22" :
             pattern.name === "4-7-8 Relaxation" ? "478" :
             pattern.name === "Box Breathing (4x4)" ? "box" :
-            pattern.name === "5-5-5 Triangle" ? "555" : "22"}
+            pattern.name === "5-5-5 Triangle" ? "555" :
+            pattern.name === "2-4 Ha Breath" ? "24ha" : "22"}
           onValueChange={(value) => onPatternChange(value as PatternType)}
           className="h-[48px] w-full"
         >
@@ -189,6 +190,7 @@ export function BreathingGuide({
             <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
             <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
             <SelectItem value="555" className="text-[#F5F5DC] hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+            <SelectItem value="24ha" className="text-[#F5F5DC] hover:bg-primary/10">2-4 Ha Breath</SelectItem>
           </SelectContent>
         </Select>
 
