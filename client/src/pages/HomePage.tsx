@@ -9,7 +9,7 @@ import { useUser } from "@/hooks/use-user";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 
-type PatternType = "478" | "box" | "22" | "555" | "24ha";
+type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
 const breathingPatterns: Record<PatternType, { name: string; sequence: number[] }> = {
   "478": { name: "4-7-8 Relaxation", sequence: [4, 7, 8] },
@@ -17,6 +17,7 @@ const breathingPatterns: Record<PatternType, { name: string; sequence: number[] 
   "22": { name: "2-2 Energized Focus", sequence: [2, 2] },
   "555": { name: "5-5-5 Triangle", sequence: [5, 5, 5] },
   "24ha": { name: "2-4 Ha Breath", sequence: [2, 4] },
+  "fire": { name: "Breath of Fire", sequence: [0.5, 0.5] },
 };
 
 export default function HomePage() {

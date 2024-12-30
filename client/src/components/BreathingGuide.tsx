@@ -6,30 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-type PatternType = "478" | "box" | "22" | "555" | "24ha";
-
-interface BreathingGuideProps {
-  pattern: {
-    name: string;
-    sequence: number[];
-  };
-  isActive: boolean;
-  currentPhase: number;
-  isPaused?: boolean;
-  isZenMode?: boolean;
-  isSoundEnabled?: boolean;
-  elapsed: number;
-  breathCount: number;
-  countdown: number;
-  sessionCompleted?: boolean;
-  onStart: () => void;
-  onPause: () => void;
-  onResume: () => void;
-  onStop: () => void;
-  onToggleZen: () => void;
-  onToggleSound: () => void;
-  onPatternChange: (value: PatternType) => void;
-}
+type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
 
@@ -43,7 +20,7 @@ const getPhaseLabel = (patternName: string, phase: number) => {
   if (patternName === "2-4 Ha Breath") {
     return phase === 0 ? "Inhale" : "Ha";
   }
-  if (patternName.includes("2-2")) {
+  if (patternName.includes("2-2") || patternName === "Breath of Fire") {
     return phase === 0 ? "Inhale" : "Exhale";
   }
   return phaseLabels[phase];
@@ -176,7 +153,8 @@ export function BreathingGuide({
             pattern.name === "4-7-8 Relaxation" ? "478" :
             pattern.name === "Box Breathing (4x4)" ? "box" :
             pattern.name === "5-5-5 Triangle" ? "555" :
-            pattern.name === "2-4 Ha Breath" ? "24ha" : "22"}
+            pattern.name === "2-4 Ha Breath" ? "24ha" :
+            pattern.name === "Breath of Fire" ? "fire" : "22"}
           onValueChange={(value) => onPatternChange(value as PatternType)}
           className="h-[48px] w-full"
         >
@@ -189,6 +167,7 @@ export function BreathingGuide({
             <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
             <SelectItem value="555" className="text-[#F5F5DC] hover:bg-primary/10">5-5-5 Triangle</SelectItem>
             <SelectItem value="24ha" className="text-[#F5F5DC] hover:bg-primary/10">2-4 Ha Breath</SelectItem>
+            <SelectItem value="fire" className="text-[#F5F5DC] hover:bg-primary/10">Breath of Fire</SelectItem>
           </SelectContent>
         </Select>
 
@@ -255,9 +234,11 @@ export function BreathingGuide({
           <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
-                <div className="text-xl font-mono text-[#F5F5DC] font-bold">
-                  {countdown}
-                </div>
+                {pattern.name !== "Breath of Fire" && (
+                  <div className="text-xl font-mono text-[#F5F5DC] font-bold">
+                    {countdown}
+                  </div>
+                )}
                 <div className="text-xs text-[#F5F5DC] font-semibold">
                   {getPhaseLabel(pattern.name, currentPhase)}
                 </div>
@@ -287,7 +268,7 @@ export function BreathingGuide({
           <span>Time: {formatTime(elapsed)}</span>
         </div>
 
-        <div className="flex items-center justify-center gap-[20px] pb-10">
+        <div className="flex items-center justify-center gap-[20px]">
           <Button
             variant="outline"
             size="icon"
@@ -339,4 +320,27 @@ export function BreathingGuide({
       </div>
     </div>
   );
+}
+
+interface BreathingGuideProps {
+  pattern: {
+    name: string;
+    sequence: number[];
+  };
+  isActive: boolean;
+  currentPhase: number;
+  isPaused?: boolean;
+  isZenMode?: boolean;
+  isSoundEnabled?: boolean;
+  elapsed: number;
+  breathCount: number;
+  countdown: number;
+  sessionCompleted?: boolean;
+  onStart: () => void;
+  onPause: () => void;
+  onResume: () => void;
+  onStop: () => void;
+  onToggleZen: () => void;
+  onToggleSound: () => void;
+  onPatternChange: (value: PatternType) => void;
 }
