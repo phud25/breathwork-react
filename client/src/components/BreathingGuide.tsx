@@ -173,13 +173,13 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-2">
+        <div className="space-y-2 mt-[35px]">
           <Select
             value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px] w-full"
           >
-            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
+            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors text-[#F5F5DC]">
               <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
@@ -252,10 +252,10 @@ export function BreathingGuide({
         <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
           {isActive ? (
             <div className="text-center pointer-events-none select-none">
-              <div className="text-xl font-mono text-primary font-bold">
+              <div className="text-xl font-mono text-[#F5F5DC] font-bold">
                 {countdown}
               </div>
-              <div className="text-xs text-primary/80 font-semibold">
+              <div className="text-xs text-[#F5F5DC] font-semibold">
                 {getPhaseLabel()}
               </div>
             </div>
@@ -263,7 +263,7 @@ export function BreathingGuide({
             <Button
               variant="ghost"
               onClick={onStart}
-              className="text-sm text-primary hover:text-primary/80 hover:bg-transparent transition-colors duration-200"
+              className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-colors duration-200"
             >
               Start
             </Button>
