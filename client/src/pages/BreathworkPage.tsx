@@ -1,14 +1,11 @@
 import { useState, useCallback } from "react";
 import { BreathingGuide } from "@/components/BreathingGuide";
 import { ProgressChart } from "@/components/ProgressChart";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useUser } from "@/hooks/use-user";
 import { useBreathing } from "@/hooks/use-breathing";
 import { cn } from "@/lib/utils";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type PatternType = "478" | "box" | "22" | "555";
 
@@ -25,7 +22,7 @@ export default function BreathworkPage() {
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
-  const {
+  const { 
     isActive,
     isPaused,
     currentPhase,
@@ -45,7 +42,7 @@ export default function BreathworkPage() {
     setSelectedPattern(value);
   }, [isActive, endSession]);
 
-  const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length +
+  const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length + 
     (currentPhase > 0 ? currentPhase : 0);
 
   return (
@@ -54,38 +51,21 @@ export default function BreathworkPage() {
       isZenMode ? "p-0" : "p-4"
     )}>
       <div className={cn(
-        "max-w-4xl mx-auto space-y-4",
+        "max-w-4xl mx-auto space-y-6",
         isZenMode && "hidden"
       )}>
         <header className="flex justify-between items-center">
-          <h1 className="text-xl font-semibold text-primary">Breath Session</h1>
-          <Button variant="ghost" size="icon">
-            <Menu className="h-5 w-5" />
-          </Button>
+          <h1 className="text-2xl font-bold text-primary">Welcome, {user?.firstName}</h1>
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardContent className="pt-6">
-                <div className="mb-6">
-                  <Select
-                    value={selectedPattern}
-                    onValueChange={handlePatternChange}
-                  >
-                    <SelectTrigger className="h-[48px] text-foreground border-input hover:border-primary/50 transition-colors">
-                      <SelectValue placeholder="Select breathing pattern" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="478">4-7-8 Relaxation</SelectItem>
-                      <SelectItem value="box">Box Breathing (4x4)</SelectItem>
-                      <SelectItem value="22">2-2 Energized Focus</SelectItem>
-                      <SelectItem value="555">5-5-5 Triangle</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <BreathingGuide
+              <CardHeader className="pb-3">
+                <CardTitle>Breath Session</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BreathingGuide 
                   pattern={breathingPatterns[selectedPattern]}
                   isActive={isActive}
                   isPaused={isPaused}
@@ -107,8 +87,11 @@ export default function BreathworkPage() {
             </Card>
           </ErrorBoundary>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className={cn(isZenMode && "hidden")}>
+            <CardHeader>
+              <CardTitle>Your Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
               <ProgressChart />
             </CardContent>
           </Card>
@@ -118,7 +101,7 @@ export default function BreathworkPage() {
       {isZenMode && (
         <ErrorBoundary>
           <div className="fixed inset-0 bg-background">
-            <BreathingGuide
+            <BreathingGuide 
               pattern={breathingPatterns[selectedPattern]}
               isActive={isActive}
               isPaused={isPaused}

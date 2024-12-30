@@ -2,63 +2,42 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { useLocation } from "wouter";
+import { Loader2 } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { loginSchema, insertUserSchema } from "@db/schema";
-import type { NewUser } from "@db/schema";
-import { z } from "zod";
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { insertUserSchema } from "@db/schema";
 
 export default function AuthPage() {
   const { login, register: registerUser } = useUser();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const [showPassword, setShowPassword] = useState(false);
-  const [_, setLocation] = useLocation();
 
-  const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    }
-  });
-
-  const registerForm = useForm<NewUser>({
+  const form = useForm({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
       password: "",
       firstName: "",
-      lastName: "",
+      lastName: ""
     }
   });
 
-  const onSubmit = async (data: LoginFormData | NewUser) => {
+  const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      const result = await (activeTab === "login" 
-        ? login(data as LoginFormData)
-        : registerUser(data as NewUser)
-      );
-
+      const result = await (activeTab === "login" ? login(data) : registerUser(data));
       if (!result.ok) {
         toast({
           variant: "destructive",
           title: "Error",
           description: result.message
         });
-      } else {
-        setLocation("/");
       }
     } catch (error: any) {
       toast({
@@ -69,10 +48,6 @@ export default function AuthPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   return (
@@ -88,189 +63,82 @@ export default function AuthPage() {
             <CardTitle className="text-2xl text-center text-primary">Breathwork</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs
-              value={activeTab}
-              onValueChange={(value) => {
-                setActiveTab(value as "login" | "register");
-                loginForm.reset();
-                registerForm.reset();
-                setShowPassword(false);
-              }}
-            >
+            <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
 
-              <div className="mt-4">
-                {activeTab === "login" ? (
-                  <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit(onSubmit)} className="space-y-4">
-                      <FormField
-                        control={loginForm.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Enter your username"
-                                autoComplete="username"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  {activeTab === "register" && (
+                    <>
                       <FormField
-                        control={loginForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <div className="relative">
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  type={showPassword ? "text" : "password"}
-                                  placeholder="Enter your password"
-                                  autoComplete="current-password"
-                                />
-                              </FormControl>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                onClick={togglePasswordVisibility}
-                              >
-                                {showPassword ? (
-                                  <EyeOff className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <Eye className="h-4 w-4 text-muted-foreground" />
-                                )}
-                              </Button>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isLoading}
-                      >
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Login
-                      </Button>
-                    </form>
-                  </Form>
-                ) : (
-                  <Form {...registerForm}>
-                    <form onSubmit={registerForm.handleSubmit(onSubmit)} className="space-y-4">
-                      <FormField
-                        control={registerForm.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Enter your username"
-                                autoComplete="username"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={registerForm.control}
+                        control={form.control}
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>First Name</FormLabel>
                             <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Enter your first name"
-                                autoComplete="given-name"
-                              />
+                              <Input {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
                       <FormField
-                        control={registerForm.control}
+                        control={form.control}
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Last Name</FormLabel>
                             <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Enter your last name"
-                                autoComplete="family-name"
-                              />
+                              <Input {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+                    </>
+                  )}
 
-                      <FormField
-                        control={registerForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <div className="relative">
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  type={showPassword ? "text" : "password"}
-                                  placeholder="Enter your password"
-                                  autoComplete="new-password"
-                                />
-                              </FormControl>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                onClick={togglePasswordVisibility}
-                              >
-                                {showPassword ? (
-                                  <EyeOff className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <Eye className="h-4 w-4 text-muted-foreground" />
-                                )}
-                              </Button>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isLoading}
-                      >
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Register
-                      </Button>
-                    </form>
-                  </Form>
-                )}
-              </div>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {activeTab === "login" ? "Login" : "Register"}
+                  </Button>
+                </form>
+              </Form>
             </Tabs>
           </CardContent>
         </Card>
