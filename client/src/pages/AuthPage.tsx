@@ -11,8 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
 import { insertUserSchema } from "@db/schema";
 import type { InsertUser } from "@db/schema";
+
+const loginSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function AuthPage() {
   const { login, register: registerUser } = useUser();
@@ -21,7 +29,15 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [_, setLocation] = useLocation();
 
-  const form = useForm<InsertUser>({
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    }
+  });
+
+  const registerForm = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
@@ -31,12 +47,12 @@ export default function AuthPage() {
     }
   });
 
-  const onSubmit = async (data: InsertUser) => {
+  const onSubmit = async (data: LoginFormData | InsertUser) => {
     setIsLoading(true);
     try {
       const result = await (activeTab === "login" 
-        ? login({ username: data.username, password: data.password })
-        : registerUser(data)
+        ? login(data as LoginFormData)
+        : registerUser(data as InsertUser)
       );
 
       if (!result.ok) {
@@ -46,7 +62,7 @@ export default function AuthPage() {
           description: result.message
         });
       } else {
-        setLocation("/"); // Redirect to home page on success
+        setLocation("/");
       }
     } catch (error: any) {
       toast({
@@ -58,6 +74,8 @@ export default function AuthPage() {
       setIsLoading(false);
     }
   };
+
+  const currentForm = activeTab === "login" ? loginForm : registerForm;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -74,17 +92,18 @@ export default function AuthPage() {
           <CardContent>
             <Tabs value={activeTab} onValueChange={(value) => {
               setActiveTab(value as "login" | "register");
-              form.reset();
+              loginForm.reset();
+              registerForm.reset();
             }}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
 
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+              <Form {...currentForm}>
+                <form onSubmit={currentForm.handleSubmit(onSubmit)} className="space-y-4 mt-4">
                   <FormField
-                    control={form.control}
+                    control={currentForm.control}
                     name="username"
                     render={({ field }) => (
                       <FormItem>
@@ -100,7 +119,7 @@ export default function AuthPage() {
                   {activeTab === "register" && (
                     <>
                       <FormField
-                        control={form.control}
+                        control={currentForm.control}
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
@@ -113,7 +132,7 @@ export default function AuthPage() {
                         )}
                       />
                       <FormField
-                        control={form.control}
+                        control={currentForm.control}
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
@@ -129,7 +148,7 @@ export default function AuthPage() {
                   )}
 
                   <FormField
-                    control={form.control}
+                    control={currentForm.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>

@@ -138,7 +138,7 @@ export function BreathingGuide({
       isZenMode ? "h-screen" : "min-h-[600px]"
     )}>
       <div className={cn(
-        "w-full max-w-[600px] mx-auto pt-6",
+        "w-full max-w-[600px] mx-auto mt-6",
         isZenMode && "hidden"
       )}>
         <Select
@@ -149,11 +149,11 @@ export function BreathingGuide({
           <SelectTrigger className="h-[48px] bg-background border-input hover:border-primary/50 transition-colors">
             <SelectValue placeholder="Box Breathing (4x4)" className="text-foreground" />
           </SelectTrigger>
-          <SelectContent className="bg-background border-input">
-            <SelectItem value="478" className="text-foreground hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-            <SelectItem value="box" className="text-foreground hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-            <SelectItem value="22" className="text-foreground hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-            <SelectItem value="555" className="text-foreground hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+          <SelectContent>
+            <SelectItem value="478">4-7-8 Relaxation</SelectItem>
+            <SelectItem value="box">Box Breathing (4x4)</SelectItem>
+            <SelectItem value="22">2-2 Energized Focus</SelectItem>
+            <SelectItem value="555">5-5-5 Triangle</SelectItem>
           </SelectContent>
         </Select>
 
