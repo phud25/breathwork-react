@@ -32,6 +32,11 @@ export const achievements = pgTable("achievements", {
 });
 
 // Schemas for validation
+export const loginSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 export const insertUserSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -39,16 +44,11 @@ export const insertUserSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
 });
 
-export const loginSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
 export const selectUserSchema = createSelectSchema(users);
 
 // Export types
 export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
+export type NewUser = z.infer<typeof insertUserSchema>;
 export type Session = typeof sessions.$inferSelect;
 export type NewSession = typeof sessions.$inferInsert;
 export type Achievement = typeof achievements.$inferSelect;
