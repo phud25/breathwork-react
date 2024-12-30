@@ -16,23 +16,9 @@ export default function ProfilePage() {
 
   const isLoading = isLoadingSessions || isLoadingStats;
 
-  const todaySessions = sessions || [];
-  const todayStats = todaySessions.reduce((acc, session) => ({
-    totalBreaths: acc.totalBreaths + session.breathCount,
-    totalMinutes: acc.totalMinutes + Math.floor(session.duration / 60),
-    totalHolds: acc.totalHolds + session.holdCount,
-    totalHoldTime: acc.totalHoldTime + session.totalHoldTime,
-    longestHold: Math.max(acc.longestHold, session.longestHold)
-  }), {
-    totalBreaths: 0,
-    totalMinutes: 0,
-    totalHolds: 0,
-    totalHoldTime: 0,
-    longestHold: 0
-  });
-
-  const avgHoldTime = todayStats.totalHolds > 0
-    ? Math.round(todayStats.totalHoldTime / todayStats.totalHolds)
+  // Calculate average hold time
+  const avgHoldTime = stats?.todayStats?.totalHolds && stats.todayStats.totalHolds > 0
+    ? Math.round(stats.todayStats.totalHoldTime / stats.todayStats.totalHolds)
     : 0;
 
   return (
@@ -71,7 +57,7 @@ export default function ProfilePage() {
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <p className="text-2xl font-bold">{todaySessions.length}</p>
+                    <p className="text-2xl font-bold">{sessions?.length || 0}</p>
                   )}
                 </div>
                 <div>
@@ -95,7 +81,7 @@ export default function ProfilePage() {
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <p className="text-2xl font-bold">{Math.floor((stats?.todayStats?.totalHoldTime || 0) / 60)}:{((stats?.todayStats?.totalHoldTime || 0) % 60).toString().padStart(2, '0')}</p>
+                    <p className="text-2xl font-bold">{stats?.todayStats?.totalHolds || 0}</p>
                   )}
                 </div>
               </div>
@@ -132,7 +118,7 @@ export default function ProfilePage() {
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <p className="text-2xl font-bold">{stats?.totalMinutes || 0}</p>
+                      <p className="text-2xl font-bold">{stats?.todayStats?.totalMinutes || 0}</p>
                     )}
                   </div>
                   <div>
@@ -160,8 +146,7 @@ export default function ProfilePage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <p className="text-2xl font-bold">
-                        {Math.floor((stats?.todayStats?.totalHoldTime || 0) / (stats?.todayStats?.totalHolds || 1) / 60)}:
-                        {((stats?.todayStats?.totalHoldTime || 0) / (stats?.todayStats?.totalHolds || 1) % 60).toFixed(0).padStart(2, '0')}
+                        {Math.floor(avgHoldTime / 60)}:{(avgHoldTime % 60).toString().padStart(2, '0')}
                       </p>
                     )}
                   </div>
