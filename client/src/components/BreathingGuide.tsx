@@ -39,6 +39,25 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
+const getPhaseLabel = (patternName: string, phase: number) => {
+  if (patternName === "2-4 Ha Breath") {
+    return phase === 0 ? "Inhale" : "Ha";
+  }
+  if (patternName.includes("2-2")) {
+    return phase === 0 ? "Inhale" : "Exhale";
+  }
+  return phaseLabels[phase];
+};
+
+const getPhaseVariant = (patternName: string, phase: number) => {
+  if (patternName === "2-4 Ha Breath" || patternName.includes("2-2")) {
+    return phase === 0 ? "inhale" : "exhale";
+  }
+  if (phase === 0) return "inhale";
+  if (phase === 2) return "exhale";
+  return "hold";
+};
+
 const durationOptions = Array.from({ length: 119 }, (_, i) => {
   const totalSeconds = (i + 2) * 30;
   const minutes = Math.floor(totalSeconds / 60);
@@ -87,29 +106,8 @@ export function BreathingGuide({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const getPhaseVariant = () => {
-    if (pattern.name.includes("2-2") && currentPhase === 1) {
-      return "exhale";
-    }
-
-    if (currentPhase === 0) return "inhale";
-    if (currentPhase === 2) return "exhale";
-    return "hold";
-  };
-
-  const getPhaseLabel = () => {
-    if (pattern.name.includes("2-2")) {
-      return currentPhase === 0 ? "Inhale" : "Exhale";
-    }
-    return phaseLabels[currentPhase];
-  };
-
-  const getPhaseColor = () => {
-    return phaseColors[getPhaseVariant() as keyof typeof phaseColors];
-  };
-
   const getPhaseAnimation = (): AnimationProps => {
-    const phase = getPhaseVariant();
+    const phase = getPhaseVariant(pattern.name, currentPhase);
     const phaseDuration = pattern.sequence[currentPhase];
     const isPostInhale = currentPhase === 1;
 
@@ -185,7 +183,7 @@ export function BreathingGuide({
           <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
             <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
           </SelectTrigger>
-          <SelectContent className="bg-slate-800 border-slate-600 pb-4">
+          <SelectContent className="bg-slate-800 border-slate-600">
             <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
             <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
             <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
@@ -249,7 +247,7 @@ export function BreathingGuide({
           <motion.div
             className={cn(
               "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
-              getPhaseColor()
+              phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors]
             )}
             {...getPhaseAnimation()}
           />
@@ -261,7 +259,7 @@ export function BreathingGuide({
                   {countdown}
                 </div>
                 <div className="text-xs text-[#F5F5DC] font-semibold">
-                  {getPhaseLabel()}
+                  {getPhaseLabel(pattern.name, currentPhase)}
                 </div>
               </div>
             ) : (
