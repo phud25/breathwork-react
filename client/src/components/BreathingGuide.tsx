@@ -16,56 +16,18 @@ const phaseColors = {
   hold: "from-indigo-600/30 to-indigo-700/40"
 };
 
-// Define ripple animation variants
+// Simplified ripple animation variant
 const rippleVariants = {
   inhale: {
-    scale: [1, 1.1],
-    opacity: [0.3, 0],
+    scale: [1, 1.2],
+    opacity: [0.2, 0],
     transition: {
       duration: 2,
       repeat: Infinity,
       ease: "linear"
     }
   },
-  exhale: {
-    scale: [1.1, 1],
-    opacity: [0.3, 0],
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      ease: "linear"
-    }
-  },
-  hold: {
-    scale: 1,
-    opacity: 0,
-    transition: {
-      duration: 0.3
-    }
-  }
-};
-
-// Define inner ripple variants
-const innerRippleVariants = {
-  inhale: {
-    scale: [0.8, 1],
-    opacity: [0.4, 0],
-    transition: {
-      duration: 1.5,
-      repeat: Infinity,
-      ease: "linear"
-    }
-  },
-  exhale: {
-    scale: [1, 0.8],
-    opacity: [0.4, 0],
-    transition: {
-      duration: 1.5,
-      repeat: Infinity,
-      ease: "linear"
-    }
-  },
-  hold: {
+  inactive: {
     scale: 1,
     opacity: 0,
     transition: {
@@ -306,47 +268,27 @@ export function BreathingGuide({
       </div>
 
       <div className="mt-8 mb-12">
-        <div className="relative w-[285px] h-[285px] flex items-center justify-center">
+        <div className="relative w-[265px] h-[265px] flex items-center justify-center">
           {/* Background circle */}
           <div className="absolute w-[265px] h-[265px] rounded-full bg-gradient-to-r from-purple-500/10 via-purple-600/20 to-purple-700/30 transition-all duration-500" />
 
-          {/* Outer ripple circles */}
-          {[0, 1, 2].map((index) => (
-            <motion.div
-              key={`outer-ripple-${index}`}
-              className={cn(
-                "absolute w-[265px] h-[265px] rounded-full border border-purple-500/20",
-              )}
-              initial="hold"
-              animate={isActive && !isPaused ? 
-                getPhaseVariant(pattern.name, currentPhase) === "inhale" ? "inhale" :
-                getPhaseVariant(pattern.name, currentPhase) === "exhale" ? "exhale" : 
-                "hold" : "hold"}
-              variants={rippleVariants}
-              transition={{
-                delay: index * 0.4,
-              }}
-            />
-          ))}
-
-          {/* Inner ripple circles */}
-          {[0, 1].map((index) => (
-            <motion.div
-              key={`inner-ripple-${index}`}
-              className={cn(
-                "absolute w-[265px] h-[265px] rounded-full border border-purple-500/20",
-              )}
-              initial="hold"
-              animate={isActive && !isPaused ? 
-                getPhaseVariant(pattern.name, currentPhase) === "inhale" ? "inhale" :
-                getPhaseVariant(pattern.name, currentPhase) === "exhale" ? "exhale" : 
-                "hold" : "hold"}
-              variants={innerRippleVariants}
-              transition={{
-                delay: index * 0.3,
-              }}
-            />
-          ))}
+          {/* Ripple circles - only shown during inhale */}
+          {isActive && !isPaused && getPhaseVariant(pattern.name, currentPhase) === "inhale" && (
+            <>
+              {[0, 1, 2].map((index) => (
+                <motion.div
+                  key={`ripple-${index}`}
+                  className="absolute w-[265px] h-[265px] rounded-full border border-purple-500/20"
+                  initial="inactive"
+                  animate="inhale"
+                  variants={rippleVariants}
+                  transition={{
+                    delay: index * 0.4,
+                  }}
+                />
+              ))}
+            </>
+          )}
 
           {/* Breathing animation circle */}
           <motion.div
