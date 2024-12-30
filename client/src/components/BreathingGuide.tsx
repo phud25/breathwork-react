@@ -173,7 +173,7 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-2 mt-[-85px]">
+        <div className="space-y-2 mt-[-100px]">
           <Select
             value={pattern.name === "2-2 Energized Focus" ? "22" :
               pattern.name === "4-7-8 Relaxation" ? "478" :
