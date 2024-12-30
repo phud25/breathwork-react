@@ -238,7 +238,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className={cn("flex items-center justify-center mt-5 mb-5", isZenMode ? "h-full" : "")}>
+      <div className={cn("flex items-center justify-center mt-1 mb-1", isZenMode ? "h-full" : "")}>
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
           <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
