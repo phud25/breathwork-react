@@ -282,61 +282,61 @@ export function BreathingGuide({
       </div>
 
       <div className="w-full max-w-[600px] -mt-1">
-        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
-          <span>Completed Breaths: {breathCount}</span>
-          <span>Time: {formatTime(elapsed)}</span>
-        </div>
+          <div className="flex justify-between items-center text-sm text-primary/80 mb-4 mt-2">
+            <span>Completed Breaths: {breathCount}</span>
+            <span>Time: {formatTime(elapsed)}</span>
+          </div>
 
-        <div className="flex items-center justify-center gap-[20px] pb-10 -mb-[100px]">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent"
-          >
-            {isSoundEnabled ? (
-              <Volume2 className="h-4 w-4" />
-            ) : (
-              <VolumeX className="h-4 w-4" />
+          <div className="flex items-center justify-center gap-[20px] pb-10">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleSound}
+              className="h-[48px] hover:bg-transparent"
+            >
+              {isSoundEnabled ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleZen}
+              className="h-[48px] hover:bg-transparent"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+
+            {isActive && (
+              <>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={isPaused ? onResume : onPause}
+                  className="h-[48px] hover:bg-transparent"
+                >
+                  {isPaused ? (
+                    <Play className="h-4 w-4" />
+                  ) : (
+                    <Pause className="h-4 w-4" />
+                  )}
+                </Button>
+
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={onStop}
+                  className="h-[48px]"
+                >
+                  <Square className="h-4 w-4" />
+                </Button>
+              </>
             )}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleZen}
-            className="h-[48px] hover:bg-transparent"
-          >
-            <Maximize2 className="h-4 w-4" />
-          </Button>
-
-          {isActive && (
-            <>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={isPaused ? onResume : onPause}
-                className="h-[48px] hover:bg-transparent"
-              >
-                {isPaused ? (
-                  <Play className="h-4 w-4" />
-                ) : (
-                  <Pause className="h-4 w-4" />
-                )}
-              </Button>
-
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={onStop}
-                className="h-[48px]"
-              >
-                <Square className="h-4 w-4" />
-              </Button>
-            </>
-          )}
+          </div>
         </div>
-      </div>
     </div>
   );
 }
