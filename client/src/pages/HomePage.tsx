@@ -65,7 +65,10 @@ export default function HomePage() {
         "max-w-4xl mx-auto space-y-5",
         isZenMode && "hidden"
       )}>
-        <header className="flex justify-between items-center mb-3">
+        <header className={cn(
+          "flex justify-between items-center mb-3 transition-opacity duration-300",
+          isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
+        )}>
           <h1 className="text-2xl font-bold text-primary">Breath Session</h1>
           <Button variant="outline" onClick={() => logout()}>Logout</Button>
         </header>
@@ -97,7 +100,10 @@ export default function HomePage() {
             </Card>
           </ErrorBoundary>
 
-          <Card className={cn(isZenMode && "hidden")}>
+          <Card className={cn(
+            "transition-opacity duration-300",
+            isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
+          )}>
             <CardHeader>
               <CardTitle>Daily Tracking</CardTitle>
             </CardHeader>

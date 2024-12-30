@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { exec } from "child_process";
+import { promisify } from "util";
 
 const app = express();
 app.use(express.json());
@@ -45,54 +47,59 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(status).json({ message });
 });
 
+const execAsync = promisify(exec);
+
+async function killProcessOnPort(port: number) {
+  try {
+    // Find and kill the process using the port
+    if (process.platform === 'win32') {
+      await execAsync(`netstat -ano | findstr :${port}`);
+    } else {
+      await execAsync(`lsof -i :${port} -t | xargs kill -9`);
+    }
+    log(`Killed process on port ${port}`);
+  } catch (error) {
+    // Ignore errors as the process might not exist
+    log(`No process found on port ${port}`);
+  }
+}
+
 (async () => {
   try {
+    const PORT = 5000;
+
+    // Kill any existing process on our port
+    await killProcessOnPort(PORT);
+
     const server = registerRoutes(app);
 
-    // importantly only setup vite in development and after
-    // setting up all the other routes so the catch-all route
-    // doesn't interfere with the other routes
     if (app.get("env") === "development") {
       await setupVite(app, server);
     } else {
       serveStatic(app);
     }
 
-    const startServer = (port: number) => {
-      return new Promise((resolve, reject) => {
-        server.listen(port, "0.0.0.0")
-          .once('listening', () => {
-            log(`Server running on port ${port}`);
-            resolve(true);
-          })
-          .once('error', (err: any) => {
-            if (err.code === 'EADDRINUSE') {
-              log(`Port ${port} is in use, trying next port`);
-              resolve(false);
-            } else {
-              reject(err);
-            }
-          });
-      });
-    };
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`serving on port ${PORT}`);
+    });
 
-    // Try ports starting from 5000
-    let port = 5000;
-    while (port < 5010) {
-      if (await startServer(port)) {
-        break;
-      }
-      port++;
-    }
-
-    // Handle server shutdown
-    process.on('SIGTERM', () => {
-      log('SIGTERM received, shutting down gracefully');
+    // Cleanup handler
+    const cleanup = () => {
+      log('Shutting down server...');
       server.close(() => {
         log('Server closed');
         process.exit(0);
       });
+    };
+
+    // Handle termination signals
+    process.on('SIGTERM', cleanup);
+    process.on('SIGINT', cleanup);
+    process.on('uncaughtException', (err) => {
+      log(`Uncaught Exception: ${err.message}`);
+      cleanup();
     });
+
   } catch (error: any) {
     log(`Failed to start application: ${error.message}`);
     process.exit(1);
