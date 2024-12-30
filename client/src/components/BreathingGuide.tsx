@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, type AnimationProps } from "framer-motion";
-import { Volume2, VolumeX, Maximize2, Pause, Play, Square } from "lucide-react";
+import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -67,17 +67,39 @@ export function BreathingGuide({
   const [sessionType, setSessionType] = useState<"breaths" | "duration">("breaths");
   const [breathCountState, setBreathCountState] = useState<number>(15);
   const [durationInput, setDurationInput] = useState<string>("3:00");
+  const [isHolding, setIsHolding] = useState(false);
+  const [holdTime, setHoldTime] = useState(0);
+  const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
+
+  const startHold = () => {
+    if (!isActive || isHolding) return;
+    setIsHolding(true);
+    onPause();
+    const interval = setInterval(() => {
+      setHoldTime(prev => prev + 1);
+    }, 1000);
+    setHoldInterval(interval);
+  };
+
+  const endHold = () => {
+    if (holdInterval) {
+      clearInterval(holdInterval);
+      setHoldInterval(null);
+    }
+    setIsHolding(false);
+    setHoldTime(0);
+    onResume();
+  };
 
   useEffect(() => {
-    if (sessionType === "duration") {
-      const [minutes, seconds] = durationInput.split(":").map(Number);
-      if (!isNaN(minutes) && !isNaN(seconds)) {
-        console.log("Duration updated:", { minutes, seconds });
+    return () => {
+      if (holdInterval) {
+        clearInterval(holdInterval);
       }
-    }
-  }, [sessionType, durationInput]);
+    };
+  }, [holdInterval]);
 
-  const formatTime = (seconds: number) => {
+  const formatHoldTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
@@ -239,28 +261,40 @@ export function BreathingGuide({
       </div>
 
       <div className={cn("flex items-center justify-center mt-1 mb-1", isZenMode ? "h-full" : "")}>
-        <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+        <div
+          className="relative w-[300px] h-[300px] flex items-center justify-center"
+          onClick={() => isHolding && endHold()}
+        >
           <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
           <motion.div
             className={cn(
               "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
-              phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors]
+              phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors],
+              isHolding && "animate-pulse"
             )}
-            {...getPhaseAnimation()}
+            {...(isHolding ? {} : getPhaseAnimation())}
           />
 
           <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
-                {pattern.name !== "Breath of Fire" && (
+                {isHolding ? (
                   <div className="text-xl font-mono text-[#F5F5DC] font-bold">
-                    {countdown}
+                    {formatHoldTime(holdTime)}
                   </div>
+                ) : (
+                  <>
+                    {pattern.name !== "Breath of Fire" && (
+                      <div className="text-xl font-mono text-[#F5F5DC] font-bold">
+                        {countdown}
+                      </div>
+                    )}
+                    <div className="text-xs text-[#F5F5DC] font-semibold">
+                      {getPhaseLabel(pattern.name, currentPhase)}
+                    </div>
+                  </>
                 )}
-                <div className="text-xs text-[#F5F5DC] font-semibold">
-                  {getPhaseLabel(pattern.name, currentPhase)}
-                </div>
               </div>
             ) : (
               <Button
@@ -320,8 +354,21 @@ export function BreathingGuide({
               <Button
                 variant="outline"
                 size="icon"
+                onClick={isHolding ? endHold : startHold}
+                className={cn(
+                  "h-[48px] hover:bg-transparent",
+                  isHolding && "ring-2 ring-purple-500 ring-opacity-50"
+                )}
+              >
+                <Hand className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={isPaused ? onResume : onPause}
                 className="h-[48px] hover:bg-transparent"
+                disabled={isHolding}
               >
                 {isPaused ? (
                   <Play className="h-4 w-4" />
