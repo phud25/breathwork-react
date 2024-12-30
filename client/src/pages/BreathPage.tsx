@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 import { useBreathing } from "@/hooks/use-breathing";
+import { useSessionStats } from "@/hooks/use-sessions";
+import { Loader2 } from "lucide-react";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -22,6 +24,7 @@ export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const { data: stats, isLoading: isLoadingStats } = useSessionStats();
 
   const {
     isActive,
@@ -111,21 +114,43 @@ export default function BreathPage() {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Breaths</p>
-                    <p className="text-2xl font-bold">{breathCount}</p>
+                    {isLoadingStats ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{(stats?.todayStats?.totalBreaths || 0) + breathCount}</p>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Time</p>
-                    <p className="text-2xl font-bold">{Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}</p>
+                    {isLoadingStats ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">
+                        {Math.floor(((stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime) / 60)}:
+                        {((stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime) % 60}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   <div>
                     <p className="text-sm text-muted-foreground">Holds</p>
-                    <p className="text-2xl font-bold">{holdStats.holdCount}</p>
+                    {isLoadingStats ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{(stats?.todayStats?.totalHolds || 0) + holdStats.holdCount}</p>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Hold Time</p>
-                    <p className="text-2xl font-bold">{Math.floor(holdStats.totalHoldTime / 60)}:{(holdStats.totalHoldTime % 60).toString().padStart(2, '0')}</p>
+                    {isLoadingStats ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">
+                        {Math.floor(((stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime) / 60)}:
+                        {((stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime) % 60}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <ProgressChart />

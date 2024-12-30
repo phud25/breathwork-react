@@ -91,7 +91,7 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Hold Time</p>
+                  <p className="text-sm text-muted-foreground">Hold</p>
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -136,7 +136,7 @@ export default function ProfilePage() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Hold Time</p>
+                    <p className="text-sm text-muted-foreground">Hold</p>
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
@@ -150,15 +150,35 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Longest Streak Card */}
+            {/* Breath Hold Stats Card */}
             <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">Longest Streak</p>
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <p className="text-2xl font-bold">{stats?.longestStreak || 0} days</p>
-                )}
+              <CardHeader>
+                <CardTitle>Breath Hold Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Average Hold</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">
+                        {Math.floor(avgHoldTime / 60)}:{(avgHoldTime % 60).toString().padStart(2, '0')}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Longest Hold</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">
+                        {Math.floor(todayStats.longestHold / 60)}:
+                        {(todayStats.longestHold % 60).toString().padStart(2, '0')}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -175,23 +195,6 @@ export default function ProfilePage() {
                   selected={selectedDate}
                   onSelect={setSelectedDate}
                   className="rounded-md border"
-                  classNames={{
-                    day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 flex items-center justify-center",
-                    day_disabled: "text-muted-foreground opacity-50",
-                    day_today: "bg-accent text-accent-foreground",
-                    cell: "w-9 p-0 text-center relative [&:has([aria-selected].day)]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                    head_cell: "w-9 text-muted-foreground font-normal text-[0.8rem]",
-                    nav: "space-x-1 flex items-center justify-center",
-                    nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
-                    table: "w-full border-collapse space-y-1",
-                    caption: "flex justify-center pt-1 relative items-center mb-3",
-                    caption_label: "text-sm font-medium",
-                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                    tbody: "grid grid-cols-7 gap-1",
-                    head: "grid grid-cols-7 gap-1 mb-1",
-                    row: "contents",
-                  }}
                 />
                 <Card>
                   <CardHeader>
