@@ -238,7 +238,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className={cn("flex-1 flex items-center justify-center", isZenMode ? "h-full" : "py-8")}>
+      <div className={cn("flex-1 flex items-center justify-center", isZenMode ? "h-full" : "p-5")}>
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
           <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -272,7 +272,6 @@ export function BreathingGuide({
               </Button>
             )}
           </div>
-
           {sessionCompleted && !isActive && (
             <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-2 rounded bg-black/50 text-white text-center whitespace-nowrap">
               Session Complete! Tap Start to begin another session
