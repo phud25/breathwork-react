@@ -240,7 +240,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="mt-2 mb-0">
+      <div className="mt-0 mb-0">
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
           <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -281,7 +281,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className="w-full max-w-[600px] -mt-12">
+      <div className="w-full max-w-[600px] -mt-6">
         <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
