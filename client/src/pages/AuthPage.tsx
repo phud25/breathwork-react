@@ -11,16 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { z } from "zod";
-import { insertUserSchema } from "@db/schema";
-import type { InsertUser } from "@db/schema";
+import { loginSchema } from "@db/schema";
+import type { NewUser } from "@db/schema";
 
-const loginSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = {
+  username: string;
+  password: string;
+};
 
 export default function AuthPage() {
   const { login, register: registerUser } = useUser();
@@ -37,22 +34,22 @@ export default function AuthPage() {
     }
   });
 
-  const registerForm = useForm<InsertUser>({
-    resolver: zodResolver(insertUserSchema),
+  const registerForm = useForm<NewUser>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       username: "",
       password: "",
       firstName: "",
-      lastName: ""
+      lastName: "",
     }
   });
 
-  const onSubmit = async (data: LoginFormData | InsertUser) => {
+  const onSubmit = async (data: LoginFormData | NewUser) => {
     setIsLoading(true);
     try {
       const result = await (activeTab === "login" 
         ? login(data as LoginFormData)
-        : registerUser(data as InsertUser)
+        : registerUser(data as NewUser)
       );
 
       if (!result.ok) {
@@ -75,8 +72,6 @@ export default function AuthPage() {
     }
   };
 
-  const currentForm = activeTab === "login" ? loginForm : registerForm;
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <motion.div
@@ -90,91 +85,156 @@ export default function AuthPage() {
             <CardTitle className="text-2xl text-center text-primary">Breathwork</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={(value) => {
-              setActiveTab(value as "login" | "register");
-              loginForm.reset();
-              registerForm.reset();
-            }}>
+            <Tabs 
+              value={activeTab} 
+              onValueChange={(value) => {
+                setActiveTab(value as "login" | "register");
+                loginForm.reset();
+                registerForm.reset();
+              }}
+            >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
 
-              <Form {...currentForm}>
-                <form onSubmit={currentForm.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                  <FormField
-                    control={currentForm.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter your username" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              {activeTab === "login" ? (
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                    <FormField
+                      control={loginForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your username" 
+                              autoComplete="username"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  {activeTab === "register" && (
-                    <>
-                      <FormField
-                        control={registerForm.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>First Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Enter your first name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Last Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Enter your last name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </>
-                  )}
+                    <FormField
+                      control={loginForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="password" 
+                              placeholder="Enter your password"
+                              autoComplete="current-password"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={currentForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder="Enter your password"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Login
+                    </Button>
+                  </form>
+                </Form>
+              ) : (
+                <Form {...registerForm}>
+                  <form onSubmit={registerForm.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                    <FormField
+                      control={registerForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your username" 
+                              autoComplete="username"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <Button 
-                    type="submit" 
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {activeTab === "login" ? "Login" : "Register"}
-                  </Button>
-                </form>
-              </Form>
+                    <FormField
+                      control={registerForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your first name"
+                              autoComplete="given-name"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={registerForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter your last name"
+                              autoComplete="family-name"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={registerForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="password" 
+                              placeholder="Enter your password"
+                              autoComplete="new-password"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Register
+                    </Button>
+                  </form>
+                </Form>
+              )}
             </Tabs>
           </CardContent>
         </Card>

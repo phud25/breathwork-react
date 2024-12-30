@@ -49,7 +49,7 @@ export default function HomePage() {
           </button>
         </header>
 
-        <h2 className="text-xl text-muted-foreground mt-6">Welcome, {user.firstName}!</h2>
+        <h2 className="text-xl text-muted-foreground mt-6">{user.firstName}</h2>
 
         <div className="grid md:grid-cols-3 gap-6 mt-6">
           {navigationCards.map((card, index) => (
