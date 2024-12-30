@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <>
       <Navigation />
-      <main className="min-h-screen pt-24 pb-8 px-4 bg-background">
+      <main className="min-h-screen pt-[66px] pb-8 px-4 bg-background">
         <div className="container max-w-6xl mx-auto grid gap-6 md:grid-cols-3">
           <Link href="/breathwork">
             <Card className="group cursor-pointer transition-all hover:border-primary/50">

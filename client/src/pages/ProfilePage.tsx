@@ -12,7 +12,7 @@ export default function ProfilePage() {
   return (
     <>
       <Navigation />
-      <main className="min-h-screen pt-24 px-4 pb-8 bg-background">
+      <main className="min-h-screen pt-[66px] px-4 pb-8 bg-background">
         <div className="container max-w-4xl mx-auto space-y-6">
           {/* User Info Section */}
           <Card>
