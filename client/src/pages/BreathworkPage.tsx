@@ -58,12 +58,9 @@ export default function BreathworkPage() {
       )}>
         <header className="flex justify-between items-center">
           <h1 className="text-xl font-semibold text-primary">Breath Session</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-lg text-primary">Welcome, {user?.firstName}</span>
-            <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
+          <Button variant="ghost" size="icon">
+            <Menu className="h-5 w-5" />
+          </Button>
         </header>
 
         <div className="grid md:grid-cols-2 gap-6">

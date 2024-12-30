@@ -3,7 +3,6 @@ import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Wind, Brain, User } from "lucide-react";
 import { useUser } from "@/hooks/use-user";
-import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const { user, logout } = useUser();
@@ -40,7 +39,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center mb-8">
+        <header className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary">Patterns Breathwork</h1>
           <button 
             onClick={() => logout()}
@@ -50,7 +49,9 @@ export default function HomePage() {
           </button>
         </header>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <h2 className="text-xl text-muted-foreground mt-6">Welcome, {user.firstName}!</h2>
+
+        <div className="grid md:grid-cols-3 gap-6 mt-6">
           {navigationCards.map((card, index) => (
             <Link key={card.href} href={card.href}>
               <motion.div

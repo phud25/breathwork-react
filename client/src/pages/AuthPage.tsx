@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { useLocation } from "wouter";
 import { useUser } from "@/hooks/use-user";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [_, setLocation] = useLocation();
 
   const form = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
@@ -43,6 +45,8 @@ export default function AuthPage() {
           title: "Error",
           description: result.message
         });
+      } else {
+        setLocation("/"); // Redirect to home page on success
       }
     } catch (error: any) {
       toast({
