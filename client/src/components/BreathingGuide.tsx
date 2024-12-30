@@ -95,6 +95,19 @@ export function BreathingGuide({
       };
     }
 
+    if (pattern.name === "Breath of Fire") {
+      return {
+        initial: { scale: phase === "inhale" ? 0.3 : 1 },
+        animate: { 
+          scale: phase === "inhale" ? 1 : 0.3,
+          transition: {
+            duration: 0.5,
+            ease: "easeInOut"
+          }
+        }
+      };
+    }
+
     if (phase === "inhale") {
       return {
         initial: { scale: 0.3 },
