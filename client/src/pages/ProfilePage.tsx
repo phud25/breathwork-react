@@ -42,7 +42,8 @@ export default function ProfilePage() {
 
           {/* Stats Section */}
           <div className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2">
+            {/* Streak Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground">Current Streak</p>
@@ -64,6 +65,8 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Stats Card */}
             <Card>
               <CardContent className="pt-6">
                 <div className="grid grid-cols-3 gap-4">
@@ -109,7 +112,14 @@ export default function ProfilePage() {
                   mode="single"
                   selected={selectedDate}
                   onSelect={setSelectedDate}
-                  className="rounded-md border text-center [&_.rdp-nav]:justify-center [&_.rdp-tbody_td]:justify-center [&_.rdp-cell]:justify-center"
+                  className="rounded-md border"
+                  classNames={{
+                    day: "h-9 w-9 text-center p-0 aria-selected:bg-primary hover:bg-primary/10 focus:bg-primary/10",
+                    nav_button: "h-7 w-7 !bg-transparent p-0 opacity-50 hover:opacity-100",
+                    cell: "text-center p-0",
+                    head_cell: "text-center",
+                    nav: "justify-center",
+                  }}
                 />
                 <Card>
                   <CardHeader>
