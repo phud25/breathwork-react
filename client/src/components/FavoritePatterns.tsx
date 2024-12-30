@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SaveIcon, Star, Trash2 } from "lucide-react";
+import { Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -54,26 +54,6 @@ export function FavoritePatterns({ currentPattern, onPatternSelect }: FavoritePa
     }
   };
 
-  const handleQuickSave = async () => {
-    try {
-      await saveFavorite({
-        name: `Quick Save - ${currentPattern.name}`,
-        sequence: currentPattern.sequence,
-        isQuickSave: true,
-      });
-      toast({
-        title: "Pattern quick saved",
-        description: "Your breathing pattern has been quick saved.",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    }
-  };
-
   const handleDelete = async (id: number) => {
     try {
       await deleteFavorite(id);
@@ -91,7 +71,7 @@ export function FavoritePatterns({ currentPattern, onPatternSelect }: FavoritePa
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" size="icon" className="h-[48px] hover:bg-transparent">
@@ -113,15 +93,6 @@ export function FavoritePatterns({ currentPattern, onPatternSelect }: FavoritePa
         </DialogContent>
       </Dialog>
 
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleQuickSave}
-        className="h-[48px] hover:bg-transparent"
-      >
-        <SaveIcon className="h-4 w-4" />
-      </Button>
-
       {favorites && favorites.length > 0 && (
         <Select
           onValueChange={(value) => {
@@ -135,7 +106,7 @@ export function FavoritePatterns({ currentPattern, onPatternSelect }: FavoritePa
           }}
         >
           <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors h-[48px]">
-            <SelectValue placeholder="Saved Patterns" />
+            <SelectValue placeholder="Saved Patterns" className="text-white" />
           </SelectTrigger>
           <SelectContent className="bg-slate-800 border-slate-600">
             {favorites.map((pattern) => (

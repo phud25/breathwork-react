@@ -176,30 +176,21 @@ export function BreathingGuide({
         isZenMode && "hidden"
       )}>
         <div className="space-y-2">
-          <div className="flex gap-2">
-            <Select
-              value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
-              onValueChange={(value) => onPatternChange(value as PatternType)}
-              className="h-[48px] flex-grow"
-            >
-              <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors">
-                <SelectValue className="text-white text-base" placeholder="Select Breathing Pattern" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600">
-                <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-                <SelectItem value="box" className="text-white hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-                <SelectItem value="22" className="text-white hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-                <SelectItem value="555" className="text-white hover:bg-primary/10">5-5-5 Triangle</SelectItem>
-              </SelectContent>
-            </Select>
-            <FavoritePatterns
-              currentPattern={pattern}
-              onPatternSelect={pattern => {
-                // Handle custom pattern selection
-                onPatternChange(pattern.name.toLowerCase().replace(/\s+/g, '-') as PatternType);
-              }}
-            />
-          </div>
+          <Select
+            value={pattern.name.toLowerCase().replace(/\s+/g, '-')}
+            onValueChange={(value) => onPatternChange(value as PatternType)}
+            className="h-[48px] w-full"
+          >
+            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
+              <SelectValue placeholder="Select Breathing Pattern" className="text-white" />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-800 border-slate-600">
+              <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+              <SelectItem value="box" className="text-white hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+              <SelectItem value="22" className="text-white hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+              <SelectItem value="555" className="text-white hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+            </SelectContent>
+          </Select>
 
           <div className="flex gap-[5%] mb-1">
             <Select
@@ -296,6 +287,12 @@ export function BreathingGuide({
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">
+          <FavoritePatterns
+            currentPattern={pattern}
+            onPatternSelect={pattern => {
+              onPatternChange(pattern.name.toLowerCase().replace(/\s+/g, '-') as PatternType);
+            }}
+          />
           <Button
             variant="outline"
             size="icon"
