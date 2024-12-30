@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, type AnimationProps } from "framer-motion";
-import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Volume1 } from "lucide-react";
+import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -82,9 +82,10 @@ export function BreathingGuide({
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
   const [showVolumeControl, setShowVolumeControl] = useState(false);
+  const [volume, setVolume] = useState(0.5);
 
-  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: 0.3 });
-  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: 0.5 });
+  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: volume * 0.6 });
+  const breathSound = useAudio('/audio/breath-sound.mp3', { volume: volume });
 
   useEffect(() => {
     if (isActive && isSoundEnabled && !isPaused && !isHolding) {
@@ -136,7 +137,7 @@ export function BreathingGuide({
 
   const handleToggleSound = () => {
     onToggleSound();
-    if (!isSoundEnabled) {
+    if (isSoundEnabled) {
       backgroundMusic.stop();
       breathSound.stop();
     }
@@ -371,51 +372,30 @@ export function BreathingGuide({
               onClick={() => setShowVolumeControl(!showVolumeControl)}
               className="h-[48px] hover:bg-transparent"
             >
-              {isSoundEnabled ? (
-                showVolumeControl ? <Volume1 className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />
-              ) : (
-                <VolumeX className="h-4 w-4" />
-              )}
+              {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>
 
             {showVolumeControl && (
               <div className="absolute bottom-full mb-2 p-4 bg-background border rounded-lg shadow-lg">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm mb-2">Background Music</p>
-                    <Slider
-                      value={[backgroundMusic.volume * 100]}
-                      onValueChange={([value]) => backgroundMusic.setVolume(value / 100)}
-                      max={100}
-                      step={1}
-                    />
-                  </div>
-                  <div>
-                    <p className="text-sm mb-2">Breath Sounds</p>
-                    <Slider
-                      value={[breathSound.volume * 100]}
-                      onValueChange={([value]) => breathSound.setVolume(value / 100)}
-                      max={100}
-                      step={1}
-                    />
-                  </div>
+                <div>
+                  <p className="text-sm mb-2">Volume</p>
+                  <Slider
+                    value={[volume * 100]}
+                    onValueChange={([value]) => {
+                      setVolume(value / 100);
+                      if (!isSoundEnabled && value > 0) {
+                        onToggleSound();
+                      } else if (isSoundEnabled && value === 0) {
+                        onToggleSound();
+                      }
+                    }}
+                    max={100}
+                    step={1}
+                  />
                 </div>
               </div>
             )}
           </div>
-
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleToggleSound}
-            className="h-[48px] hover:bg-transparent"
-          >
-            {isSoundEnabled ? (
-              <Volume2 className="h-4 w-4" />
-            ) : (
-              <VolumeX className="h-4 w-4" />
-            )}
-          </Button>
 
           {isActive && (
             <>
