@@ -98,7 +98,7 @@ export function BreathingGuide({
     if (pattern.name === "Breath of Fire") {
       return {
         initial: { scale: phase === "inhale" ? 0.3 : 1 },
-        animate: { 
+        animate: {
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
             duration: 0.5,
@@ -165,7 +165,7 @@ export function BreathingGuide({
     )}>
       <div className={cn(
         "w-full max-w-[600px] mx-auto space-y-3 transition-opacity duration-300",
-        isZenMode ? "opacity-0 hidden" : "opacity-100"
+        isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
       )}>
         <Select
           value={pattern.name === "2-2 Energized Focus" ? "22" :
@@ -177,7 +177,7 @@ export function BreathingGuide({
           onValueChange={(value) => onPatternChange(value as PatternType)}
           className="h-[48px] w-full"
         >
-          <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
+          <SelectTrigger className="bg-transparent border-slate-600 text-[#F5F5DC] hover:border-primary/50 focus:border-primary/50 transition-colors">
             <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
           </SelectTrigger>
           <SelectContent className="bg-slate-800 border-slate-600">
@@ -196,7 +196,7 @@ export function BreathingGuide({
             onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
             className="w-[50%] h-[48px]"
           >
-            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
+            <SelectTrigger className="bg-transparent border-slate-600 hover:border-primary/50 focus:border-primary/50 transition-colors">
               <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
@@ -211,7 +211,7 @@ export function BreathingGuide({
               onValueChange={setDurationInput}
               className="w-[45%] h-[48px]"
             >
-              <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
+              <SelectTrigger className="bg-transparent border-slate-600 hover:border-primary/50 focus:border-primary/50 transition-colors">
                 <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
@@ -231,7 +231,7 @@ export function BreathingGuide({
               type="number"
               value={breathCountState}
               onChange={(e) => handleBreathCountChange(e.target.value)}
-              className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-[#F5F5DC] focus:ring-primary/50"
+              className="w-[45%] h-[48px] text-center bg-transparent border-slate-600 text-[#F5F5DC] hover:border-primary/50 focus:border-primary/50 focus:ring-primary/50"
               min={1}
             />
           )}

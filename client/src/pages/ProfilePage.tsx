@@ -41,7 +41,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Stats Section */}
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">Current Streak</p>
@@ -62,14 +62,36 @@ export default function ProfilePage() {
                 )}
               </CardContent>
             </Card>
-            <Card>
+            <Card className="md:col-span-2">
               <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">Total Sessions</p>
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <p className="text-2xl font-bold">{stats?.totalSessions || 0}</p>
-                )}
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Streak Sessions</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{stats?.totalSessions || 0}</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Breaths</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">
+                        {sessions?.reduce((acc, session) => acc + session.breathCount, 0) || 0}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Minutes</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{stats?.totalMinutes || 0}</p>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
