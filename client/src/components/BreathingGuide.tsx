@@ -38,6 +38,17 @@ const phaseColors = {
   hold: "from-purple-500/30 to-purple-500/30"
 };
 
+// Generate duration options (1:00 to 60:00 in 30-second increments)
+const durationOptions = Array.from({ length: 119 }, (_, i) => {
+  const totalSeconds = (i + 2) * 30; // Start from 1:00 (60 seconds)
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return {
+    value: `${minutes}:${seconds.toString().padStart(2, '0')}`,
+    label: `${minutes}:${seconds.toString().padStart(2, '0')}`
+  };
+});
+
 export function BreathingGuide({
   pattern,
   isActive,
@@ -147,14 +158,6 @@ export function BreathingGuide({
     };
   };
 
-  const handleDurationChange = (value: string) => {
-    if (!/^\d{1,2}:\d{2}$/.test(value)) return;
-    const [minutes, seconds] = value.split(":").map(Number);
-    if (minutes >= 1 && minutes <= 60 && seconds >= 0 && seconds < 60) {
-      setDurationInput(value);
-    }
-  };
-
   const handleBreathCountChange = (value: string) => {
     const count = parseInt(value, 10);
     if (!isNaN(count) && count >= 1) {
@@ -168,7 +171,7 @@ export function BreathingGuide({
       isZenMode ? "h-screen p-0" : "min-h-[600px] p-4"
     )}>
       <div className={cn(
-        "w-full max-w-[600px] mx-auto",
+        "w-full max-w-[600px] mx-auto -mt-[75px]",
         isZenMode && "hidden"
       )}>
         <div className="space-y-2">
@@ -178,7 +181,7 @@ export function BreathingGuide({
             className="h-[48px]"
           >
             <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors">
-              <SelectValue placeholder="Select Breathing Pattern" />
+              <SelectValue className="text-white" placeholder="Select Breathing Pattern" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
               <SelectItem value="478" className="text-white hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
@@ -204,15 +207,26 @@ export function BreathingGuide({
             </Select>
 
             {sessionType === "duration" ? (
-              <Input
-                type="text"
+              <Select
                 value={durationInput}
-                onChange={(e) => handleDurationChange(e.target.value)}
-                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-white focus:ring-primary/50"
-                placeholder="3:00"
-                min="1:00"
-                max="60:00"
-              />
+                onValueChange={setDurationInput}
+                className="w-[45%] h-[48px]"
+              >
+                <SelectTrigger className="bg-slate-800 border-slate-600 text-white hover:border-primary/50 transition-colors text-center">
+                  <SelectValue placeholder="3:00" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
+                  {durationOptions.map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value}
+                      className="text-white hover:bg-primary/10"
+                    >
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             ) : (
               <Input
                 type="number"
