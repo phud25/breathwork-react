@@ -185,7 +185,7 @@ export function BreathingGuide({
             <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
               <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600 pb-4"> {/* Added padding-bottom */}
+            <SelectContent className="bg-slate-800 border-slate-600 pb-4">
               <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
               <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
               <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
@@ -241,52 +241,53 @@ export function BreathingGuide({
           </div>
         </div>
       </div>
-      <div className="relative w-[300px] h-[300px] mt-6 mb-2 flex items-center justify-center">
-        <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+      <div className="flex-1 flex flex-col justify-center items-center py-6">
+        <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
-        <motion.div
-          className={cn(
-            "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
-            getPhaseColor()
-          )}
-          {...getPhaseAnimation()}
-        />
+          <motion.div
+            className={cn(
+              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+              getPhaseColor()
+            )}
+            {...getPhaseAnimation()}
+          />
 
-        <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
-          {isActive ? (
-            <div className="text-center pointer-events-none select-none">
-              <div className="text-xl font-mono text-[#F5F5DC] font-bold">
-                {countdown}
+          <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+            {isActive ? (
+              <div className="text-center pointer-events-none select-none">
+                <div className="text-xl font-mono text-[#F5F5DC] font-bold">
+                  {countdown}
+                </div>
+                <div className="text-xs text-[#F5F5DC] font-semibold">
+                  {getPhaseLabel()}
+                </div>
               </div>
-              <div className="text-xs text-[#F5F5DC] font-semibold">
-                {getPhaseLabel()}
-              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={onStart}
+                className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-colors duration-200"
+              >
+                Start
+              </Button>
+            )}
+          </div>
+
+          {sessionCompleted && !isActive && (
+            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-2 rounded bg-black/50 text-white text-center whitespace-nowrap">
+              Session Complete! Tap Start to begin another session
             </div>
-          ) : (
-            <Button
-              variant="ghost"
-              onClick={onStart}
-              className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-colors duration-200"
-            >
-              Start
-            </Button>
           )}
         </div>
-
-        {sessionCompleted && !isActive && (
-          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-2 rounded bg-black/50 text-white text-center whitespace-nowrap">
-            Session Complete! Tap Start to begin another session
-          </div>
-        )}
       </div>
-
-      <div className="w-full max-w-[600px] -mt-6">
-        <div className="flex justify-between items-center text-sm text-primary/80 mb-2">
+      <div className="w-full max-w-[600px]">
+        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
         </div>
 
-        <div className="flex items-center justify-center gap-[20px]">
+        <div className="flex items-center justify-center gap-[20px] mb-8">
           <Button
             variant="outline"
             size="icon"
