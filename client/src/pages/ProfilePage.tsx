@@ -16,6 +16,25 @@ export default function ProfilePage() {
 
   const isLoading = isLoadingSessions || isLoadingStats;
 
+  const todaySessions = sessions || [];
+  const todayStats = todaySessions.reduce((acc, session) => ({
+    totalBreaths: acc.totalBreaths + session.breathCount,
+    totalMinutes: acc.totalMinutes + Math.floor(session.duration / 60),
+    totalHolds: acc.totalHolds + session.holdCount,
+    totalHoldTime: acc.totalHoldTime + session.totalHoldTime,
+    longestHold: Math.max(acc.longestHold, session.longestHold)
+  }), {
+    totalBreaths: 0,
+    totalMinutes: 0,
+    totalHolds: 0,
+    totalHoldTime: 0,
+    longestHold: 0
+  });
+
+  const avgHoldTime = todayStats.totalHolds > 0 
+    ? Math.round(todayStats.totalHoldTime / todayStats.totalHolds)
+    : 0;
+
   return (
     <>
       <Navigation />
@@ -40,9 +59,52 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
+          {/* Daily Stats Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Today's Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Sessions</p>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <p className="text-2xl font-bold">{todaySessions.length}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Breaths</p>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <p className="text-2xl font-bold">{todayStats.totalBreaths}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Minutes</p>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <p className="text-2xl font-bold">{todayStats.totalMinutes}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Hold Time</p>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <p className="text-2xl font-bold">{Math.floor(todayStats.totalHoldTime / 60)}:{(todayStats.totalHoldTime % 60).toString().padStart(2, '0')}</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Stats Section */}
           <div className="grid gap-4">
-            {/* Streak Cards - Force single row */}
+            {/* Streak Cards */}
             <div className="grid grid-cols-2 gap-4">
               <Card>
                 <CardContent className="pt-6">
@@ -69,9 +131,9 @@ export default function ProfilePage() {
             {/* Stats Card */}
             <Card>
               <CardContent className="pt-6">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground">Streak Sessions</p>
+                    <p className="text-sm text-muted-foreground">Total Sessions</p>
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
@@ -94,6 +156,41 @@ export default function ProfilePage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <p className="text-2xl font-bold">{stats?.totalMinutes || 0}</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Holds</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{todayStats.totalHolds}</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Hold Stats Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Breath Hold Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Average Hold Time</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{Math.floor(avgHoldTime / 60)}:{(avgHoldTime % 60).toString().padStart(2, '0')}</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Longest Hold</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{Math.floor(todayStats.longestHold / 60)}:{(todayStats.longestHold % 60).toString().padStart(2, '0')}</p>
                     )}
                   </div>
                 </div>

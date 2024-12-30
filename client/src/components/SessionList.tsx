@@ -34,6 +34,16 @@ export function SessionList({ sessions }: SessionListProps) {
                   </p>
                 </div>
               </div>
+              {session.holdCount > 0 && (
+                <div className="mt-2 pt-2 border-t border-border/50">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-muted-foreground">Holds: {session.holdCount}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Longest: {Math.floor(session.longestHold / 60)}:{(session.longestHold % 60).toString().padStart(2, '0')}
+                    </p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
