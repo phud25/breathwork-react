@@ -175,7 +175,10 @@ export function BreathingGuide({
       )}>
         <div className="space-y-2 mt-[-85px]">
           <Select
-            value={pattern.name} //Corrected line
+            value={pattern.name === "2-2 Energized Focus" ? "22" :
+              pattern.name === "4-7-8 Relaxation" ? "478" :
+              pattern.name === "Box Breathing (4x4)" ? "box" :
+              pattern.name === "5-5-5 Triangle" ? "555" : "22"}
             onValueChange={(value) => onPatternChange(value as PatternType)}
             className="h-[48px] w-full"
           >
