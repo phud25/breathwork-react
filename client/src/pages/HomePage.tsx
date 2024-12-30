@@ -72,7 +72,7 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardHeader className="pb-[15px]">
+              <CardHeader className="pb-[8px]">
                 <CardTitle>Breath Session</CardTitle>
               </CardHeader>
               <CardContent>
@@ -108,7 +108,6 @@ export default function HomePage() {
           </Card>
         </div>
       </div>
-
       {isZenMode && (
         <ErrorBoundary>
           <div className="fixed inset-0 bg-background">
