@@ -41,28 +41,30 @@ export default function ProfilePage() {
           </Card>
 
           {/* Stats Section */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-sm text-muted-foreground">Current Streak</p>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <p className="text-2xl font-bold">{stats?.currentStreak || 0} days</p>
+                  )}
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-sm text-muted-foreground">Longest Streak</p>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <p className="text-2xl font-bold">{stats?.longestStreak || 0} days</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
             <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">Current Streak</p>
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <p className="text-2xl font-bold">{stats?.currentStreak || 0} days</p>
-                )}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">Longest Streak</p>
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <p className="text-2xl font-bold">{stats?.longestStreak || 0} days</p>
-                )}
-              </CardContent>
-            </Card>
-            <Card className="md:col-span-2">
               <CardContent className="pt-6">
                 <div className="grid grid-cols-3 gap-4">
                   <div>
@@ -107,7 +109,7 @@ export default function ProfilePage() {
                   mode="single"
                   selected={selectedDate}
                   onSelect={setSelectedDate}
-                  className="rounded-md border"
+                  className="rounded-md border text-center [&_.rdp-nav]:justify-center [&_.rdp-tbody_td]:justify-center [&_.rdp-cell]:justify-center"
                 />
                 <Card>
                   <CardHeader>

@@ -165,7 +165,7 @@ export function BreathingGuide({
     )}>
       <div className={cn(
         "w-full max-w-[600px] mx-auto space-y-3 transition-opacity duration-300",
-        isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
+        isZenMode ? "opacity-0 pointer-events-none absolute" : "opacity-100"
       )}>
         <Select
           value={pattern.name === "2-2 Energized Focus" ? "22" :
