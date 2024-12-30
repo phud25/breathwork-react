@@ -53,6 +53,28 @@ export function registerRoutes(app: Express): Server {
     .from(sessions)
     .where(eq(sessions.userId, req.user.id));
 
+    // Calculate daily stats for today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const todayStats = await db.select({
+      totalBreaths: sql<number>`sum(breath_count)`,
+      totalMinutes: sql<number>`sum(duration) / 60`,
+      totalHolds: sql<number>`sum(hold_count)`,
+      totalHoldTime: sql<number>`sum(total_hold_time)`,
+      longestHold: sql<number>`max(longest_hold)`,
+    })
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.userId, req.user.id),
+        gte(sessions.completedAt, todayStart),
+        lte(sessions.completedAt, todayEnd)
+      )
+    );
+
     // Calculate streaks
     const userSessions = await db.query.sessions.findMany({
       where: eq(sessions.userId, req.user.id),
@@ -104,26 +126,6 @@ export function registerRoutes(app: Express): Server {
       longestStreak = currentCount;
     }
 
-    // Calculate daily stats for today
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const todayStats = await db.select({
-      totalBreaths: sql<number>`sum(breath_count)`,
-      totalHolds: sql<number>`sum(hold_count)`,
-      totalHoldTime: sql<number>`sum(total_hold_time)`,
-      longestHold: sql<number>`max(longest_hold)`,
-    })
-    .from(sessions)
-    .where(
-      and(
-        eq(sessions.userId, req.user.id),
-        gte(sessions.completedAt, todayStart),
-        lte(sessions.completedAt, todayEnd)
-      )
-    );
 
     res.json({
       totalSessions: Number(stats[0].totalSessions),
@@ -132,6 +134,7 @@ export function registerRoutes(app: Express): Server {
       longestStreak,
       todayStats: {
         totalBreaths: Number(todayStats[0].totalBreaths) || 0,
+        totalMinutes: Math.round(Number(todayStats[0].totalMinutes)) || 0,
         totalHolds: Number(todayStats[0].totalHolds) || 0,
         totalHoldTime: Number(todayStats[0].totalHoldTime) || 0,
         longestHold: Number(todayStats[0].longestHold) || 0
@@ -145,7 +148,7 @@ export function registerRoutes(app: Express): Server {
       return res.status(401).send("Not authenticated");
     }
 
-    const { pattern, duration, breathCount } = req.body;
+    const { pattern, duration, breathCount, holdCount, totalHoldTime, longestHold } = req.body;
 
     const [newSession] = await db.insert(sessions)
       .values({
@@ -153,6 +156,9 @@ export function registerRoutes(app: Express): Server {
         pattern,
         duration,
         breathCount,
+        holdCount,
+        totalHoldTime,
+        longestHold
       })
       .returning();
 
