@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { SoundControls } from "./SoundControls";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -334,18 +335,11 @@ export function BreathingGuide({
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent"
-          >
-            {isSoundEnabled ? (
-              <Volume2 className="h-4 w-4" />
-            ) : (
-              <VolumeX className="h-4 w-4" />
-            )}
-          </Button>
+          <SoundControls
+            isActive={isActive}
+            isSoundEnabled={isSoundEnabled}
+            onToggleSound={onToggleSound}
+          />
 
           <Button
             variant="outline"
