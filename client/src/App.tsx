@@ -4,6 +4,7 @@ import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
 import BreathPage from "./pages/BreathPage";
 import ProfilePage from "./pages/ProfilePage";
+import TrancePage from "./pages/TrancePage";
 import { useUser } from "./hooks/use-user";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/breathwork" component={BreathPage} />
+      <Route path="/trance" component={TrancePage} />
       <Route path="/profile" component={ProfilePage} />
       <Route>
         {/* 404 page */}
