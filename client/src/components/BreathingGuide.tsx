@@ -173,7 +173,7 @@ export function BreathingGuide({
         "w-full max-w-[600px] mx-auto",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-2 mt-[-100px]">
+        <div className="space-y-2 mt-[-110px]">
           <Select
             value={pattern.name === "2-2 Energized Focus" ? "22" :
               pattern.name === "4-7-8 Relaxation" ? "478" :
@@ -185,7 +185,7 @@ export function BreathingGuide({
             <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
               <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600">
+            <SelectContent className="bg-slate-800 border-slate-600 pb-4"> {/* Added padding-bottom */}
               <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
               <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
               <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
