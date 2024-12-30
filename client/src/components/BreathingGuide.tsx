@@ -86,6 +86,8 @@ export function BreathingGuide({
 
   const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: volume * 0.6 });
   const breathSound = useAudio('/audio/breath-sound.mp3', { volume: volume });
+  const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: volume });
+
 
   useEffect(() => {
     if (isActive && isSoundEnabled && !isPaused && !isHolding) {
@@ -97,11 +99,14 @@ export function BreathingGuide({
     if (isActive && isSoundEnabled) {
       if (isPaused) {
         backgroundMusic.fadeOut();
+        sessionAudio.pause();
       } else {
         backgroundMusic.fadeIn();
+        sessionAudio.play();
       }
     } else {
       backgroundMusic.stop();
+      sessionAudio.stop();
     }
   }, [isActive, isPaused, isSoundEnabled]);
 
@@ -109,6 +114,7 @@ export function BreathingGuide({
     return () => {
       backgroundMusic.stop();
       breathSound.stop();
+      sessionAudio.stop();
     };
   }, []);
 
@@ -135,11 +141,43 @@ export function BreathingGuide({
     onResume();
   };
 
+  const handleStart = () => {
+    sessionAudio.play();
+    backgroundMusic.fadeIn(1000);
+    onStart();
+  };
+
+  const handlePause = () => {
+    backgroundMusic.fadeOut(500);
+    sessionAudio.pause();
+    onPause();
+  };
+
+  const handleResume = () => {
+    backgroundMusic.fadeIn(500);
+    sessionAudio.play();
+    onResume();
+  };
+
+  const handleStop = () => {
+    backgroundMusic.fadeOut(1000);
+    sessionAudio.stop();
+    onStop();
+  };
+
   const handleToggleSound = () => {
-    onToggleSound();
-    if (isSoundEnabled) {
-      backgroundMusic.stop();
-      breathSound.stop();
+    const newState = !isSoundEnabled;
+    setIsSoundEnabled(newState);
+    if (newState) {
+      backgroundMusic.setVolume(volume * 0.6);
+      sessionAudio.setVolume(volume);
+      if (isActive && !isPaused) {
+        backgroundMusic.fadeIn(500);
+        sessionAudio.play();
+      }
+    } else {
+      backgroundMusic.fadeOut(500);
+      sessionAudio.pause();
     }
   };
 
@@ -337,7 +375,7 @@ export function BreathingGuide({
             ) : (
               <Button
                 variant="ghost"
-                onClick={onStart}
+                onClick={handleStart}
                 className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-colors duration-200"
               >
                 Start
@@ -384,9 +422,9 @@ export function BreathingGuide({
                     onValueChange={([value]) => {
                       setVolume(value / 100);
                       if (!isSoundEnabled && value > 0) {
-                        onToggleSound();
+                        handleToggleSound();
                       } else if (isSoundEnabled && value === 0) {
-                        onToggleSound();
+                        handleToggleSound();
                       }
                     }}
                     max={100}
@@ -414,7 +452,7 @@ export function BreathingGuide({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={isPaused ? onResume : onPause}
+                onClick={isPaused ? handleResume : handlePause}
                 className="h-[48px] hover:bg-transparent"
                 disabled={isHolding}
               >
@@ -428,7 +466,7 @@ export function BreathingGuide({
               <Button
                 variant="destructive"
                 size="icon"
-                onClick={onStop}
+                onClick={handleStop}
                 className="h-[48px]"
               >
                 <Square className="h-4 w-4" />
