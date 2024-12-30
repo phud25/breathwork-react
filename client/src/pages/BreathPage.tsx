@@ -133,29 +133,29 @@ export default function BreathPage() {
                         <p className="text-2xl font-bold">{sessionBreaths}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Holds</p>
-                        <p className="text-2xl font-bold">{holdStats.holdCount}</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
                         <p className="text-sm text-muted-foreground">Breath Time</p>
                         <p className="text-2xl font-bold">
                           {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
                         </p>
                       </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <p className="text-sm text-muted-foreground">Hold Time</p>
+                        <p className="text-sm text-muted-foreground">Breath Holds</p>
+                        <p className="text-2xl font-bold">{holdStats.holdCount}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Average Hold</p>
                         <p className="text-2xl font-bold">
-                          {Math.floor(holdStats.totalHoldTime / 60)}:{(holdStats.totalHoldTime % 60).toString().padStart(2, '0')}
+                          {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
                         </p>
                       </div>
-                    </div>
-                    <div className="mt-4">
-                      <p className="text-sm text-muted-foreground">Average Hold</p>
-                      <p className="text-2xl font-bold">
-                        {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
-                      </p>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Longest Hold</p>
+                        <p className="text-2xl font-bold">
+                          {Math.floor(holdStats.longestHold / 60)}:{(holdStats.longestHold % 60).toString().padStart(2, '0')}
+                        </p>
+                      </div>
                     </div>
                   </TabsContent>
 
@@ -170,16 +170,6 @@ export default function BreathPage() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Holds</p>
-                        {isLoadingStats ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <p className="text-2xl font-bold">{totalHolds}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
                         <p className="text-sm text-muted-foreground">Breath Time</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -189,26 +179,37 @@ export default function BreathPage() {
                           </p>
                         )}
                       </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <p className="text-sm text-muted-foreground">Hold Time</p>
+                        <p className="text-sm text-muted-foreground">Breath Holds</p>
+                        {isLoadingStats ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <p className="text-2xl font-bold">{totalHolds}</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Average Hold</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <p className="text-2xl font-bold">
-                            {Math.floor(totalHoldTime / 60)}:{(totalHoldTime % 60).toString().padStart(2, '0')}
+                            {Math.floor(dailyAvgHold / 60)}:{(dailyAvgHold % 60).toString().padStart(2, '0')}
                           </p>
                         )}
                       </div>
-                    </div>
-                    <div className="mt-4">
-                      <p className="text-sm text-muted-foreground">Average Hold</p>
-                      {isLoadingStats ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <p className="text-2xl font-bold">
-                          {Math.floor(dailyAvgHold / 60)}:{(dailyAvgHold % 60).toString().padStart(2, '0')}
-                        </p>
-                      )}
+                      <div>
+                        <p className="text-sm text-muted-foreground">Longest Hold</p>
+                        {isLoadingStats ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <p className="text-2xl font-bold">
+                            {Math.floor((stats?.todayStats?.longestHold || 0) / 60)}:
+                            {((stats?.todayStats?.longestHold || 0) % 60).toString().padStart(2, '0')}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </TabsContent>
                 </Tabs>
