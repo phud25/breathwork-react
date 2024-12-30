@@ -7,6 +7,8 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   totalSessions: integer("total_sessions").default(0).notNull(),
   totalMinutes: integer("total_minutes").default(0).notNull(),
+  totalHoldTime: integer("total_hold_time").default(0).notNull(),
+  longestHold: integer("longest_hold").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
@@ -16,6 +18,9 @@ export const sessions = pgTable("sessions", {
   pattern: text("pattern").notNull(),
   duration: integer("duration").notNull(),
   breathCount: integer("breath_count").notNull(),
+  holdCount: integer("hold_count").default(0).notNull(),
+  totalHoldTime: integer("total_hold_time").default(0).notNull(),
+  longestHold: integer("longest_hold").default(0).notNull(),
   completedAt: timestamp("completed_at").defaultNow().notNull()
 });
 

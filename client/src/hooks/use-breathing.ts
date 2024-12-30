@@ -13,6 +13,9 @@ export function useBreathing(sequence: number[]) {
   const [targetBreaths, setTargetBreaths] = useState<number | null>(null);
   const [targetDuration, setTargetDuration] = useState<number | null>(null);
   const [sessionCompleted, setSessionCompleted] = useState(false);
+  const [holdCount, setHoldCount] = useState(0);
+  const [totalHoldTime, setTotalHoldTime] = useState(0);
+  const [longestHold, setLongestHold] = useState(0);
 
   // Refs for timing precision
   const lastTickTime = useRef<number>(0);
@@ -25,6 +28,9 @@ export function useBreathing(sequence: number[]) {
       pattern: string;
       duration: number;
       breathCount: number;
+      holdCount: number;
+      totalHoldTime: number;
+      longestHold: number;
     }) => {
       const response = await fetch("/api/sessions", {
         method: "POST",
@@ -141,6 +147,9 @@ export function useBreathing(sequence: number[]) {
     setElapsedTime(0);
     setCountdown(sequence[0]);
     setSessionCompleted(false);
+    setHoldCount(0);
+    setTotalHoldTime(0);
+    setLongestHold(0);
     lastTickTime.current = 0;
   }, [sequence]);
 
@@ -161,6 +170,12 @@ export function useBreathing(sequence: number[]) {
     lastTickTime.current = 0;
   }, [pausedTime, startTime]);
 
+  const recordHold = useCallback((holdDuration: number) => {
+    setHoldCount(prev => prev + 1);
+    setTotalHoldTime(prev => prev + holdDuration);
+    setLongestHold(prev => Math.max(prev, holdDuration));
+  }, []);
+
   const endSession = useCallback(async () => {
     console.log('Ending session');
     if (!startTime) return;
@@ -172,7 +187,10 @@ export function useBreathing(sequence: number[]) {
     await sessionMutation.mutateAsync({
       pattern: sequence.join("-"),
       duration,
-      breathCount: currentCycle * sequence.length + currentPhase
+      breathCount: currentCycle * sequence.length + currentPhase,
+      holdCount,
+      totalHoldTime,
+      longestHold
     });
 
     setStartTime(null);
@@ -180,7 +198,7 @@ export function useBreathing(sequence: number[]) {
     setElapsedTime(0);
     setCountdown(0);
     lastTickTime.current = 0;
-  }, [startTime, currentCycle, currentPhase, sequence, sessionMutation]);
+  }, [startTime, currentCycle, currentPhase, sequence, sessionMutation, holdCount, totalHoldTime, longestHold]);
 
   return {
     isActive,
@@ -195,6 +213,12 @@ export function useBreathing(sequence: number[]) {
     resumeSession,
     endSession,
     setTargetBreaths,
-    setTargetDuration
+    setTargetDuration,
+    recordHold,
+    holdStats: {
+      holdCount,
+      totalHoldTime,
+      longestHold
+    }
   };
 }

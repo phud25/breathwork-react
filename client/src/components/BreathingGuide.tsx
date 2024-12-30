@@ -71,7 +71,8 @@ export function BreathingGuide({
   onStop,
   onToggleZen,
   onToggleSound,
-  onPatternChange
+  onPatternChange,
+  onHoldComplete
 }: BreathingGuideProps) {
   const [sessionType, setSessionType] = useState<"breaths" | "duration">("breaths");
   const [breathCountState, setBreathCountState] = useState<number>(15);
@@ -94,6 +95,9 @@ export function BreathingGuide({
     if (holdInterval) {
       clearInterval(holdInterval);
       setHoldInterval(null);
+    }
+    if (isHolding) {
+      onHoldComplete(holdTime);
     }
     setIsHolding(false);
     setHoldTime(0);
@@ -417,4 +421,5 @@ interface BreathingGuideProps {
   onToggleZen: () => void;
   onToggleSound: () => void;
   onPatternChange: (value: PatternType) => void;
+  onHoldComplete: (holdDuration: number) => void;
 }
