@@ -62,10 +62,10 @@ export default function HomePage() {
       isZenMode ? "p-0" : "p-4"
     )}>
       <div className={cn(
-        "max-w-4xl mx-auto space-y-6",
+        "max-w-4xl mx-auto space-y-5",
         isZenMode && "hidden"
       )}>
-        <header className="flex justify-between items-center">
+        <header className="flex justify-between items-center mb-3">
           <h1 className="text-2xl font-bold text-primary">Breath Session</h1>
           <Button variant="outline" onClick={() => logout()}>Logout</Button>
         </header>
@@ -73,7 +73,7 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 gap-6">
           <ErrorBoundary>
             <Card>
-              <CardContent className="pt-6 pb-40"> {/* Modification here */}
+              <CardContent className="pt-4 pb-6">
                 <BreathingGuide
                   pattern={breathingPatterns[selectedPattern]}
                   isActive={isActive}
@@ -107,31 +107,6 @@ export default function HomePage() {
           </Card>
         </div>
       </div>
-      {isZenMode && (
-        <ErrorBoundary>
-          <div className="fixed inset-0 bg-background">
-            <BreathingGuide
-              pattern={breathingPatterns[selectedPattern]}
-              isActive={isActive}
-              isPaused={isPaused}
-              currentPhase={currentPhase}
-              isZenMode={isZenMode}
-              isSoundEnabled={isSoundEnabled}
-              elapsed={elapsedTime}
-              breathCount={breathCount}
-              countdown={countdown}
-              sessionCompleted={sessionCompleted}
-              onStart={startSession}
-              onPause={pauseSession}
-              onResume={resumeSession}
-              onStop={endSession}
-              onToggleZen={handleToggleZen}
-              onToggleSound={handleToggleSound}
-              onPatternChange={handlePatternChange}
-            />
-          </div>
-        </ErrorBoundary>
-      )}
     </div>
   );
 }

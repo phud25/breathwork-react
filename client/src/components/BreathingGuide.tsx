@@ -166,82 +166,81 @@ export function BreathingGuide({
 
   return (
     <div className={cn(
-      "flex flex-col items-center justify-center max-h-[100vh] transition-all duration-500",
-      isZenMode ? "h-screen p-0" : "min-h-[600px] p-4"
+      "flex flex-col items-center justify-start gap-5 transition-all duration-500",
+      isZenMode ? "h-screen p-0" : "min-h-[600px]"
     )}>
       <div className={cn(
-        "w-full max-w-[600px] mx-auto",
+        "w-full max-w-[600px] mx-auto space-y-3",
         isZenMode && "hidden"
       )}>
-        <div className="space-y-2 mt-[-110px]">
+        <Select
+          value={pattern.name === "2-2 Energized Focus" ? "22" :
+            pattern.name === "4-7-8 Relaxation" ? "478" :
+            pattern.name === "Box Breathing (4x4)" ? "box" :
+            pattern.name === "5-5-5 Triangle" ? "555" : "22"}
+          onValueChange={(value) => onPatternChange(value as PatternType)}
+          className="h-[48px] w-full"
+        >
+          <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
+            <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
+          </SelectTrigger>
+          <SelectContent className="bg-slate-800 border-slate-600 pb-4">
+            <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
+            <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
+            <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
+            <SelectItem value="555" className="text-[#F5F5DC] hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="flex gap-[5%] mb-1">
           <Select
-            value={pattern.name === "2-2 Energized Focus" ? "22" :
-              pattern.name === "4-7-8 Relaxation" ? "478" :
-              pattern.name === "Box Breathing (4x4)" ? "box" :
-              pattern.name === "5-5-5 Triangle" ? "555" : "22"}
-            onValueChange={(value) => onPatternChange(value as PatternType)}
-            className="h-[48px] w-full"
+            value={sessionType}
+            onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
+            className="w-[50%] h-[48px]"
           >
-            <SelectTrigger className="bg-slate-800 border-slate-600 text-[#F5F5DC] hover:border-primary/50 transition-colors">
-              <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
+            <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
+              <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600 pb-4">
-              <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-              <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-              <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-              <SelectItem value="555" className="text-[#F5F5DC] hover:bg-primary/10">5-5-5 Triangle</SelectItem>
+            <SelectContent className="bg-slate-800 border-slate-600">
+              <SelectItem value="breaths" className="text-[#F5F5DC] hover:bg-primary/10">By Breath Count</SelectItem>
+              <SelectItem value="duration" className="text-[#F5F5DC] hover:bg-primary/10">By Duration</SelectItem>
             </SelectContent>
           </Select>
 
-          <div className="flex gap-[5%] mb-1">
+          {sessionType === "duration" ? (
             <Select
-              value={sessionType}
-              onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
-              className="w-[50%] h-[48px]"
+              value={durationInput}
+              onValueChange={setDurationInput}
+              className="w-[45%] h-[48px]"
             >
               <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-                <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
+                <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600">
-                <SelectItem value="breaths" className="text-[#F5F5DC] hover:bg-primary/10">By Breath Count</SelectItem>
-                <SelectItem value="duration" className="text-[#F5F5DC] hover:bg-primary/10">By Duration</SelectItem>
+              <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
+                {durationOptions.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="text-[#F5F5DC] hover:bg-primary/10"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-
-            {sessionType === "duration" ? (
-              <Select
-                value={durationInput}
-                onValueChange={setDurationInput}
-                className="w-[45%] h-[48px]"
-              >
-                <SelectTrigger className="bg-slate-800 border-slate-600 hover:border-primary/50 transition-colors">
-                  <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
-                  {durationOptions.map((option) => (
-                    <SelectItem
-                      key={option.value}
-                      value={option.value}
-                      className="text-[#F5F5DC] hover:bg-primary/10"
-                    >
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <Input
-                type="number"
-                value={breathCountState}
-                onChange={(e) => handleBreathCountChange(e.target.value)}
-                className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-[#F5F5DC] focus:ring-primary/50"
-                min={1}
-              />
-            )}
-          </div>
+          ) : (
+            <Input
+              type="number"
+              value={breathCountState}
+              onChange={(e) => handleBreathCountChange(e.target.value)}
+              className="w-[45%] h-[48px] text-center bg-slate-800 border-slate-600 text-[#F5F5DC] focus:ring-primary/50"
+              min={1}
+            />
+          )}
         </div>
       </div>
-      <div className="flex-1 flex flex-col justify-center items-center py-6">
+
+      <div className="flex-1 flex flex-col items-center justify-center mt-5 mb-5">
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
           <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
 
@@ -281,13 +280,14 @@ export function BreathingGuide({
           )}
         </div>
       </div>
-      <div className="w-full max-w-[600px]">
-        <div className="flex justify-between items-center text-sm text-primary/80 mb-4">
+
+      <div className="w-full max-w-[600px] space-y-4">
+        <div className="flex justify-between items-center text-sm text-primary/80">
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
         </div>
 
-        <div className="flex items-center justify-center gap-[20px] mb-8">
+        <div className="flex items-center justify-center gap-[20px]">
           <Button
             variant="outline"
             size="icon"
