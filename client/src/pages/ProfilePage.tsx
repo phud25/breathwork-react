@@ -79,7 +79,7 @@ export default function ProfilePage() {
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <p className="text-2xl font-bold">{todayStats.totalBreaths}</p>
+                    <p className="text-2xl font-bold">{stats?.todayStats?.totalBreaths || 0}</p>
                   )}
                 </div>
                 <div>
@@ -87,7 +87,7 @@ export default function ProfilePage() {
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <p className="text-2xl font-bold">{todayStats.totalMinutes}</p>
+                    <p className="text-2xl font-bold">{stats?.todayStats?.totalMinutes || 0}</p>
                   )}
                 </div>
                 <div>
@@ -95,7 +95,7 @@ export default function ProfilePage() {
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <p className="text-2xl font-bold">{Math.floor(todayStats.totalHoldTime / 60)}:{(todayStats.totalHoldTime % 60).toString().padStart(2, '0')}</p>
+                    <p className="text-2xl font-bold">{Math.floor((stats?.todayStats?.totalHoldTime || 0) / 60)}:{((stats?.todayStats?.totalHoldTime || 0) % 60).toString().padStart(2, '0')}</p>
                   )}
                 </div>
               </div>
@@ -104,7 +104,7 @@ export default function ProfilePage() {
 
           {/* Stats Section */}
           <div className="grid gap-4">
-            {/* Current Streak Card */}
+            {/* Current Streak Stats */}
             <Card>
               <CardHeader>
                 <CardTitle>Current Streak Stats</CardTitle>
@@ -132,7 +132,7 @@ export default function ProfilePage() {
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <p className="text-2xl font-bold">{Math.round(stats?.totalMinutes || 0)}</p>
+                      <p className="text-2xl font-bold">{stats?.totalMinutes || 0}</p>
                     )}
                   </div>
                   <div>
@@ -140,10 +140,7 @@ export default function ProfilePage() {
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <p className="text-2xl font-bold">
-                        {Math.floor((stats?.todayStats?.totalHoldTime || 0) / 60)}:
-                        {((stats?.todayStats?.totalHoldTime || 0) % 60).toString().padStart(2, '0')}
-                      </p>
+                      <p className="text-2xl font-bold">{stats?.todayStats?.totalHolds || 0}</p>
                     )}
                   </div>
                 </div>
@@ -163,7 +160,8 @@ export default function ProfilePage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <p className="text-2xl font-bold">
-                        {Math.floor(avgHoldTime / 60)}:{(avgHoldTime % 60).toString().padStart(2, '0')}
+                        {Math.floor((stats?.todayStats?.totalHoldTime || 0) / (stats?.todayStats?.totalHolds || 1) / 60)}:
+                        {((stats?.todayStats?.totalHoldTime || 0) / (stats?.todayStats?.totalHolds || 1) % 60).toFixed(0).padStart(2, '0')}
                       </p>
                     )}
                   </div>
@@ -173,8 +171,8 @@ export default function ProfilePage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <p className="text-2xl font-bold">
-                        {Math.floor(todayStats.longestHold / 60)}:
-                        {(todayStats.longestHold % 60).toString().padStart(2, '0')}
+                        {Math.floor((stats?.todayStats?.longestHold || 0) / 60)}:
+                        {((stats?.todayStats?.longestHold || 0) % 60).toString().padStart(2, '0')}
                       </p>
                     )}
                   </div>

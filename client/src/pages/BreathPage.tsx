@@ -64,6 +64,17 @@ export default function BreathPage() {
   const breathCount = currentCycle * breathingPatterns[selectedPattern].sequence.length +
     (currentPhase > 0 ? currentPhase : 0);
 
+  // Calculate total stats including current session
+  const totalBreaths = (stats?.todayStats?.totalBreaths || 0) + breathCount;
+  const totalSeconds = (stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime;
+  const totalHolds = (stats?.todayStats?.totalHolds || 0) + holdStats.holdCount;
+  const totalHoldTime = (stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime;
+
+  // Calculate average hold time
+  const avgHoldTime = totalHolds > 0
+    ? Math.round(totalHoldTime / totalHolds)
+    : 0;
+
   return (
     <>
       <Navigation />
@@ -117,7 +128,7 @@ export default function BreathPage() {
                     {isLoadingStats ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <p className="text-2xl font-bold">{(stats?.todayStats?.totalBreaths || 0) + breathCount}</p>
+                      <p className="text-2xl font-bold">{totalBreaths}</p>
                     )}
                   </div>
                   <div>
@@ -126,19 +137,18 @@ export default function BreathPage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <p className="text-2xl font-bold">
-                        {Math.floor(((stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime) / 60)}:
-                        {((stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime) % 60}
+                        {Math.floor(totalSeconds / 60)}:{(totalSeconds % 60).toString().padStart(2, '0')}
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-3 gap-4 mb-8">
                   <div>
                     <p className="text-sm text-muted-foreground">Holds</p>
                     {isLoadingStats ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <p className="text-2xl font-bold">{(stats?.todayStats?.totalHolds || 0) + holdStats.holdCount}</p>
+                      <p className="text-2xl font-bold">{totalHolds}</p>
                     )}
                   </div>
                   <div>
@@ -147,8 +157,17 @@ export default function BreathPage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <p className="text-2xl font-bold">
-                        {Math.floor(((stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime) / 60)}:
-                        {((stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime) % 60}
+                        {Math.floor(totalHoldTime / 60)}:{(totalHoldTime % 60).toString().padStart(2, '0')}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Avg Hold</p>
+                    {isLoadingStats ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">
+                        {Math.floor(avgHoldTime / 60)}:{(avgHoldTime % 60).toString().padStart(2, '0')}
                       </p>
                     )}
                   </div>
