@@ -127,10 +127,16 @@ export default function BreathPage() {
                   </TabsList>
 
                   <TabsContent value="session" className="mt-0">
-                    <div className="grid grid-cols-1 gap-4 mb-4">
+                    <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Breaths</p>
                         <p className="text-2xl font-bold">{sessionBreaths}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Breath Time</p>
+                        <p className="text-2xl font-bold">
+                          {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+                        </p>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
@@ -138,19 +144,11 @@ export default function BreathPage() {
                         <p className="text-sm text-muted-foreground">Breath Holds</p>
                         <p className="text-2xl font-bold">{holdStats.holdCount}</p>
                       </div>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Breath Time</p>
-                          <p className="text-2xl font-bold">
-                            {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Average Hold</p>
-                          <p className="text-2xl font-bold">
-                            {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
-                          </p>
-                        </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Average Hold</p>
+                        <p className="text-2xl font-bold">
+                          {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Longest Hold</p>
@@ -162,13 +160,23 @@ export default function BreathPage() {
                   </TabsContent>
 
                   <TabsContent value="daily" className="mt-0">
-                    <div className="grid grid-cols-1 gap-4 mb-4">
+                    <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Breaths</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <p className="text-2xl font-bold">{totalBreaths}</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Breath Time</p>
+                        {isLoadingStats ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <p className="text-2xl font-bold">
+                            {totalMinutes}:{(0).toString().padStart(2, '0')}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -181,27 +189,15 @@ export default function BreathPage() {
                           <p className="text-2xl font-bold">{totalHolds}</p>
                         )}
                       </div>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Breath Time</p>
-                          {isLoadingStats ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <p className="text-2xl font-bold">
-                              {totalMinutes}:{(0).toString().padStart(2, '0')}
-                            </p>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Average Hold</p>
-                          {isLoadingStats ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <p className="text-2xl font-bold">
-                              {Math.floor(dailyAvgHold / 60)}:{(dailyAvgHold % 60).toString().padStart(2, '0')}
-                            </p>
-                          )}
-                        </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Average Hold</p>
+                        {isLoadingStats ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <p className="text-2xl font-bold">
+                            {Math.floor(dailyAvgHold / 60)}:{(dailyAvgHold % 60).toString().padStart(2, '0')}
+                          </p>
+                        )}
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Longest Hold</p>
@@ -216,6 +212,7 @@ export default function BreathPage() {
                       </div>
                     </div>
                   </TabsContent>
+
                 </Tabs>
                 <div className="mt-8">
                   <ProgressChart />
