@@ -42,8 +42,8 @@ export default function ProfilePage() {
 
           {/* Stats Section */}
           <div className="grid gap-4">
-            {/* Streak Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Streak Cards - Force single row */}
+            <div className="grid grid-cols-2 gap-4">
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground">Current Streak</p>
@@ -114,11 +114,18 @@ export default function ProfilePage() {
                   onSelect={setSelectedDate}
                   className="rounded-md border"
                   classNames={{
-                    day: "h-9 w-9 text-center p-0 aria-selected:bg-primary hover:bg-primary/10 focus:bg-primary/10",
-                    nav_button: "h-7 w-7 !bg-transparent p-0 opacity-50 hover:opacity-100",
-                    cell: "text-center p-0",
-                    head_cell: "text-center",
-                    nav: "justify-center",
+                    day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                    day_disabled: "text-muted-foreground opacity-50",
+                    day_today: "bg-accent text-accent-foreground",
+                    cell: "text-center h-9 w-9 p-0 relative [&:has([aria-selected].day)]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                    head_cell: "text-center text-muted-foreground",
+                    nav: "space-x-1 flex items-center justify-center",
+                    nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                    table: "w-full border-collapse space-y-1",
+                    caption: "flex justify-center pt-1 relative items-center",
+                    caption_label: "text-sm font-medium",
+                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                   }}
                 />
                 <Card>
