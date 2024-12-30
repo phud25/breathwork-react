@@ -16,6 +16,23 @@ const phaseColors = {
   hold: "from-indigo-600/30 to-indigo-700/40"
 };
 
+// Define ripple animation variants
+const rippleVariants = {
+  active: {
+    scale: [1, 1.1, 1.2],
+    opacity: [0.3, 0.2, 0],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "linear"
+    }
+  },
+  inactive: {
+    scale: 1,
+    opacity: 0
+  }
+};
+
 const getPhaseLabel = (patternName: string, phase: number) => {
   if (patternName === "2-4 Ha Breath") {
     return phase === 0 ? "Inhale" : "Ha";
@@ -178,8 +195,7 @@ export function BreathingGuide({
         >
           <SelectTrigger
             className="h-[48px] w-full bg-white/5 border-purple-500/10 backdrop-blur-md
-            transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
-            focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+            transition-all duration-200 hover:border-purple-500/50"
           >
             <SelectValue placeholder="Select Breathing Pattern" />
           </SelectTrigger>
@@ -201,8 +217,7 @@ export function BreathingGuide({
           >
             <SelectTrigger
               className="h-[48px] bg-white/5 border-purple-500/10 backdrop-blur-md
-              transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
-              focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+              transition-all duration-200 hover:border-purple-500/50"
             >
               <SelectValue placeholder="Session Type" />
             </SelectTrigger>
@@ -220,8 +235,7 @@ export function BreathingGuide({
             >
               <SelectTrigger
                 className="h-[48px] bg-white/5 border-purple-500/10 backdrop-blur-md
-                transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
-                focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+                transition-all duration-200 hover:border-purple-500/50"
               >
                 <SelectValue placeholder="3:00" />
               </SelectTrigger>
@@ -243,8 +257,7 @@ export function BreathingGuide({
               value={breathCountState}
               onChange={(e) => handleBreathCountChange(e.target.value)}
               className="w-[45%] h-[48px] text-center bg-white/5 border-purple-500/10 backdrop-blur-md
-                transition-all duration-200 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]
-                focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+                transition-all duration-200 hover:border-purple-500/50"
               min={1}
             />
           )}
@@ -253,20 +266,36 @@ export function BreathingGuide({
 
       <div className="mt-0 mb-0">
         <div className="relative w-[300px] h-[300px] flex items-center justify-center">
-          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 via-purple-600/20 to-purple-700/30
-            shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-500" />
+          {/* Background circle */}
+          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 via-purple-600/20 to-purple-700/30 transition-all duration-500" />
 
+          {/* Ripple circles */}
+          {[0, 1, 2].map((index) => (
+            <motion.div
+              key={`ripple-${index}`}
+              className={cn(
+                "absolute w-[280px] h-[280px] rounded-full border border-purple-500/20",
+              )}
+              initial="inactive"
+              animate={isActive && !isPaused ? "active" : "inactive"}
+              variants={rippleVariants}
+              transition={{
+                delay: index * 0.5,
+              }}
+            />
+          ))}
+
+          {/* Breathing animation circle */}
           <motion.div
             className={cn(
-              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r shadow-[0_0_30px_rgba(139,92,246,0.3)]",
+              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
               phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors]
             )}
             {...getPhaseAnimation()}
           />
 
           <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40
-            border-2 border-purple-500/50 shadow-[0_0_15px_rgba(139,92,246,0.3)]
-            flex items-center justify-center backdrop-blur-sm">
+            border-2 border-purple-500/50 flex items-center justify-center backdrop-blur-sm">
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
                 {pattern.name !== "Breath of Fire" && (
@@ -308,8 +337,7 @@ export function BreathingGuide({
             size="icon"
             onClick={onToggleSound}
             className="h-[48px] bg-white/5 border-purple-500/20 backdrop-blur-md
-              transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60
-              hover:transform hover:-translate-y-0.5"
+              transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60"
           >
             {isSoundEnabled ? (
               <Volume2 className="h-4 w-4" />
@@ -323,8 +351,7 @@ export function BreathingGuide({
             size="icon"
             onClick={onToggleZen}
             className="h-[48px] bg-white/5 border-purple-500/20 backdrop-blur-md
-              transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60
-              hover:transform hover:-translate-y-0.5"
+              transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60"
           >
             <Maximize2 className="h-4 w-4" />
           </Button>
@@ -336,8 +363,7 @@ export function BreathingGuide({
                 size="icon"
                 onClick={isPaused ? onResume : onPause}
                 className="h-[48px] bg-white/5 border-purple-500/20 backdrop-blur-md
-                  transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60
-                  hover:transform hover:-translate-y-0.5"
+                  transition-all duration-200 hover:bg-purple-500/10 hover:border-purple-500/60"
               >
                 {isPaused ? (
                   <Play className="h-4 w-4" />
@@ -351,8 +377,7 @@ export function BreathingGuide({
                 size="icon"
                 onClick={onStop}
                 className="h-[48px] bg-red-500/10 border-red-500/20 backdrop-blur-md
-                  transition-all duration-200 hover:bg-red-500/20 hover:border-red-500/60
-                  hover:transform hover:-translate-y-0.5"
+                  transition-all duration-200 hover:bg-red-500/20 hover:border-red-500/60"
               >
                 <Square className="h-4 w-4" />
               </Button>
