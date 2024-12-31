@@ -22,9 +22,9 @@ export default function ProfilePage() {
     : 0;
 
   return (
-    <>
+    <div className="relative w-full max-w-[100vw] overflow-x-hidden">
       <Navigation />
-      <main className="min-h-screen pt-[66px] px-4 pb-8 bg-background">
+      <main className="min-h-screen pt-[40px] px-4 pb-8 bg-background">
         <div className="container max-w-4xl mx-auto space-y-6">
           {/* User Info Section */}
           <Card>
@@ -200,6 +200,6 @@ export default function ProfilePage() {
           </Card>
         </div>
       </main>
-    </>
+    </div>
   );
 }

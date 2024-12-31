@@ -80,15 +80,19 @@ export default function BreathPage() {
     : 0;
 
   return (
-    <>
-      <Navigation />
+    <div className={cn(
+      "relative w-full max-w-[100vw] overflow-x-hidden",
+      isZenMode && "h-screen bg-background/95 backdrop-blur-sm"
+    )}>
+      {!isZenMode && <Navigation />}
       <main className={cn(
-        "min-h-screen bg-background/95 backdrop-blur-sm transition-all duration-500",
-        isZenMode ? "p-0" : "pt-[88px] px-4 pb-8"
+        "min-h-screen transition-all duration-500",
+        !isZenMode && "pt-[40px] px-4 pb-8",
+        isZenMode && "flex items-center justify-center"
       )}>
         <div className={cn(
           "container max-w-4xl mx-auto space-y-5 transition-all duration-500",
-          isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
+          isZenMode && "opacity-0 pointer-events-none absolute"
         )}>
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
@@ -229,7 +233,36 @@ export default function BreathPage() {
             </Card>
           </div>
         </div>
+
+        {isZenMode && (
+          <div className="fixed inset-0 flex items-center justify-center">
+            <Card className="session-container bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
+              <CardContent className="p-4 md:p-6">
+                <BreathingGuide
+                  pattern={breathingPatterns[selectedPattern]}
+                  isActive={isActive}
+                  isPaused={isPaused}
+                  currentPhase={currentPhase}
+                  isZenMode={isZenMode}
+                  isSoundEnabled={isSoundEnabled}
+                  elapsed={elapsedTime}
+                  breathCount={sessionBreaths}
+                  countdown={countdown}
+                  sessionCompleted={sessionCompleted}
+                  onStart={startSession}
+                  onPause={pauseSession}
+                  onResume={resumeSession}
+                  onStop={endSession}
+                  onToggleZen={handleToggleZen}
+                  onToggleSound={handleToggleSound}
+                  onPatternChange={handlePatternChange}
+                  onHoldComplete={handleHoldComplete}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </main>
-    </>
+    </div>
   );
 }
