@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, type AnimationProps } from "framer-motion";
+import { AnimatePresence, motion, type AnimationProps } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -179,13 +179,10 @@ export function BreathingGuide({
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
             duration: 0.3,
-            ease: "linear"
-          }
-        },
-        exit: {
-          scale: phase === "inhale" ? 1 : 0.3,
-          transition: {
-            duration: 0,
+            ease: [0.4, 0, 0.2, 1], // Custom easing for fluid motion
+            type: "spring",
+            stiffness: 200,
+            damping: 20
           }
         }
       };
@@ -305,7 +302,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle", isZenMode ? "h-full scale-120" : "mt-1 mb-1 scale-100")}>
+      <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle relative", isZenMode ? "h-full scale-120" : "mt-1 mb-1 scale-100")}>
         <div
           className="relative w-[285px] h-[285px] flex items-center justify-center transition-transform duration-500"
           onClick={() => isHolding && endHold()}
@@ -320,6 +317,29 @@ export function BreathingGuide({
             )}
             {...(isHolding ? {} : getPhaseAnimation())}
           />
+
+          {/* Add completion message */}
+          <AnimatePresence>
+            {sessionCompleted && !isActive && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-center whitespace-nowrap"
+              >
+                <motion.div
+                  className="px-4 py-2 rounded bg-black/50 text-white"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Session complete! Well done.<br />
+                  Click Start to go again...
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div
             className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform cursor-pointer hover:scale-105 animate-pulse"
@@ -359,11 +379,6 @@ export function BreathingGuide({
               </Button>
             )}
           </div>
-          {sessionCompleted && !isActive && (
-            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 px-4 py-2 rounded bg-black/50 text-white text-center whitespace-nowrap">
-              Session Complete! Tap Start to begin another session
-            </div>
-          )}
         </div>
       </div>
 
