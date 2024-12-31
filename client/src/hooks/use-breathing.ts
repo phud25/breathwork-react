@@ -16,10 +16,10 @@ export function useBreathing(sequence: number[]) {
   const [holdCount, setHoldCount] = useState(0);
   const [totalHoldTime, setTotalHoldTime] = useState(0);
   const [longestHold, setLongestHold] = useState(0);
+  const [phaseProgress, setPhaseProgress] = useState(0);
 
-  // Refs for timing precision
-  const lastTickTime = useRef<number>(0);
-  const animationFrameId = useRef<number>();
+  const lastFrameTime = useRef<number>(0);
+  const frameId = useRef<number>();
 
   const queryClient = useQueryClient();
 
@@ -50,7 +50,6 @@ export function useBreathing(sequence: number[]) {
     },
   });
 
-  // Check if session should end based on targets
   useEffect(() => {
     if (!isActive) return;
 
@@ -80,22 +79,51 @@ export function useBreathing(sequence: number[]) {
       return prev + 1;
     });
 
-    // Set the countdown for the next phase
     setCountdown(sequence[currentPhase]);
   }, [isActive, isPaused, sequence.length, currentPhase, sequence]);
 
-  // High precision timer using requestAnimationFrame
+  const updateTimer = useCallback(() => {
+    if (!isActive || isPaused) return;
+
+    const now = performance.now();
+    if (!lastFrameTime.current) {
+      lastFrameTime.current = now;
+    }
+
+    const deltaTime = now - lastFrameTime.current;
+    const currentPhaseDuration = sequence[currentPhase] * 1000; // Convert to milliseconds
+
+    if (deltaTime >= 1000) { 
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          progressSequence();
+          return sequence[(currentPhase + 1) % sequence.length];
+        }
+        return prev - 1;
+      });
+      lastFrameTime.current = now;
+    }
+
+    setPhaseProgress(
+      Math.min(1, (sequence[currentPhase] - countdown) / sequence[currentPhase])
+    );
+
+    frameId.current = requestAnimationFrame(updateTimer);
+  }, [isActive, isPaused, sequence, currentPhase, countdown, progressSequence]);
+
   useEffect(() => {
     const updateTimer = () => {
       if (!isActive || isPaused) return;
 
       const now = performance.now();
-      if (!lastTickTime.current) {
-        lastTickTime.current = now;
+      if (!lastFrameTime.current) {
+        lastFrameTime.current = now;
       }
 
-      const delta = now - lastTickTime.current;
-      if (delta >= 1000) { // 1 second has passed
+      const deltaTime = now - lastFrameTime.current;
+      const currentPhaseDuration = sequence[currentPhase] * 1000; // Convert to milliseconds
+
+      if (deltaTime >= 1000) { 
         setCountdown((prev) => {
           if (prev <= 1) {
             progressSequence();
@@ -103,24 +131,29 @@ export function useBreathing(sequence: number[]) {
           }
           return prev - 1;
         });
-        lastTickTime.current = now;
+        lastFrameTime.current = now;
       }
 
-      animationFrameId.current = requestAnimationFrame(updateTimer);
+      setPhaseProgress(
+        Math.min(1, (sequence[currentPhase] - countdown) / sequence[currentPhase])
+      );
+
+      frameId.current = requestAnimationFrame(updateTimer);
     };
 
+
     if (isActive && !isPaused) {
-      animationFrameId.current = requestAnimationFrame(updateTimer);
+      frameId.current = requestAnimationFrame(updateTimer);
     }
 
     return () => {
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
+      if (frameId.current) {
+        cancelAnimationFrame(frameId.current);
       }
     };
-  }, [isActive, isPaused, currentPhase, sequence, progressSequence]);
+  }, [isActive, isPaused, updateTimer]);
 
-  // Update elapsed time
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -150,7 +183,7 @@ export function useBreathing(sequence: number[]) {
     setHoldCount(0);
     setTotalHoldTime(0);
     setLongestHold(0);
-    lastTickTime.current = 0;
+    lastFrameTime.current = 0;
   }, [sequence]);
 
   const pauseSession = useCallback(() => {
@@ -167,7 +200,7 @@ export function useBreathing(sequence: number[]) {
       setStartTime(new Date(startTime.getTime() + pauseDuration));
       setPausedTime(null);
     }
-    lastTickTime.current = 0;
+    lastFrameTime.current = 0;
   }, [pausedTime, startTime]);
 
   const recordHold = useCallback((holdDuration: number) => {
@@ -197,7 +230,7 @@ export function useBreathing(sequence: number[]) {
     setPausedTime(null);
     setElapsedTime(0);
     setCountdown(0);
-    lastTickTime.current = 0;
+    lastFrameTime.current = 0;
   }, [startTime, currentCycle, currentPhase, sequence, sessionMutation, holdCount, totalHoldTime, longestHold]);
 
   return {
@@ -219,6 +252,7 @@ export function useBreathing(sequence: number[]) {
       holdCount,
       totalHoldTime,
       longestHold
-    }
+    },
+    phaseProgress,
   };
 }
