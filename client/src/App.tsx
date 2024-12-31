@@ -23,21 +23,23 @@ function App() {
   }
 
   return (
-    <Switch>
-      <Route path="/" component={HomePage} />
-      <Route path="/breathwork" component={BreathPage} />
-      <Route path="/trance" component={TrancePage} />
-      <Route path="/profile" component={ProfilePage} />
-      <Route>
-        {/* 404 page */}
-        <div className="flex items-center justify-center min-h-screen bg-background">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-primary">404</h1>
-            <p className="mt-2 text-muted-foreground">Page not found</p>
+    <div className="w-full min-w-full max-w-full overflow-x-hidden relative">
+      <Switch>
+        <Route path="/" component={HomePage} />
+        <Route path="/breathwork" component={BreathPage} />
+        <Route path="/trance" component={TrancePage} />
+        <Route path="/profile" component={ProfilePage} />
+        <Route>
+          {/* 404 page */}
+          <div className="flex items-center justify-center min-h-screen bg-background">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-primary">404</h1>
+              <p className="mt-2 text-muted-foreground">Page not found</p>
+            </div>
           </div>
-        </div>
-      </Route>
-    </Switch>
+        </Route>
+      </Switch>
+    </div>
   );
 }
 
