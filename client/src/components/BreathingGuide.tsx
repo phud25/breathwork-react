@@ -246,7 +246,7 @@ export function BreathingGuide({
             pattern.name === "2-4 Ha Breath" ? "24ha" :
             pattern.name === "Breath of Fire" ? "fire" : "22"}
         >
-          <SelectTrigger className="bg-transparent border-slate-600 text-[#F5F5DC] hover:border-primary/50 focus:border-primary/50 transition-colors">
+          <SelectTrigger className="h-[48px] rounded-xl bg-white/10 border-slate-600 text-[#F5F5DC] hover:brightness-110 hover:border-primary/50 focus:border-primary/50 transition-all">
             <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
           </SelectTrigger>
           <SelectContent className="bg-slate-800 border-slate-600">
@@ -264,7 +264,7 @@ export function BreathingGuide({
             value={sessionType}
             onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
           >
-            <SelectTrigger className="bg-transparent border-slate-600 hover:border-primary/50 focus:border-primary/50 transition-colors">
+            <SelectTrigger className="h-[48px] rounded-xl bg-white/10 border-slate-600 hover:brightness-110 hover:border-primary/50 focus:border-primary/50 transition-all">
               <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-600">
@@ -278,7 +278,7 @@ export function BreathingGuide({
               value={durationInput}
               onValueChange={setDurationInput}
             >
-              <SelectTrigger className="bg-transparent border-slate-600 hover:border-primary/50 focus:border-primary/50 transition-colors">
+              <SelectTrigger className="h-[48px] rounded-xl bg-white/10 border-slate-600 hover:brightness-110 hover:border-primary/50 focus:border-primary/50 transition-all">
                 <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
@@ -298,7 +298,7 @@ export function BreathingGuide({
               type="number"
               value={breathCountState}
               onChange={(e) => handleBreathCountChange(e.target.value)}
-              className="w-[45%] h-[48px] text-center bg-transparent border-slate-600 text-[#F5F5DC] hover:border-primary/50 focus:border-primary/50 focus:ring-primary/50"
+              className="w-[45%] h-[48px] rounded-xl text-center bg-white/10 border-slate-600 text-[#F5F5DC] hover:brightness-110 hover:border-primary/50 focus:border-primary/50 focus:ring-primary/50"
               min={1}
             />
           )}
@@ -307,21 +307,21 @@ export function BreathingGuide({
 
       <div className={cn("flex items-center justify-center mt-1 mb-1", isZenMode ? "h-full" : "")}>
         <div
-          className="relative w-[300px] h-[300px] flex items-center justify-center"
+          className="relative w-[285px] h-[285px] flex items-center justify-center"
           onClick={() => isHolding && endHold()}
         >
-          <div className="absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-500/10 to-purple-600/20" />
+          <div className="absolute w-[265px] h-[265px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20" />
 
           <motion.div
             className={cn(
-              "absolute w-[280px] h-[280px] rounded-full bg-gradient-to-r",
+              "absolute w-[265px] h-[265px] rounded-full bg-gradient-to-br",
               phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors],
               isHolding && "animate-pulse"
             )}
             {...(isHolding ? {} : getPhaseAnimation())}
           />
 
-          <div className="relative w-[80px] h-[80px] rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/40 border-2 border-primary flex items-center justify-center">
+          <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform hover:scale-105">
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
                 {isHolding ? (
@@ -345,9 +345,9 @@ export function BreathingGuide({
               <Button
                 variant="ghost"
                 onClick={onStart}
-                className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-colors duration-200"
+                className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-all duration-200 group"
               >
-                Start
+                <span className="relative inline-flex rounded-full animate-ping-slow">Start</span>
               </Button>
             )}
           </div>

@@ -24,7 +24,7 @@ const breathingPatterns: Record<PatternType, { name: string; sequence: number[] 
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
   const [isZenMode, setIsZenMode] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(false); // Set default to false
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
   const [activeTab, setActiveTab] = useState<"session" | "daily">("session");
 
@@ -84,7 +84,7 @@ export default function BreathPage() {
       <Navigation />
       <main className={cn(
         "min-h-screen bg-background transition-all duration-500",
-        isZenMode ? "p-0" : "pt-14 px-4 pb-8"
+        isZenMode ? "p-0" : "pt-[88px] px-4 pb-8" 
       )}>
         <div className={cn(
           "container max-w-4xl mx-auto space-y-5",
@@ -92,8 +92,8 @@ export default function BreathPage() {
         )}>
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
-              <Card>
-                <CardContent className="py-4">
+              <Card className="bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg">
+                <CardContent className="p-4 md:p-6">
                   <BreathingGuide
                     pattern={breathingPatterns[selectedPattern]}
                     isActive={isActive}
@@ -119,92 +119,94 @@ export default function BreathPage() {
             </ErrorBoundary>
 
             <Card>
-              <CardContent className="py-4">
+              <CardContent className="p-4 md:p-6">
                 <Tabs defaultValue="session" value={activeTab} onValueChange={(value) => setActiveTab(value as "session" | "daily")}>
-                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsList className="grid w-full grid-cols-2 mb-6">
                     <TabsTrigger value="session">Session Tracker</TabsTrigger>
                     <TabsTrigger value="daily">Daily Tracker</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="session" className="mt-0">
-                    <div className="grid grid-cols-2 gap-4 mb-4 text-center">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Breaths</p>
-                        <p className="text-2xl font-bold">{sessionBreaths}</p>
+                  <TabsContent value="session" className="mt-0 space-y-6">
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Breaths</p>
+                        <p className="text-3xl font-bold tracking-tight">{sessionBreaths}</p>
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Breath Time</p>
-                        <p className="text-2xl font-bold">
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
+                        <p className="text-3xl font-bold tracking-tight">
                           {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
                         </p>
                       </div>
                     </div>
+                    <div className="h-px bg-border/50 my-2" />
                     <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Breath Holds</p>
-                        <p className="text-2xl font-bold">{holdStats.holdCount}</p>
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Holds</p>
+                        <p className="text-3xl font-bold tracking-tight">{holdStats.holdCount}</p>
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Average Hold</p>
-                        <p className="text-2xl font-bold">
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Avg Hold</p>
+                        <p className="text-3xl font-bold tracking-tight">
                           {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Longest Hold</p>
-                        <p className="text-2xl font-bold">
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Best Hold</p>
+                        <p className="text-3xl font-bold tracking-tight">
                           {Math.floor(holdStats.longestHold / 60)}:{(holdStats.longestHold % 60).toString().padStart(2, '0')}
                         </p>
                       </div>
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="daily" className="mt-0">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Breaths</p>
+                  <TabsContent value="daily" className="mt-0 space-y-6">
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Total Breaths</p>
                         {isLoadingStats ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
                         ) : (
-                          <p className="text-2xl font-bold">{totalBreaths}</p>
+                          <p className="text-3xl font-bold tracking-tight">{totalBreaths}</p>
                         )}
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Breath Time</p>
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Total Minutes</p>
                         {isLoadingStats ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
                         ) : (
-                          <p className="text-2xl font-bold">
+                          <p className="text-3xl font-bold tracking-tight">
                             {totalMinutes}:{(0).toString().padStart(2, '0')}
                           </p>
                         )}
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Breath Holds</p>
+                    <div className="h-px bg-border/50 my-2" />
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Total Holds</p>
                         {isLoadingStats ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
                         ) : (
-                          <p className="text-2xl font-bold">{totalHolds}</p>
+                          <p className="text-3xl font-bold tracking-tight">{totalHolds}</p>
                         )}
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Average Hold</p>
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Avg Hold</p>
                         {isLoadingStats ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
                         ) : (
-                          <p className="text-2xl font-bold">
+                          <p className="text-3xl font-bold tracking-tight">
                             {Math.floor(dailyAvgHold / 60)}:{(dailyAvgHold % 60).toString().padStart(2, '0')}
                           </p>
                         )}
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Longest Hold</p>
+                      <div className="p-4 rounded-lg bg-background/50">
+                        <p className="text-sm text-muted-foreground font-medium">Best Hold</p>
                         {isLoadingStats ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
                         ) : (
-                          <p className="text-2xl font-bold">
+                          <p className="text-3xl font-bold tracking-tight">
                             {Math.floor((stats?.todayStats?.longestHold || 0) / 60)}:
                             {((stats?.todayStats?.longestHold || 0) % 60).toString().padStart(2, '0')}
                           </p>
@@ -212,7 +214,6 @@ export default function BreathPage() {
                       </div>
                     </div>
                   </TabsContent>
-
                 </Tabs>
                 <div className="mt-8">
                   <ProgressChart />
