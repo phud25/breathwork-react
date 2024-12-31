@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,27 @@ import { useAudio } from "@/hooks/use-audio";
 
 export default function TrancePage() {
   const [activeSession, setActiveSession] = useState<string | null>(null);
+  const audioRefs = {
+    manifestation: useRef<HTMLAudioElement>(null),
+    energizer: useRef<HTMLAudioElement>(null),
+    sleep: useRef<HTMLAudioElement>(null)
+  };
+
+  useEffect(() => {
+    // Play the appropriate audio when a session is activated
+    Object.entries(audioRefs).forEach(([key, ref]) => {
+      if (ref.current) {
+        if (activeSession === key) {
+          ref.current.play().catch(error => {
+            console.error('Audio playback failed:', error);
+          });
+        } else {
+          ref.current.pause();
+          ref.current.currentTime = 0;
+        }
+      }
+    });
+  }, [activeSession]);
 
   return (
     <>
@@ -31,6 +52,7 @@ export default function TrancePage() {
               {activeSession === 'manifestation' && (
                 <div className="pt-4 border-t">
                   <audio
+                    ref={audioRefs.manifestation}
                     controls
                     className="w-full"
                     src="/audio/DM.mp3"
@@ -60,6 +82,7 @@ export default function TrancePage() {
               {activeSession === 'energizer' && (
                 <div className="pt-4 border-t">
                   <audio
+                    ref={audioRefs.energizer}
                     controls
                     className="w-full"
                     src="/audio/2-2bg.mp3"
@@ -89,6 +112,7 @@ export default function TrancePage() {
               {activeSession === 'sleep' && (
                 <div className="pt-4 border-t">
                   <audio
+                    ref={audioRefs.sleep}
                     controls
                     className="w-full"
                     src="/audio/meditation-bg.mp3"

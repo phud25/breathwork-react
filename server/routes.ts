@@ -53,11 +53,9 @@ export function registerRoutes(app: Express): Server {
     .from(sessions)
     .where(eq(sessions.userId, req.user.id));
 
-    // Calculate daily stats for today
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
+    // Calculate daily stats for last 24 hours
+    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const now = new Date();
 
     const todayStats = await db.select({
       totalBreaths: sql<number>`sum(breath_count)`,
@@ -70,8 +68,8 @@ export function registerRoutes(app: Express): Server {
     .where(
       and(
         eq(sessions.userId, req.user.id),
-        gte(sessions.completedAt, todayStart),
-        lte(sessions.completedAt, todayEnd)
+        gte(sessions.completedAt, last24Hours),
+        lte(sessions.completedAt, now)
       )
     );
 
