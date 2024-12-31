@@ -127,7 +127,7 @@ export default function BreathPage() {
                   </TabsList>
 
                   <TabsContent value="session" className="mt-0">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-2 gap-4 mb-4 text-center">
                       <div>
                         <p className="text-sm text-muted-foreground">Breaths</p>
                         <p className="text-2xl font-bold">{sessionBreaths}</p>
@@ -139,7 +139,7 @@ export default function BreathPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
                         <p className="text-sm text-muted-foreground">Breath Holds</p>
                         <p className="text-2xl font-bold">{holdStats.holdCount}</p>
