@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, type AnimationProps } from "framer-motion";
-import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand } from "lucide-react";
+import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -419,6 +419,18 @@ export function BreathingGuide({
               </Button>
             </>
           )}
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleZen}
+            className={cn(
+              "h-[48px] hover:bg-transparent transition-opacity",
+              isZenMode ? "opacity-50 hover:opacity-100" : ""
+            )}
+          >
+            <Maximize className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>
