@@ -179,10 +179,7 @@ export function BreathingGuide({
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
             duration: 0.3,
-            ease: [0.4, 0, 0.2, 1], // Custom easing for fluid motion
-            type: "spring",
-            stiffness: 200,
-            damping: 20
+            ease: "linear" // Simple linear transition for immediate response
           }
         }
       };

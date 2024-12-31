@@ -24,7 +24,7 @@ const breathingPatterns: Record<PatternType, { name: string; sequence: number[] 
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
   const [isZenMode, setIsZenMode] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true); 
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
   const [activeTab, setActiveTab] = useState<"session" | "daily">("session");
 
@@ -170,7 +170,7 @@ export default function BreathPage() {
 
                   <TabsContent value="daily" className="mt-0 space-y-6">
                     <div className="grid grid-cols-2 gap-4 text-center">
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Total Breaths</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
@@ -178,7 +178,7 @@ export default function BreathPage() {
                           <p className="text-3xl font-bold tracking-tight">{totalBreaths}</p>
                         )}
                       </div>
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Total Minutes</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
@@ -191,7 +191,7 @@ export default function BreathPage() {
                     </div>
                     <div className="h-px bg-border/50 my-2" />
                     <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Total Holds</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
@@ -199,7 +199,7 @@ export default function BreathPage() {
                           <p className="text-3xl font-bold tracking-tight">{totalHolds}</p>
                         )}
                       </div>
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Avg Hold</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
@@ -209,7 +209,7 @@ export default function BreathPage() {
                           </p>
                         )}
                       </div>
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Best Hold</p>
                         {isLoadingStats ? (
                           <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
