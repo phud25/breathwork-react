@@ -21,8 +21,6 @@ export function Navigation() {
     switch (path) {
       case '/breathwork':
         return 'Breathwork Sessions';
-      case '/trance':
-        return 'Guided Trance';
       default:
         return 'Patterns Breathwork';
     }
@@ -31,9 +29,11 @@ export function Navigation() {
   return (
     <header className="relative top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/40">
       <nav className="container h-full flex items-center justify-between px-4">
-        <div className="text-xl font-semibold text-[rgb(167,139,250)] truncate mr-2 pl-[15px]">
-          {getHeaderText(location)}
-        </div>
+        <Link href="/">
+          <a className="text-xl font-semibold text-[rgb(167,139,250)] truncate mr-2 pl-[15px]">
+            {getHeaderText(location)}
+          </a>
+        </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
@@ -45,9 +45,8 @@ export function Navigation() {
             <nav className="flex flex-col space-y-4 mt-8">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href}>
-                  <Button
-                    variant={location === item.href ? "default" : "ghost"}
-                    className={`w-full justify-start ${
+                  <a
+                    className={`px-4 py-2 rounded-md transition-colors ${
                       location === item.href
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-primary/10"
@@ -55,12 +54,12 @@ export function Navigation() {
                     onClick={() => setIsOpen(false)}
                   >
                     {item.label}
-                  </Button>
+                  </a>
                 </Link>
               ))}
               <Button
                 variant="ghost"
-                className="justify-start hover:bg-destructive/10 hover:text-destructive"
+                className="justify-start px-4 hover:bg-destructive/10 hover:text-destructive"
                 onClick={() => {
                   logout();
                   setIsOpen(false);

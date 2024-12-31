@@ -9,36 +9,17 @@ export function useAudio(url: string, options: AudioOptions = {}) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(options.volume || 1);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Create audio context to ensure browser supports audio
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      const audioContext = new AudioContext();
+    const audio = new Audio(url);
+    audio.loop = options.loop || false;
+    audio.volume = volume;
+    audioRef.current = audio;
 
-      const audio = new Audio();
-      audio.src = url;
-      audio.loop = options.loop || false;
-      audio.volume = volume;
-
-      // Preload the audio
-      audio.load();
-
-      audioRef.current = audio;
-      setIsInitialized(true);
-
-      return () => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.src = '';
-        }
-        audioContext.close();
-      };
-    } catch (error) {
-      console.warn('Audio initialization failed:', error);
-      setIsInitialized(false);
-    }
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
   }, [url, options.loop]);
 
   useEffect(() => {
@@ -47,111 +28,82 @@ export function useAudio(url: string, options: AudioOptions = {}) {
     }
   }, [volume]);
 
-  const play = async () => {
-    if (!audioRef.current || !isInitialized) return;
-
-    try {
-      // Handle autoplay restrictions by checking if context is suspended
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      const audioContext = new AudioContext();
-      if (audioContext.state === 'suspended') {
-        await audioContext.resume();
-      }
-
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        await playPromise;
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.warn('Audio playback failed:', error);
-      setIsPlaying(false);
+  const play = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(error => {
+        console.error('Audio playback failed:', error);
+      });
+      setIsPlaying(true);
     }
   };
 
   const pause = () => {
-    if (!audioRef.current || !isInitialized) return;
-    try {
+    if (audioRef.current) {
       audioRef.current.pause();
       setIsPlaying(false);
-    } catch (error) {
-      console.warn('Audio pause failed:', error);
     }
   };
 
   const stop = () => {
-    if (!audioRef.current || !isInitialized) return;
-    try {
+    if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       setIsPlaying(false);
-    } catch (error) {
-      console.warn('Audio stop failed:', error);
     }
   };
 
-  const fadeIn = async (duration: number = 1000) => {
-    if (!audioRef.current || !isInitialized) return;
+  const fadeIn = (duration: number = 1000) => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.volume = 0;
+    const startTime = performance.now();
+    const targetVolume = volume;
 
-    try {
-      audioRef.current.volume = 0;
-      await play();
+    const fade = () => {
+      const currentTime = performance.now();
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      if (audioRef.current) {
+        audioRef.current.volume = progress * targetVolume;
+      }
 
-      const startTime = performance.now();
-      const targetVolume = volume;
+      if (progress < 1) {
+        requestAnimationFrame(fade);
+      }
+    };
 
-      const fade = () => {
-        const currentTime = performance.now();
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        if (audioRef.current) {
-          audioRef.current.volume = progress * targetVolume;
-        }
-
-        if (progress < 1) {
-          requestAnimationFrame(fade);
-        }
-      };
-
-      requestAnimationFrame(fade);
-    } catch (error) {
-      console.warn('Audio fade in failed:', error);
-    }
+    play();
+    requestAnimationFrame(fade);
   };
 
   const fadeOut = (duration: number = 1000) => {
-    if (!audioRef.current || !isInitialized) return;
+    if (!audioRef.current) return;
+    
+    const startTime = performance.now();
+    const startVolume = audioRef.current.volume;
 
-    try {
-      const startTime = performance.now();
-      const startVolume = audioRef.current.volume;
+    const fade = () => {
+      const currentTime = performance.now();
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      if (audioRef.current) {
+        audioRef.current.volume = startVolume * (1 - progress);
+      }
 
-      const fade = () => {
-        const currentTime = performance.now();
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+      if (progress < 1) {
+        requestAnimationFrame(fade);
+      } else {
+        pause();
+      }
+    };
 
-        if (audioRef.current) {
-          audioRef.current.volume = startVolume * (1 - progress);
-        }
-
-        if (progress < 1) {
-          requestAnimationFrame(fade);
-        } else {
-          pause();
-        }
-      };
-
-      requestAnimationFrame(fade);
-    } catch (error) {
-      console.warn('Audio fade out failed:', error);
-    }
+    requestAnimationFrame(fade);
   };
 
   return {
     isPlaying,
-    isInitialized,
     play,
     pause,
     stop,
