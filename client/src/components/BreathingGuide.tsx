@@ -234,8 +234,8 @@ export function BreathingGuide({
       isZenMode ? "h-screen p-0" : ""
     )}>
       <div className={cn(
-        "w-full max-w-[600px] mx-auto space-y-3 transition-opacity duration-300",
-        isZenMode ? "opacity-0 pointer-events-none absolute" : "opacity-100"
+        "w-full max-w-[600px] mx-auto space-y-3 transition-all duration-500",
+        isZenMode ? "opacity-0 scale-95 pointer-events-none absolute" : "opacity-100 scale-100"
       )}>
         <Select
           onValueChange={(value) => onPatternChange(value as PatternType)}
@@ -305,12 +305,12 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className={cn("flex items-center justify-center mt-1 mb-1", isZenMode ? "h-full" : "")}>
+      <div className={cn("flex items-center justify-center transition-all duration-500", isZenMode ? "h-full scale-120" : "mt-1 mb-1 scale-100")}>
         <div
-          className="relative w-[285px] h-[285px] flex items-center justify-center"
+          className="relative w-[285px] h-[285px] flex items-center justify-center transition-transform duration-500"
           onClick={() => isHolding && endHold()}
         >
-          <div className="absolute w-[265px] h-[265px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20" />
+          <div className="absolute w-[265px] h-[265px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20 transition-all duration-500" />
 
           <motion.div
             className={cn(
@@ -360,8 +360,8 @@ export function BreathingGuide({
       </div>
 
       <div className={cn(
-        "w-full max-w-[600px]",
-        isZenMode ? "absolute bottom-8" : ""
+        "w-full max-w-[600px] transition-all duration-500",
+        isZenMode ? "absolute bottom-8 opacity-100" : "opacity-100"
       )}>
         <div className={cn(
           "flex justify-between items-center text-sm text-primary/80 mb-4",

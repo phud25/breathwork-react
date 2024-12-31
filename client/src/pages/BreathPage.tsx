@@ -83,17 +83,18 @@ export default function BreathPage() {
     <>
       <Navigation />
       <main className={cn(
-        "min-h-screen bg-background transition-all duration-500",
-        isZenMode ? "p-0" : "pt-[88px] px-4 pb-8" 
+        "min-h-screen bg-background/95 backdrop-blur-sm transition-all duration-500",
+        isZenMode ? "p-0" : "pt-[88px] px-4 pb-8"
       )}>
         <div className={cn(
-          "container max-w-4xl mx-auto space-y-5",
-          isZenMode && "hidden"
+          "container max-w-4xl mx-auto space-y-5 transition-all duration-500",
+          isZenMode ? "opacity-0 scale-110 pointer-events-none" : "opacity-100 scale-100"
         )}>
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
-              <Card className="bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg">
+              <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
                 <CardContent className="p-4 md:p-6">
+                  <h2 className="text-[1.875rem] text-purple-400 mb-4 font-semibold">Breath Session</h2>
                   <BreathingGuide
                     pattern={breathingPatterns[selectedPattern]}
                     isActive={isActive}
@@ -118,7 +119,7 @@ export default function BreathPage() {
               </Card>
             </ErrorBoundary>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-purple-600/10 to-purple-800/5 backdrop-blur-sm shadow-inner border-purple-500/20">
               <CardContent className="p-4 md:p-6">
                 <Tabs defaultValue="session" value={activeTab} onValueChange={(value) => setActiveTab(value as "session" | "daily")}>
                   <TabsList className="grid w-full grid-cols-2 mb-6">
