@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { Navigation } from "@/components/Navigation";
 import { BreathingGuide } from "@/components/BreathingGuide";
 import { ProgressChart } from "@/components/ProgressChart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
@@ -88,11 +88,14 @@ export default function BreathPage() {
       )}>
         <div className={cn(
           "container max-w-4xl mx-auto space-y-5 transition-all duration-500",
-          isZenMode ? "opacity-0 scale-110 pointer-events-none" : "opacity-100 scale-100"
+          isZenMode ? "opacity-0 pointer-events-none" : "opacity-100"
         )}>
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
-              <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
+              <Card className={cn(
+                "session-container bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20",
+                isZenMode && "zen-mode"
+              )}>
                 <CardContent className="p-4 md:p-6">
                   <BreathingGuide
                     pattern={breathingPatterns[selectedPattern]}
@@ -118,7 +121,11 @@ export default function BreathPage() {
               </Card>
             </ErrorBoundary>
 
-            <Card className="bg-gradient-to-br from-purple-600/10 to-purple-800/5 backdrop-blur-sm shadow-inner border-purple-500/20">
+            <Card className={cn(
+              "bg-gradient-to-br from-purple-600/10 to-purple-800/5 backdrop-blur-sm shadow-inner border-purple-500/20",
+              "non-essential transition-opacity duration-300",
+              isZenMode && "opacity-0 pointer-events-none"
+            )}>
               <CardContent className="p-4 md:p-6">
                 <Tabs defaultValue="session" value={activeTab} onValueChange={(value) => setActiveTab(value as "session" | "daily")}>
                   <TabsList className="grid w-full grid-cols-2 mb-6">

@@ -234,8 +234,8 @@ export function BreathingGuide({
       isZenMode ? "h-screen p-0" : ""
     )}>
       <div className={cn(
-        "w-full max-w-[600px] mx-auto space-y-3 transition-all duration-500",
-        isZenMode ? "opacity-0 scale-95 pointer-events-none absolute" : "opacity-100 scale-100"
+        "w-full max-w-[600px] mx-auto space-y-3 transition-all duration-500 non-essential",
+        isZenMode ? "opacity-0 pointer-events-none absolute" : "opacity-100 scale-100"
       )}>
         <Select
           onValueChange={(value) => onPatternChange(value as PatternType)}
@@ -305,7 +305,7 @@ export function BreathingGuide({
         </div>
       </div>
 
-      <div className={cn("flex items-center justify-center transition-all duration-500", isZenMode ? "h-full scale-120" : "mt-1 mb-1 scale-100")}>
+      <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle", isZenMode ? "h-full scale-120" : "mt-1 mb-1 scale-100")}>
         <div
           className="relative w-[285px] h-[285px] flex items-center justify-center transition-transform duration-500"
           onClick={() => isHolding && endHold()}
@@ -360,12 +360,12 @@ export function BreathingGuide({
       </div>
 
       <div className={cn(
-        "w-full max-w-[600px] transition-all duration-500",
+        "w-full max-w-[600px] transition-all duration-500 controls",
         isZenMode ? "absolute bottom-8 opacity-100" : "opacity-100"
       )}>
         <div className={cn(
-          "flex justify-between items-center text-sm text-primary/80 mb-4",
-          isZenMode ? "opacity-0 pointer-events-none absolute" : "opacity-100"
+          "flex justify-between items-center text-sm text-primary/80 mb-4 non-essential",
+          isZenMode && "opacity-0 pointer-events-none"
         )}>
           <span>Completed Breaths: {breathCount}</span>
           <span>Time: {formatTime(elapsed)}</span>
@@ -376,7 +376,7 @@ export function BreathingGuide({
             variant="outline"
             size="icon"
             onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent"
+            className="h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
           >
             {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           </Button>
@@ -388,7 +388,7 @@ export function BreathingGuide({
                 size="icon"
                 onClick={isHolding ? endHold : startHold}
                 className={cn(
-                  "h-[48px] hover:bg-transparent",
+                  "h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors",
                   isHolding && "ring-2 ring-purple-500 ring-opacity-50"
                 )}
               >
@@ -399,21 +399,17 @@ export function BreathingGuide({
                 variant="outline"
                 size="icon"
                 onClick={isPaused ? onResume : onPause}
-                className="h-[48px] hover:bg-transparent"
+                className="h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
                 disabled={isHolding}
               >
-                {isPaused ? (
-                  <Play className="h-4 w-4" />
-                ) : (
-                  <Pause className="h-4 w-4" />
-                )}
+                {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
               </Button>
 
               <Button
                 variant="destructive"
                 size="icon"
                 onClick={onStop}
-                className="h-[48px]"
+                className="h-[48px] control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
               >
                 <Square className="h-4 w-4" />
               </Button>
@@ -425,7 +421,7 @@ export function BreathingGuide({
             size="icon"
             onClick={onToggleZen}
             className={cn(
-              "h-[48px] hover:bg-transparent transition-opacity",
+              "h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors",
               isZenMode ? "opacity-50 hover:opacity-100" : ""
             )}
           >

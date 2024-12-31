@@ -27,10 +27,10 @@ export function Navigation() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/40">
+    <header className="relative top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/40">
       <nav className="container h-full flex items-center justify-between px-4">
         <Link href="/">
-          <a className="text-[1.875rem] font-semibold text-[rgb(167,139,250)] truncate mr-2 pl-[15px]">
+          <a className="text-xl font-semibold text-[rgb(167,139,250)] truncate mr-2 pl-[15px]">
             {getHeaderText(location)}
           </a>
         </Link>
