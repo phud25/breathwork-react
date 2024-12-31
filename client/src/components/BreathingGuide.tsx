@@ -178,7 +178,7 @@ export function BreathingGuide({
         animate: {
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
-            duration: 0.5,
+            duration: 0.3,
             ease: "linear"
           }
         },

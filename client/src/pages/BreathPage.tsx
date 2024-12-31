@@ -24,7 +24,7 @@ const breathingPatterns: Record<PatternType, { name: string; sequence: number[] 
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
   const [isZenMode, setIsZenMode] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true); // This line is changed
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
   const [activeTab, setActiveTab] = useState<"session" | "daily">("session");
 

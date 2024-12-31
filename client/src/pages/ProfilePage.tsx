@@ -52,39 +52,39 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-4 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Sessions</p>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <p className="text-2xl font-bold">{sessions?.length || 0}</p>
-                  )}
+                  <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+                    <p className="text-sm text-muted-foreground">Sessions</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{sessions?.length || 0}</p>
+                    )}
+                  </div>
+                  <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+                    <p className="text-sm text-muted-foreground">Breaths</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{stats?.todayStats?.totalBreaths || 0}</p>
+                    )}
+                  </div>
+                  <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+                    <p className="text-sm text-muted-foreground">Minutes</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{stats?.todayStats?.totalMinutes || 0}</p>
+                    )}
+                  </div>
+                  <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+                    <p className="text-sm text-muted-foreground">Hold</p>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <p className="text-2xl font-bold">{stats?.todayStats?.totalHolds || 0}</p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Breaths</p>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stats?.todayStats?.totalBreaths || 0}</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Minutes</p>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stats?.todayStats?.totalMinutes || 0}</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Hold</p>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stats?.todayStats?.totalHolds || 0}</p>
-                  )}
-                </div>
-              </div>
             </CardContent>
           </Card>
 
