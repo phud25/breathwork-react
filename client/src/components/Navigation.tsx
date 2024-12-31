@@ -27,15 +27,17 @@ export function Navigation() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-      <nav className="container h-full flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 border-b border-border/40">
+      <nav className="container h-full flex items-center justify-between px-4">
         <Link href="/">
-          <a className="text-lg font-semibold text-primary pl-5">{getHeaderText(location)}</a>
+          <a className="text-base md:text-lg font-semibold text-primary truncate mr-2">
+            {getHeaderText(location)}
+          </a>
         </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-10 w-10">
+            <Button variant="ghost" size="icon" className="h-10 w-10 mr-2">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
