@@ -179,7 +179,8 @@ export function BreathingGuide({
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
             duration: 0.3,
-            ease: "linear" // Simple linear transition for immediate response
+            ease: "linear",
+            type: "tween"
           }
         }
       };
