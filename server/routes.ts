@@ -62,7 +62,7 @@ export function registerRoutes(app: Express): Server {
       totalMinutes: sql<number>`sum(duration) / 60`,
       totalHolds: sql<number>`sum(hold_count)`,
       totalHoldTime: sql<number>`sum(total_hold_time)`,
-      longestHold: sql<number>`max(longest_hold)`,
+      longestHold: sql<number>`GREATEST(COALESCE(MAX(longest_hold), 0), 0)`
     })
     .from(sessions)
     .where(
@@ -91,9 +91,7 @@ export function registerRoutes(app: Express): Server {
       sessionDate.setHours(0, 0, 0, 0);
 
       if (i === 0) {
-        // First session
         currentCount = 1;
-        // If the first session is from today, start the current streak
         if (sessionDate.getTime() === today.getTime()) {
           currentStreak = 1;
         }
@@ -101,12 +99,10 @@ export function registerRoutes(app: Express): Server {
         const prevDate = new Date(userSessions[i - 1].completedAt);
         prevDate.setHours(0, 0, 0, 0);
 
-        // Check if sessions are on consecutive days
         const diffDays = Math.floor((prevDate.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24));
 
         if (diffDays === 1) {
           currentCount++;
-          // Update current streak if the streak includes today
           if (i === 0 || new Date(userSessions[0].completedAt).setHours(0, 0, 0, 0) === today.getTime()) {
             currentStreak = currentCount;
           }
@@ -119,7 +115,6 @@ export function registerRoutes(app: Express): Server {
       }
     }
 
-    // Update longest streak if the current streak is longer
     if (currentCount > longestStreak) {
       longestStreak = currentCount;
     }

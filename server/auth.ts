@@ -5,17 +5,12 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { users, insertUserSchema, type User } from "@db/schema";
+import { users, type User } from "@db/schema";
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 
 const scryptAsync = promisify(scrypt);
 const crypto = {
-  hash: async (password: string) => {
-    const salt = randomBytes(16).toString("hex");
-    const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-    return `${buf.toString("hex")}.${salt}`;
-  },
   compare: async (suppliedPassword: string, storedPassword: string) => {
     const [hashedPassword, salt] = storedPassword.split(".");
     const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
@@ -28,7 +23,6 @@ const crypto = {
   },
 };
 
-// extend express user object with our schema
 declare global {
   namespace Express {
     interface User extends User { }
@@ -98,63 +92,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req, res, next) => {
-    try {
-      const result = insertUserSchema.safeParse(req.body);
-      if (!result.success) {
-        return res
-          .status(400)
-          .send("Invalid input: " + result.error.issues.map(i => i.message).join(", "));
-      }
-
-      const { username, password } = result.data;
-
-      // Check if user already exists
-      const [existingUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, username))
-        .limit(1);
-
-      if (existingUser) {
-        return res.status(400).send("Username already exists");
-      }
-
-      // Hash the password
-      const hashedPassword = await crypto.hash(password);
-
-      // Create the new user
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          username,
-          password: hashedPassword,
-        })
-        .returning();
-
-      // Log the user in after registration
-      req.login(newUser, (err) => {
-        if (err) {
-          return next(err);
-        }
-        return res.json({
-          message: "Registration successful",
-          user: { id: newUser.id, username: newUser.username },
-        });
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-
   app.post("/api/login", (req, res, next) => {
-    const result = insertUserSchema.safeParse(req.body);
-    if (!result.success) {
-      return res
-        .status(400)
-        .send("Invalid input: " + result.error.issues.map(i => i.message).join(", "));
-    }
-
     const cb = (err: any, user: Express.User, info: IVerifyOptions) => {
       if (err) {
         return next(err);
