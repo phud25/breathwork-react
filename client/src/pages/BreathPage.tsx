@@ -94,7 +94,6 @@ export default function BreathPage() {
             <ErrorBoundary>
               <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
                 <CardContent className="p-4 md:p-6">
-                  <h2 className="text-[1.875rem] text-purple-400 mb-4 font-semibold">Breath Session</h2>
                   <BreathingGuide
                     pattern={breathingPatterns[selectedPattern]}
                     isActive={isActive}
