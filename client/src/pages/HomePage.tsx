@@ -8,8 +8,8 @@ export default function HomePage() {
   return (
     <div className="relative w-full max-w-[100vw] overflow-x-hidden">
       <Navigation />
-      <main className="min-h-screen pt-[66px] pb-8 px-4 bg-background">
-        <div className="container max-w-6xl mx-auto grid gap-4 md:gap-6">
+      <main className="main-content bg-background">
+        <div className="container max-w-6xl mx-auto grid gap-4 md:gap-6 pb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <Link href="/breathwork">
               <Card className="group cursor-pointer transition-all hover:border-primary/50 max-w-[90%] mx-auto md:max-w-none">
