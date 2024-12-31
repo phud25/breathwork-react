@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <div className="relative w-full max-w-[100vw] overflow-x-hidden">
       <Navigation />
-      <main className="min-h-screen pt-[40px] pb-8 px-4 bg-background">
+      <main className="min-h-screen pt-[30px] pb-8 px-4 bg-background">
         <div className="container max-w-6xl mx-auto grid gap-4 md:gap-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <Link href="/breathwork">

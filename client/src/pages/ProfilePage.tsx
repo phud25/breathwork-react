@@ -24,10 +24,10 @@ export default function ProfilePage() {
   return (
     <div className="relative w-full max-w-[100vw] overflow-x-hidden">
       <Navigation />
-      <main className="min-h-screen pt-[40px] px-4 pb-8 bg-background">
+      <main className="min-h-screen pt-[30px] px-4 pb-8 bg-background">
         <div className="container max-w-4xl mx-auto space-y-6">
           {/* User Info Section */}
-          <Card>
+          <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
             <CardHeader>
               <CardTitle>Profile</CardTitle>
             </CardHeader>
@@ -46,7 +46,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Daily Stats Card */}
-          <Card>
+          <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
             <CardHeader>
               <CardTitle>Today's Progress</CardTitle>
             </CardHeader>
@@ -91,7 +91,7 @@ export default function ProfilePage() {
           {/* Stats Section */}
           <div className="grid gap-4">
             {/* Current Streak Stats */}
-            <Card>
+            <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
               <CardHeader>
                 <CardTitle>Current Streak Stats</CardTitle>
               </CardHeader>
@@ -134,7 +134,7 @@ export default function ProfilePage() {
             </Card>
 
             {/* Breath Hold Stats Card */}
-            <Card>
+            <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
               <CardHeader>
                 <CardTitle>Breath Hold Stats</CardTitle>
               </CardHeader>
@@ -167,7 +167,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Calendar Section */}
-          <Card>
+          <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
             <CardHeader>
               <CardTitle>Session History</CardTitle>
             </CardHeader>
