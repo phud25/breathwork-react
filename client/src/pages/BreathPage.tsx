@@ -233,7 +233,7 @@ export default function BreathPage() {
 
         {isZenMode && (
           <div className="fixed inset-0 flex flex-col items-center justify-center">
-            <div className="scale-115 mb-8">
+            <div className="scale-120 mb-8">
               <BreathingGuide
                 pattern={breathingPatterns[selectedPattern]}
                 isActive={isActive}

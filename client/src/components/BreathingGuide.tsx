@@ -372,11 +372,11 @@ export function BreathingGuide({
         isZenMode ? "absolute bottom-8 opacity-100" : "opacity-100"
       )}>
         <div className={cn(
-          "flex justify-between items-center text-sm text-primary/80 mb-4 non-essential",
+          "flex justify-between items-center text-sm mb-4 non-essential text-[rgb(167,139,250)]",
           isZenMode && "opacity-0 pointer-events-none"
         )}>
-          <div className="p-2 rounded-lg bg-white/5 backdrop-blur-sm">Completed Breaths: {breathCount}</div>
-          <div className="p-2 rounded-lg bg-white/5 backdrop-blur-sm">Time: {formatTime(elapsed)}</div>
+          <div>Completed Breaths: {breathCount}</div>
+          <div>Time: {formatTime(elapsed)}</div>
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">
