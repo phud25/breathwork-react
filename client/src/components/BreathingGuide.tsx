@@ -174,15 +174,18 @@ export function BreathingGuide({
 
     if (pattern.name === "Breath of Fire") {
       return {
-        initial: { scale: phase === "inhale" ? 0.3 : 1 },
+        initial: { scale: 0.3 },
         animate: {
-          scale: phase === "inhale" ? 1 : 0.3,
+          scale: [0.3, 1, 0.3],
           transition: {
-            duration: 0.3,
-            ease: [0.4, 0, 0.2, 1], // Custom easing for fluid motion
+            duration: 0.6,
+            ease: "easeInOut",
+            repeat: Infinity,
+            times: [0, 0.5, 1],
             type: "spring",
             stiffness: 200,
-            damping: 20
+            damping: 12,
+            mass: 0.8
           }
         }
       };
