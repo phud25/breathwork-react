@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion, type AnimationProps } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,41 +44,6 @@ const getPhaseVariant = (patternName: string, phase: number) => {
   return "hold";
 };
 
-const getCircleScale = (patternName: string, phase: number, elapsedInPhase: number, totalPhaseTime: number) => {
-  const minScale = 0.3;
-  const maxScale = 1.0;
-  const scaleRange = maxScale - minScale;
-
-  if (patternName === "4-7-8 Relaxation") {
-    const progress = Math.min(elapsedInPhase / totalPhaseTime, 1);
-
-    switch(phase) {
-      case 0: 
-        return minScale + (progress * scaleRange);
-      case 1: 
-        return maxScale;
-      case 2: 
-        return maxScale - (progress * scaleRange);
-      default:
-        return minScale;
-    }
-  }
-
-  if (patternName === "Breath of Fire") {
-    const progress = Math.min(elapsedInPhase / totalPhaseTime, 1);
-    return phase === 0 ? 
-      minScale + (progress * scaleRange) : 
-      maxScale - (progress * scaleRange);
-  }
-
-  const progress = Math.min(elapsedInPhase / totalPhaseTime, 1);
-  switch(phase) {
-    case 0: return minScale + (progress * scaleRange);
-    case 2: return maxScale - (progress * scaleRange);
-    default: return phase === 1 ? maxScale : minScale;
-  }
-};
-
 export function BreathingGuide({
   pattern,
   isActive,
@@ -106,7 +71,7 @@ export function BreathingGuide({
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
 
-  const fixedVolume = 0.5; 
+  const fixedVolume = 0.5; // Fixed volume at 50%
   const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
   const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? fixedVolume : 0 });
   const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume : 0 });
@@ -214,26 +179,44 @@ export function BreathingGuide({
           scale: phase === "inhale" ? 1 : 0.3,
           transition: {
             duration: 0.3,
-            ease: "linear"
+            ease: "linear" // Simple linear transition for immediate response
           }
         }
       };
     }
 
-    const scale = getCircleScale(
-      pattern.name,
-      currentPhase,
-      countdown ? phaseDuration - countdown : 0,
-      phaseDuration
-    );
+    if (phase === "inhale") {
+      return {
+        initial: { scale: 0.3 },
+        animate: {
+          scale: 1,
+          transition: {
+            duration: phaseDuration,
+            ease: "easeInOut"
+          }
+        }
+      };
+    }
+
+    if (phase === "exhale") {
+      return {
+        initial: { scale: 1 },
+        animate: {
+          scale: 0.3,
+          transition: {
+            duration: phaseDuration,
+            ease: "easeInOut"
+          }
+        }
+      };
+    }
 
     return {
-      initial: { scale: phase === "inhale" ? 0.3 : 1 },
+      initial: { scale: isPostInhale ? 1 : 0.3 },
       animate: {
-        scale,
+        scale: isPostInhale ? 1 : 0.3,
         transition: {
-          duration: 1,
-          ease: "linear"
+          duration: phaseDuration
         }
       }
     };
@@ -332,6 +315,7 @@ export function BreathingGuide({
             {...(isHolding ? {} : getPhaseAnimation())}
           />
 
+          {/* Add completion message */}
           <AnimatePresence>
             {sessionCompleted && !isActive && (
               <motion.div
