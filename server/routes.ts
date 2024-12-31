@@ -16,7 +16,7 @@ export function registerRoutes(app: Express): Server {
 
     const { date } = req.query;
     let query = db.query.sessions.findMany({
-      where: eq(sessions.userId, req.user.id),
+      where: eq(sessions.userId, req.user!.id),
       orderBy: (sessions, { desc }) => [desc(sessions.completedAt)],
       limit: 50
     });
@@ -28,7 +28,7 @@ export function registerRoutes(app: Express): Server {
 
       query = db.query.sessions.findMany({
         where: and(
-          eq(sessions.userId, req.user.id),
+          eq(sessions.userId, req.user!.id),
           gte(sessions.completedAt, startOfDay),
           lte(sessions.completedAt, endOfDay)
         ),
@@ -51,7 +51,7 @@ export function registerRoutes(app: Express): Server {
       totalMinutes: sql<number>`sum(duration) / 60`,
     })
     .from(sessions)
-    .where(eq(sessions.userId, req.user.id));
+    .where(eq(sessions.userId, req.user!.id));
 
     // Calculate daily stats for last 24 hours
     const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -67,15 +67,15 @@ export function registerRoutes(app: Express): Server {
     .from(sessions)
     .where(
       and(
-        eq(sessions.userId, req.user.id),
+        eq(sessions.userId, req.user!.id),
         gte(sessions.completedAt, last24Hours),
         lte(sessions.completedAt, now)
       )
     );
 
-    // Calculate streaks
+    // Calculate streaks for the current user only
     const userSessions = await db.query.sessions.findMany({
-      where: eq(sessions.userId, req.user.id),
+      where: eq(sessions.userId, req.user!.id),
       orderBy: (sessions, { desc }) => [desc(sessions.completedAt)]
     });
 
@@ -124,7 +124,6 @@ export function registerRoutes(app: Express): Server {
       longestStreak = currentCount;
     }
 
-
     res.json({
       totalSessions: Number(stats[0].totalSessions),
       totalMinutes: Math.round(Number(stats[0].totalMinutes)),
@@ -150,7 +149,7 @@ export function registerRoutes(app: Express): Server {
 
     const [newSession] = await db.insert(sessions)
       .values({
-        userId: req.user.id,
+        userId: req.user!.id,
         pattern,
         duration,
         breathCount,
@@ -170,7 +169,7 @@ export function registerRoutes(app: Express): Server {
     }
 
     const userAchievements = await db.query.achievements.findMany({
-      where: eq(achievements.userId, req.user.id),
+      where: eq(achievements.userId, req.user!.id),
       orderBy: (achievements, { desc }) => [desc(achievements.unlockedAt)]
     });
 
@@ -184,7 +183,7 @@ export function registerRoutes(app: Express): Server {
     }
 
     const favorites = await db.query.favoritePatterns.findMany({
-      where: eq(favoritePatterns.userId, req.user.id),
+      where: eq(favoritePatterns.userId, req.user!.id),
       orderBy: (patterns, { desc }) => [desc(patterns.createdAt)]
     });
 
@@ -199,16 +198,18 @@ export function registerRoutes(app: Express): Server {
 
     const { name, sequence, isQuickSave = false } = req.body;
 
-    // If it's a quick save, remove the previous quick save
+    // If it's a quick save, remove the previous quick save for this user
     if (isQuickSave) {
       await db.delete(favoritePatterns)
-        .where(eq(favoritePatterns.userId, req.user.id))
-        .where(eq(favoritePatterns.isQuickSave, true));
+        .where(and(
+          eq(favoritePatterns.userId, req.user!.id),
+          eq(favoritePatterns.isQuickSave, true)
+        ));
     }
 
     const [favorite] = await db.insert(favoritePatterns)
       .values({
-        userId: req.user.id,
+        userId: req.user!.id,
         name,
         sequence,
         isQuickSave
@@ -227,8 +228,10 @@ export function registerRoutes(app: Express): Server {
     const { id } = req.params;
 
     await db.delete(favoritePatterns)
-      .where(eq(favoritePatterns.id, parseInt(id)))
-      .where(eq(favoritePatterns.userId, req.user.id));
+      .where(and(
+        eq(favoritePatterns.id, parseInt(id)),
+        eq(favoritePatterns.userId, req.user!.id)
+      ));
 
     res.json({ success: true });
   });
