@@ -321,7 +321,15 @@ export function BreathingGuide({
             {...(isHolding ? {} : getPhaseAnimation())}
           />
 
-          <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform hover:scale-105">
+          <div
+            className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform cursor-pointer hover:scale-105 animate-pulse"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isActive && !isHolding) {
+                isPaused ? onResume() : onPause();
+              }
+            }}
+          >
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
                 {isHolding ? (
@@ -367,8 +375,8 @@ export function BreathingGuide({
           "flex justify-between items-center text-sm text-primary/80 mb-4 non-essential",
           isZenMode && "opacity-0 pointer-events-none"
         )}>
-          <span>Completed Breaths: {breathCount}</span>
-          <span>Time: {formatTime(elapsed)}</span>
+          <div className="p-2 rounded-lg bg-white/5 backdrop-blur-sm">Completed Breaths: {breathCount}</div>
+          <div className="p-2 rounded-lg bg-white/5 backdrop-blur-sm">Time: {formatTime(elapsed)}</div>
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">

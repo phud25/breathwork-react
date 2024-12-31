@@ -135,12 +135,12 @@ export default function BreathPage() {
                   </TabsList>
 
                   <TabsContent value="session" className="mt-0 space-y-6">
-                    <div className="grid grid-cols-2 gap-4 text-center">
-                      <div className="p-4 rounded-lg bg-background/50">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Breaths</p>
                         <p className="text-3xl font-bold tracking-tight">{sessionBreaths}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
                         <p className="text-3xl font-bold tracking-tight">
                           {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
@@ -149,17 +149,17 @@ export default function BreathPage() {
                     </div>
                     <div className="h-px bg-border/50 my-2" />
                     <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Holds</p>
                         <p className="text-3xl font-bold tracking-tight">{holdStats.holdCount}</p>
                       </div>
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Avg Hold</p>
                         <p className="text-3xl font-bold tracking-tight">
                           {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
                         </p>
                       </div>
-                      <div className="p-4 rounded-lg bg-background/50">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
                         <p className="text-sm text-muted-foreground font-medium">Best Hold</p>
                         <p className="text-3xl font-bold tracking-tight">
                           {Math.floor(holdStats.longestHold / 60)}:{(holdStats.longestHold % 60).toString().padStart(2, '0')}
