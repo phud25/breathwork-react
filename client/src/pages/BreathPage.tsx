@@ -232,7 +232,7 @@ export default function BreathPage() {
                       variant="outline"
                       size="icon"
                       onClick={handleToggleSound}
-                      className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20"
+                      className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all"
                     >
                       {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
                     </Button>
@@ -243,7 +243,7 @@ export default function BreathPage() {
                           size="icon"
                           onClick={isHolding ? endHold : startHold}
                           className={cn(
-                            "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20",
+                            "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all",
                             isHolding && "ring-2 ring-purple-500 ring-opacity-50"
                           )}
                         >
@@ -254,7 +254,7 @@ export default function BreathPage() {
                           variant="outline"
                           size="icon"
                           onClick={isPaused ? resumeSession : pauseSession}
-                          className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20"
+                          className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all"
                           disabled={isHolding}
                         >
                           {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
@@ -264,7 +264,7 @@ export default function BreathPage() {
                           variant="destructive"
                           size="icon"
                           onClick={handleEndSession}
-                          className="h-[48px] control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20"
+                          className="h-[48px] control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all"
                         >
                           <Square className="h-4 w-4" />
                         </Button>
@@ -275,7 +275,7 @@ export default function BreathPage() {
                       size="icon"
                       onClick={handleToggleZen}
                       className={cn(
-                        "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20",
+                        "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all",
                         isZenMode ? "opacity-50 hover:opacity-100" : ""
                       )}
                     >

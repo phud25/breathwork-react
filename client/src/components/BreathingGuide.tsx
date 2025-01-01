@@ -398,7 +398,7 @@ export function BreathingGuide({
             variant="outline"
             size="icon"
             onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
+            className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
           >
             {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           </Button>
@@ -410,7 +410,7 @@ export function BreathingGuide({
                 size="icon"
                 onClick={isHolding ? endHold : startHold}
                 className={cn(
-                  "h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors",
+                  "h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors",
                   isHolding && "ring-2 ring-purple-500 ring-opacity-50"
                 )}
               >
@@ -421,7 +421,7 @@ export function BreathingGuide({
                 variant="outline"
                 size="icon"
                 onClick={isPaused ? onResume : onPause}
-                className="h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
+                className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
                 disabled={isHolding}
               >
                 {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
@@ -431,7 +431,7 @@ export function BreathingGuide({
                 variant="destructive"
                 size="icon"
                 onClick={onStop}
-                className="h-[48px] control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
+                className="h-[48px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
               >
                 <Square className="h-4 w-4" />
               </Button>
@@ -443,7 +443,7 @@ export function BreathingGuide({
             size="icon"
             onClick={onToggleZen}
             className={cn(
-              "h-[48px] hover:bg-transparent control-icon bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors",
+              "h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors",
               isZenMode ? "opacity-50 hover:opacity-100" : ""
             )}
           >
