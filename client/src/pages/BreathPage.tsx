@@ -48,7 +48,7 @@ export default function BreathPage() {
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
-  const [activeStatsTab, setActiveStatsTab] = useState<"set" | "session" | "daily" | "weekly">("set");
+  const [activeStatsTab, setActiveStatsTab] = useState<"set" | "session" | "daily" | "weekly">("session");
   const [currentSetId, setCurrentSetId] = useState(1);
   const [sets, setSets] = useState<BreathingSet[]>([]);
 
@@ -267,7 +267,12 @@ export default function BreathPage() {
               <CardContent className="p-4 md:p-6">
                 <Tabs value={activeStatsTab} onValueChange={(value) => {
                   setActiveStatsTab(value as typeof activeStatsTab);
-                  scrollToTabs();
+                  const tabsElement = document.querySelector('.tabs-container');
+                  if (tabsElement) {
+                    setTimeout(() => {
+                      tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                  }
                 }} className="tabs-container">
                   <TabsList className="grid w-full grid-cols-4 mb-6">
                     <TabsTrigger
