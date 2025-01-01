@@ -180,7 +180,8 @@ export function BreathingGuide({
           transition: {
             duration: 0.3,
             ease: "linear",
-            type: "tween"
+            type: "keyframes",
+            times: [0, 1], // No intermediate states
           }
         }
       };
