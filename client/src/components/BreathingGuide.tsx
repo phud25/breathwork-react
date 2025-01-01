@@ -418,15 +418,16 @@ export function BreathingGuide({
                 <Hand className="h-4 w-4" />
               </Button>
 
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={isPaused ? onResume : onPause}
-                className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
-                disabled={isHolding}
-              >
-                {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-              </Button>
+              {!isHolding && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={isPaused ? () => onResume(currentPhase) : onPause}
+                  className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
+                >
+                  {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                </Button>
+              )}
 
               <Button
                 variant="destructive"
@@ -472,7 +473,7 @@ interface BreathingGuideProps {
   sessionCompleted?: boolean;
   onStart: () => void;
   onPause: () => void;
-  onResume: (phase:number) => void; //Modified to accept phase
+  onResume: (phase:number) => void;
   onStop: () => void;
   onToggleZen: () => void;
   onToggleSound: () => void;

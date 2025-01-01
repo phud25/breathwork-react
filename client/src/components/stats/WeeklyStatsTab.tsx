@@ -77,43 +77,45 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
         </div>
       </div>
 
-      {/* Calendar View moved to bottom */}
-      <div className="rounded-lg border border-border/50 bg-white/5 p-4">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          className="w-full"
-        />
+      {/* Calendar View */}
+      <div className="mt-6">
+        <div className="rounded-lg border border-border/50 bg-white/5 p-4">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            className="w-full"
+          />
 
-        {/* Selected Day Summary */}
-        {selectedSummary && (
-          <div className="mt-4 space-y-3">
-            <p className="font-medium">
-              {selectedSummary.date.toLocaleDateString(undefined, {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </p>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">Sessions</p>
-                <p className="font-medium">{selectedSummary.sessions}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Breath Time</p>
-                <p className="font-medium">{formatTime(selectedSummary.breathTime)}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Patterns Used</p>
-              <p className="text-sm font-medium">
-                {selectedSummary.patterns.join(", ")}
+          {/* Selected Day Summary */}
+          {selectedSummary && (
+            <div className="mt-4 space-y-3">
+              <p className="font-medium">
+                {selectedSummary.date.toLocaleDateString(undefined, {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric'
+                })}
               </p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Sessions</p>
+                  <p className="font-medium">{selectedSummary.sessions}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Breath Time</p>
+                  <p className="font-medium">{formatTime(selectedSummary.breathTime)}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Patterns Used</p>
+                <p className="text-sm font-medium">
+                  {selectedSummary.patterns.join(", ")}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
