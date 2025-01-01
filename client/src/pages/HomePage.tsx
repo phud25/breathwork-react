@@ -6,11 +6,11 @@ import { Link } from "wouter";
 
 export default function HomePage() {
   return (
-    <div className="relative w-full max-w-[100vw] overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
-      <main className="min-h-screen pt-[30px] pb-8 px-4 bg-background">
-        <div className="container max-w-6xl mx-auto grid gap-4 md:gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link href="/breathwork">
               <Card className="group cursor-pointer transition-all hover:border-primary/50 max-w-[90%] mx-auto md:max-w-none bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
                 <CardHeader className="p-4 md:p-6">
