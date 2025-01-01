@@ -79,12 +79,6 @@ export default function BreathPage() {
     ? Math.round(totalHoldTime / totalHolds)
     : 0;
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
   return (
     <div className={cn(
       "relative w-full max-w-[100vw] overflow-x-hidden",
@@ -141,9 +135,17 @@ export default function BreathPage() {
                   </TabsList>
 
                   <TabsContent value="session" className="mt-0 space-y-6">
-                    <div className="flex justify-between items-center text-sm mb-4 non-essential text-[rgb(167,139,250)]">
-                      <div>Breaths: {sessionBreaths}</div>
-                      <div>Time: {formatTime(elapsedTime)}</div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+                        <p className="text-sm text-muted-foreground font-medium">Breaths</p>
+                        <p className="text-3xl font-bold tracking-tight">{sessionBreaths}</p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+                        <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
+                        <p className="text-3xl font-bold tracking-tight">
+                          {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+                        </p>
+                      </div>
                     </div>
                     <div className="h-px bg-border/50 my-2" />
                     <div className="grid grid-cols-3 gap-4 text-center">
