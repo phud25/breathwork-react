@@ -30,11 +30,9 @@ export function Navigation() {
     <header className="sticky top-0 z-50 w-full">
       <div className="container px-4 mx-auto">
         <nav className="h-[80px] flex items-center justify-between">
-          <Link href="/">
-            <a className="text-xl font-semibold text-[rgb(167,139,250)] truncate">
-              {getHeaderText(location)}
-            </a>
-          </Link>
+          <span className="text-xl font-semibold text-[rgb(167,139,250)] truncate">
+            {getHeaderText(location)}
+          </span>
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -45,18 +43,21 @@ export function Navigation() {
             <SheetContent className="w-[300px] bg-background border-l border-border">
               <nav className="flex flex-col space-y-4 mt-8">
                 {navItems.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    <a
-                      className={`px-4 py-2 rounded-md transition-colors ${
-                        location === item.href
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-primary/10"
-                      }`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.label}
-                    </a>
-                  </Link>
+                  <Button
+                    key={item.href}
+                    variant="ghost"
+                    className={`justify-start px-4 ${
+                      location === item.href
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-primary/10"
+                    }`}
+                    onClick={() => {
+                      setIsOpen(false);
+                      window.location.href = item.href;
+                    }}
+                  >
+                    {item.label}
+                  </Button>
                 ))}
                 <Button
                   variant="ghost"
