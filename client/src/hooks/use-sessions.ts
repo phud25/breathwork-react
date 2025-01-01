@@ -21,13 +21,21 @@ export function useSessions(date?: Date) {
   });
 }
 
+interface SessionStats {
+  totalSessions: number;
+  totalMinutes: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalBreaths: number;
+  totalHolds: number;
+  totalHoldTime: number;
+  totalSets: number;
+  longestSession: number;
+  longestHold: number;
+}
+
 export function useSessionStats() {
-  return useQuery<{
-    totalSessions: number;
-    totalMinutes: number;
-    currentStreak: number;
-    longestStreak: number;
-  }>({
+  return useQuery<SessionStats>({
     queryKey: ['/api/sessions/stats'],
     queryFn: async () => {
       const response = await fetch('/api/sessions/stats', {

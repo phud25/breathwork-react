@@ -33,7 +33,7 @@ interface BreathingSet {
   avgHoldTime: number;
   longestHold: number;
   isActive: boolean;
-  breathTime?: number; // Added breathTime to BreathingSet
+  breathTime?: number;
 }
 
 const scrollToTabs = () => {
@@ -108,6 +108,10 @@ export default function BreathPage() {
   }, [currentSetId, selectedPattern, startSession]);
 
   const handleEndSession = useCallback(() => {
+    // Add logging to verify hold stats
+    console.log('Current hold stats:', holdStats);
+    console.log('Current sets:', sets);
+
     setSets(prev => prev.map(set =>
       set.isActive ? {
         ...set,
@@ -116,9 +120,19 @@ export default function BreathPage() {
         avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
         longestHold: holdStats.longestHold,
         isActive: false,
-        breathTime: elapsedTime, //Adding breathTime to the set
+        breathTime: elapsedTime,
       } : set
     ));
+
+    console.log('Ending session with stats:', {
+      pattern: breathingPatterns[selectedPattern].name,
+      duration: elapsedTime,
+      breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + currentPhase,
+      holdCount: holdStats.holdCount,
+      totalHoldTime: holdStats.totalHoldTime,
+      longestHold: holdStats.longestHold
+    });
+
     endSession();
     setCurrentSetId(prev => prev + 1);
   }, [currentCycle, currentPhase, selectedPattern, holdStats, endSession, elapsedTime]);
