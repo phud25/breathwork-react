@@ -52,16 +52,6 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
 
   return (
     <div className="space-y-6">
-      {/* Calendar View */}
-      <div className="rounded-lg border border-border/50 bg-white/5 p-4">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          className="w-full"
-        />
-      </div>
-
       {/* Weekly Totals */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
@@ -115,6 +105,16 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
           </div>
         </div>
       )}
+
+      {/* Calendar View */}
+      <div className="rounded-lg border border-border/50 bg-white/5 p-4">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          className="w-full"
+        />
+      </div>
     </div>
   );
 }
