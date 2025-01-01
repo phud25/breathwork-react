@@ -164,14 +164,17 @@ export function useBreathing(sequence: number[]) {
     setIsPaused(false);
     setIsHolding(false);
     setCurrentPhase(phase);
+    // Reset timing state
     if (pausedTime && startTime) {
       const pauseDuration = Date.now() - pausedTime.getTime();
       setStartTime(new Date(startTime.getTime() + pauseDuration));
       setPausedTime(null);
     }
+    // Reset animation timing
     lastTickTime.current = 0;
+    // Reset countdown for the new phase
     setCountdown(sequence[phase]);
-  }, [pausedTime, startTime, sequence, currentPhase]);
+  }, [pausedTime, startTime, sequence]);
 
   const startHold = useCallback(() => {
     if (!isActive || isHolding) return;
@@ -187,8 +190,13 @@ export function useBreathing(sequence: number[]) {
     setTotalHoldTime(prev => prev + holdDuration);
     setLongestHold(prev => Math.max(prev, holdDuration));
     setIsHolding(false);
+    // Reset hold timing state
     holdStartTime.current = 0;
-  }, [isHolding]);
+    // Force restart from beginning of inhale phase
+    setCurrentPhase(0);
+    lastTickTime.current = 0;
+    setCountdown(sequence[0]);
+  }, [isHolding, sequence]);
 
   const endSession = useCallback(async () => {
     if (!startTime) return;

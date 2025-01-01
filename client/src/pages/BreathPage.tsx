@@ -33,6 +33,7 @@ interface BreathingSet {
   avgHoldTime: number;
   longestHold: number;
   isActive: boolean;
+  breathTime?: number; // Added breathTime to BreathingSet
 }
 
 const scrollToTabs = () => {
@@ -83,14 +84,14 @@ export default function BreathPage() {
       const currentSet = sets.find(set => set.isActive);
       if (currentSet) {
         setSets(prev => prev.map(set =>
-          set.id === currentSet.id ? { ...set, isActive: false } : set
+          set.id === currentSet.id ? { ...set, isActive: false, breathTime: elapsedTime } : set
         ));
       }
       endSession();
     }
     setSelectedPattern(value);
     setCurrentSetId(prev => prev + 1);
-  }, [isActive, endSession, sets]);
+  }, [isActive, endSession, sets, elapsedTime]);
 
   const handleStartSession = useCallback(() => {
     const newSet: BreathingSet = {
@@ -114,12 +115,13 @@ export default function BreathPage() {
         holdCount: holdStats.holdCount,
         avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
         longestHold: holdStats.longestHold,
-        isActive: false
+        isActive: false,
+        breathTime: elapsedTime, //Adding breathTime to the set
       } : set
     ));
     endSession();
     setCurrentSetId(prev => prev + 1);
-  }, [currentCycle, currentPhase, selectedPattern, holdStats, endSession]);
+  }, [currentCycle, currentPhase, selectedPattern, holdStats, endSession, elapsedTime]);
 
   const handleHoldComplete = (holdDuration: number) => {
     // After a hold completes, always start from inhale phase
@@ -143,12 +145,13 @@ export default function BreathPage() {
     bestHoldTime: holdStats.longestHold
   };
 
-  // Calculate session totals
+  // Calculate session totals with combined breath time from all sets
   const sessionStats = {
     sets,
     totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
     totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0) + currentStats.holdCount,
-    totalBreathTime: elapsedTime,
+    // Add up breath time from all completed sets plus current session time
+    totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + elapsedTime,
     totalHoldTime: holdStats.totalHoldTime
   };
 
