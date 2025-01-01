@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { BreathingGuide } from "@/components/BreathingGuide";
 import { ProgressChart } from "@/components/ProgressChart";
@@ -25,13 +25,24 @@ const breathingPatterns: Record<PatternType, { name: string; sequence: number[] 
   "fire": { name: "Breath of Fire", sequence: [0.5, 0.5] },
 };
 
+interface BreathingSet {
+  id: number;
+  pattern: string;
+  breathCount: number;
+  holdCount: number;
+  avgHoldTime: number;
+  longestHold: number;
+  isActive: boolean;
+}
+
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
-  const [activeTab, setActiveTab] = useState<"session" | "daily">("session");
   const [activeStatsTab, setActiveStatsTab] = useState<"set" | "session" | "daily" | "weekly">("set");
+  const [currentSetId, setCurrentSetId] = useState(1);
+  const [sets, setSets] = useState<BreathingSet[]>([]);
 
   const {
     isActive,
@@ -49,12 +60,56 @@ export default function BreathPage() {
     holdStats
   } = useBreathing(breathingPatterns[selectedPattern].sequence);
 
+  // Reset session when navigating away and back
+  useEffect(() => {
+    return () => {
+      setSets([]);
+      setCurrentSetId(1);
+    };
+  }, []);
+
   const handlePatternChange = useCallback((value: PatternType) => {
     if (isActive) {
+      const currentSet = sets.find(set => set.isActive);
+      if (currentSet) {
+        setSets(prev => prev.map(set => 
+          set.id === currentSet.id ? { ...set, isActive: false } : set
+        ));
+      }
       endSession();
     }
     setSelectedPattern(value);
-  }, [isActive, endSession]);
+    setCurrentSetId(prev => prev + 1);
+  }, [isActive, endSession, sets]);
+
+  const handleStartSession = useCallback(() => {
+    const newSet: BreathingSet = {
+      id: currentSetId,
+      pattern: breathingPatterns[selectedPattern].name,
+      breathCount: 0,
+      holdCount: 0,
+      avgHoldTime: 0,
+      longestHold: 0,
+      isActive: true
+    };
+    setSets(prev => [...prev, newSet]);
+    startSession();
+  }, [currentSetId, selectedPattern, startSession]);
+
+  const handleEndSession = useCallback(() => {
+    setSets(prev => prev.map(set => 
+      set.isActive ? {
+        ...set,
+        breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
+        holdCount: holdStats.holdCount,
+        avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
+        longestHold: holdStats.longestHold,
+        isActive: false
+      } : set
+    ));
+    endSession();
+    setCurrentSetId(prev => prev + 1);
+  }, [currentCycle, currentPhase, selectedPattern, holdStats, endSession]);
 
   const handleHoldComplete = (holdDuration: number) => {
     recordHold(holdDuration);
@@ -68,59 +123,48 @@ export default function BreathPage() {
     setIsSoundEnabled(prev => !prev);
   };
 
-  // Calculate session stats
-  const sessionBreaths = currentCycle * breathingPatterns[selectedPattern].sequence.length +
-    (currentPhase > 0 ? currentPhase : 0);
-  const sessionAvgHold = holdStats.holdCount > 0
-    ? Math.round(holdStats.totalHoldTime / holdStats.holdCount)
-    : 0;
+  // Calculate current stats for the SetStatsTab
+  const currentStats = {
+    breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
+    breathTime: elapsedTime,
+    holdCount: holdStats.holdCount,
+    avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
+    bestHoldTime: holdStats.longestHold
+  };
+
+  // Calculate session totals
+  const sessionStats = {
+    sets,
+    totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
+    totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0) + currentStats.holdCount,
+    totalBreathTime: elapsedTime,
+    totalHoldTime: holdStats.totalHoldTime
+  };
+
 
   // Calculate daily stats including current session
-  const totalBreaths = (stats?.todayStats?.totalBreaths || 0) + sessionBreaths;
+  const totalBreaths = (stats?.todayStats?.totalBreaths || 0) + sessionStats.totalBreaths;
   const totalMinutes = (stats?.todayStats?.totalMinutes || 0) + Math.floor(elapsedTime / 60);
-  const totalHolds = (stats?.todayStats?.totalHolds || 0) + holdStats.holdCount;
+  const totalHolds = (stats?.todayStats?.totalHolds || 0) + sessionStats.totalHoldCount;
   const totalHoldTime = (stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime;
   const dailyAvgHold = totalHolds > 0
     ? Math.round(totalHoldTime / totalHolds)
     : 0;
 
-  // Calculate current stats for the SetStatsTab
-  const currentStats = {
-    breathCount: sessionBreaths,
-    targetBreaths: 0, // TODO: Implement calculation
-    breathTime: elapsedTime,
-    holdCount: holdStats.holdCount,
-    avgHoldTime: sessionAvgHold,
-    bestHoldTime: holdStats.longestHold,
-    consistencyScore: 95, // TODO: Implement calculation
-    flowStateDuration: elapsedTime, // TODO: Implement calculation
-    avgCycleTime: 4.5, // TODO: Implement calculation
-    isOnTarget: true, // TODO: Implement calculation
-  };
-
-  // Session stats for SessionStatsTab
-  const sessionStats = {
-    currentSets: [], // TODO: Implement tracking
-    totalSets: currentCycle + 1,
-    totalBreathTime: elapsedTime,
-    totalHoldTime: holdStats.totalHoldTime,
-    patternsUsed: [breathingPatterns[selectedPattern].name],
-  };
-
   // Stats for DailyStatsTab
   const dailyStats = {
-    totalSessions: stats?.todayStats?.totalSessions || 0,
-    setsPerSession: (stats?.todayStats?.totalSets || 0) / (stats?.todayStats?.totalSessions || 1),
-    breathTime: (stats?.todayStats?.totalMinutes || 0) * 60,
-    holdDuration: stats?.todayStats?.totalHoldTime || 0,
+    totalSessions: stats?.todayStats?.totalSessions || 0 + 1, //add current session
+    setsPerSession: ((stats?.todayStats?.totalSets || 0) + sets.length) / (stats?.todayStats?.totalSessions || 1 +1), //add current session
+    breathTime: (stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime,
+    holdDuration: (stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime,
     mostUsedPattern: "4-7-8 Relaxation", // TODO: Implement tracking
     bestPerformance: {
       pattern: "Box Breathing",
       score: 98,
     },
-    longestSession: (stats?.todayStats?.longestSession || 0) * 60,
+    longestSession: (stats?.todayStats?.longestSession || 0) * 60 + elapsedTime, //add current session
     peakMetrics: {
-      longestHold: stats?.todayStats?.longestHold || 0,
+      longestHold: stats?.todayStats?.longestHold || 0 > holdStats.longestHold ? stats?.todayStats?.longestHold || 0 : holdStats.longestHold,
       highestConsistency: 98,
     },
   };
@@ -128,12 +172,11 @@ export default function BreathPage() {
   // Stats for WeeklyStatsTab
   const weeklyStats = {
     activeDays: stats?.currentStreak || 0,
-    totalSessions: stats?.weeklyStats?.totalSessions || 0,
-    totalBreathTime: (stats?.weeklyStats?.totalMinutes || 0) * 60,
+    totalSessions: stats?.weeklyStats?.totalSessions || 0 + 1, //add current session
+    totalBreathTime: (stats?.weeklyStats?.totalMinutes || 0) * 60 + elapsedTime,
     patternVariety: 4, // TODO: Implement tracking
     dailySummaries: [], // TODO: Implement tracking
   };
-
 
   return (
     <div className={cn(
@@ -162,13 +205,13 @@ export default function BreathPage() {
                     isZenMode={isZenMode}
                     isSoundEnabled={isSoundEnabled}
                     elapsed={elapsedTime}
-                    breathCount={sessionBreaths}
+                    breathCount={currentStats.breathCount}
                     countdown={countdown}
                     sessionCompleted={sessionCompleted}
-                    onStart={startSession}
+                    onStart={handleStartSession}
                     onPause={pauseSession}
                     onResume={resumeSession}
-                    onStop={endSession}
+                    onStop={handleEndSession}
                     onToggleZen={handleToggleZen}
                     onToggleSound={handleToggleSound}
                     onPatternChange={handlePatternChange}
@@ -186,25 +229,25 @@ export default function BreathPage() {
               <CardContent className="p-4 md:p-6">
                 <Tabs defaultValue="set" value={activeStatsTab} onValueChange={(value) => setActiveStatsTab(value as typeof activeStatsTab)}>
                   <TabsList className="grid w-full grid-cols-4 mb-6">
-                    <TabsTrigger 
-                      value="set" 
+                    <TabsTrigger
+                      value="set"
                       className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
                       Set
                     </TabsTrigger>
-                    <TabsTrigger 
+                    <TabsTrigger
                       value="session"
                       className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
                       Session
                     </TabsTrigger>
-                    <TabsTrigger 
+                    <TabsTrigger
                       value="daily"
                       className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
                       Daily
                     </TabsTrigger>
-                    <TabsTrigger 
+                    <TabsTrigger
                       value="weekly"
                       className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
@@ -259,13 +302,13 @@ export default function BreathPage() {
                 isZenMode={isZenMode}
                 isSoundEnabled={isSoundEnabled}
                 elapsed={elapsedTime}
-                breathCount={sessionBreaths}
+                breathCount={currentStats.breathCount}
                 countdown={countdown}
                 sessionCompleted={sessionCompleted}
-                onStart={startSession}
+                onStart={handleStartSession}
                 onPause={pauseSession}
                 onResume={resumeSession}
-                onStop={endSession}
+                onStop={handleEndSession}
                 onToggleZen={handleToggleZen}
                 onToggleSound={handleToggleSound}
                 onPatternChange={handlePatternChange}
