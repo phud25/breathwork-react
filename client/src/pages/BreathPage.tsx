@@ -72,7 +72,7 @@ export default function BreathPage() {
     if (isActive) {
       const currentSet = sets.find(set => set.isActive);
       if (currentSet) {
-        setSets(prev => prev.map(set =>
+        setSets(prev => prev.map(set => 
           set.id === currentSet.id ? { ...set, isActive: false } : set
         ));
       }
@@ -97,7 +97,7 @@ export default function BreathPage() {
   }, [currentSetId, selectedPattern, startSession]);
 
   const handleEndSession = useCallback(() => {
-    setSets(prev => prev.map(set =>
+    setSets(prev => prev.map(set => 
       set.isActive ? {
         ...set,
         breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
@@ -154,7 +154,7 @@ export default function BreathPage() {
   // Stats for DailyStatsTab
   const dailyStats = {
     totalSessions: stats?.todayStats?.totalSessions || 0 + 1, //add current session
-    setsPerSession: ((stats?.todayStats?.totalSets || 0) + sets.length) / (stats?.todayStats?.totalSessions || 1 + 1), //add current session
+    setsPerSession: ((stats?.todayStats?.totalSets || 0) + sets.length) / (stats?.todayStats?.totalSessions || 1 +1), //add current session
     breathTime: (stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime,
     holdDuration: (stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime,
     mostUsedPattern: "4-7-8 Relaxation", // TODO: Implement tracking
@@ -195,7 +195,7 @@ export default function BreathPage() {
         )}>
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
-              <Card className="session-container bg-gradient-to-br from-purple-600/30 to-purple-800/20 backdrop-blur-sm shadow-lg shadow-purple-900/20 border-purple-500/30 -mt-[5px]">
+              <Card className="session-container bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20 -mt-[5px]">
                 <CardContent className="p-4 md:p-6">
                   <BreathingGuide
                     pattern={breathingPatterns[selectedPattern]}
@@ -222,23 +222,12 @@ export default function BreathPage() {
             </ErrorBoundary>
 
             <Card className={cn(
-              "bg-gradient-to-br from-purple-600/20 to-purple-800/15 hover:from-purple-600/30 hover:to-purple-800/25 backdrop-blur-sm shadow-inner border-purple-500/30",
+              "bg-gradient-to-br from-purple-600/10 to-purple-800/5 backdrop-blur-sm shadow-inner border-purple-500/20",
               "non-essential transition-opacity duration-300",
               isZenMode && "opacity-0 pointer-events-none"
             )}>
               <CardContent className="p-4 md:p-6">
-                <Tabs
-                  defaultValue="set"
-                  value={activeStatsTab}
-                  onValueChange={(value) => {
-                    setActiveStatsTab(value as typeof activeStatsTab);
-                    // Add smooth scroll to tabs
-                    const element = document.querySelector('[role="tablist"]');
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
-                >
+                <Tabs defaultValue="set" value={activeStatsTab} onValueChange={(value) => setActiveStatsTab(value as typeof activeStatsTab)}>
                   <TabsList className="grid w-full grid-cols-4 mb-6">
                     <TabsTrigger
                       value="set"
