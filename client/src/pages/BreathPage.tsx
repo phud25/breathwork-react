@@ -132,13 +132,13 @@ export default function BreathPage() {
                   <TabsList className="grid w-full grid-cols-2 mb-6">
                     <TabsTrigger 
                       value="session" 
-                      className="data-[state=active]:bg-[#050505]"
+                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
                       Session Tracker
                     </TabsTrigger>
                     <TabsTrigger 
                       value="daily"
-                      className="data-[state=active]:bg-[#050505]"
+                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
                       Daily Tracker
                     </TabsTrigger>
