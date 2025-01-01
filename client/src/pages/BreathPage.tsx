@@ -8,8 +8,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 import { useBreathing } from "@/hooks/use-breathing";
 import { useSessionStats } from "@/hooks/use-sessions";
-import { Button } from "@/components/ui/button";
-import { Loader2, Play, Pause, Square, Maximize, Volume2, VolumeX, Hand } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { SetStatsTab } from "@/components/stats/SetStatsTab";
 import { SessionStatsTab } from "@/components/stats/SessionStatsTab";
 import { DailyStatsTab } from "@/components/stats/DailyStatsTab";
@@ -227,61 +226,6 @@ export default function BreathPage() {
                     onPatternChange={handlePatternChange}
                     onHoldComplete={handleHoldComplete}
                   />
-                  <div className="flex space-x-2 mt-4">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleToggleSound}
-                      className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all"
-                    >
-                      {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-                    </Button>
-                    {isActive && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={isHolding ? endHold : startHold}
-                          className={cn(
-                            "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all",
-                            isHolding && "ring-2 ring-purple-500 ring-opacity-50"
-                          )}
-                        >
-                          <Hand className="h-4 w-4" />
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={isPaused ? resumeSession : pauseSession}
-                          className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all"
-                          disabled={isHolding}
-                        >
-                          {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-                        </Button>
-
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={handleEndSession}
-                          className="h-[48px] control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all"
-                        >
-                          <Square className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleToggleZen}
-                      className={cn(
-                        "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all",
-                        isZenMode ? "opacity-50 hover:opacity-100" : ""
-                      )}
-                    >
-                      <Maximize className="h-4 w-4" />
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
             </ErrorBoundary>
