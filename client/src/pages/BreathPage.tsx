@@ -122,7 +122,8 @@ export default function BreathPage() {
   }, [currentCycle, currentPhase, selectedPattern, holdStats, endSession]);
 
   const handleHoldComplete = (holdDuration: number) => {
-    recordHold(holdDuration);
+    // After a hold completes, always start from inhale phase
+    resumeSession(0);
   };
 
   const handleToggleZen = () => {

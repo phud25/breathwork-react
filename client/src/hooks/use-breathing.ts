@@ -4,6 +4,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 export function useBreathing(sequence: number[]) {
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
   const [currentPhase, setCurrentPhase] = useState(0);
   const [currentCycle, setCurrentCycle] = useState(0);
   const [startTime, setStartTime] = useState<Date | null>(null);
@@ -20,6 +21,7 @@ export function useBreathing(sequence: number[]) {
   // Refs for timing precision
   const lastTickTime = useRef<number>(0);
   const animationFrameId = useRef<number>();
+  const holdStartTime = useRef<number>(0);
 
   const queryClient = useQueryClient();
 
@@ -69,8 +71,7 @@ export function useBreathing(sequence: number[]) {
   }, [currentCycle, currentPhase, elapsedTime, targetBreaths, targetDuration, isActive]);
 
   const progressSequence = useCallback(() => {
-    if (!isActive || isPaused) return;
-    console.log('Progressing sequence:', { currentPhase, currentCycle });
+    if (!isActive || isPaused || isHolding) return;
 
     setCurrentPhase((prev) => {
       if (prev === sequence.length - 1) {
@@ -82,12 +83,12 @@ export function useBreathing(sequence: number[]) {
 
     // Set the countdown for the next phase
     setCountdown(sequence[currentPhase]);
-  }, [isActive, isPaused, sequence.length, currentPhase, sequence]);
+  }, [isActive, isPaused, isHolding, sequence.length, currentPhase, sequence]);
 
   // High precision timer using requestAnimationFrame
   useEffect(() => {
     const updateTimer = () => {
-      if (!isActive || isPaused) return;
+      if (!isActive || isPaused || isHolding) return;
 
       const now = performance.now();
       if (!lastTickTime.current) {
@@ -109,7 +110,7 @@ export function useBreathing(sequence: number[]) {
       animationFrameId.current = requestAnimationFrame(updateTimer);
     };
 
-    if (isActive && !isPaused) {
+    if (isActive && !isPaused && !isHolding) {
       animationFrameId.current = requestAnimationFrame(updateTimer);
     }
 
@@ -118,7 +119,7 @@ export function useBreathing(sequence: number[]) {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [isActive, isPaused, currentPhase, sequence, progressSequence]);
+  }, [isActive, isPaused, isHolding, currentPhase, sequence, progressSequence]);
 
   // Update elapsed time
   useEffect(() => {
@@ -137,9 +138,9 @@ export function useBreathing(sequence: number[]) {
   }, [isActive, isPaused, startTime, pausedTime]);
 
   const startSession = useCallback(() => {
-    console.log('Starting session');
     setIsActive(true);
     setIsPaused(false);
+    setIsHolding(false);
     setCurrentPhase(0);
     setCurrentCycle(0);
     setStartTime(new Date());
@@ -151,58 +152,82 @@ export function useBreathing(sequence: number[]) {
     setTotalHoldTime(0);
     setLongestHold(0);
     lastTickTime.current = 0;
+    holdStartTime.current = 0;
   }, [sequence]);
 
   const pauseSession = useCallback(() => {
-    console.log('Pausing session');
     setIsPaused(true);
     setPausedTime(new Date());
   }, []);
 
-  const resumeSession = useCallback(() => {
-    console.log('Resuming session');
+  const resumeSession = useCallback((phase: number = currentPhase) => {
     setIsPaused(false);
+    setIsHolding(false);
+    setCurrentPhase(phase);
     if (pausedTime && startTime) {
       const pauseDuration = Date.now() - pausedTime.getTime();
       setStartTime(new Date(startTime.getTime() + pauseDuration));
       setPausedTime(null);
     }
     lastTickTime.current = 0;
-  }, [pausedTime, startTime]);
+    setCountdown(sequence[phase]);
+  }, [pausedTime, startTime, sequence, currentPhase]);
 
-  const recordHold = useCallback((holdDuration: number) => {
+  const startHold = useCallback(() => {
+    if (!isActive || isHolding) return;
+    setIsHolding(true);
+    setIsPaused(true);
+    holdStartTime.current = Date.now();
+  }, [isActive, isHolding]);
+
+  const endHold = useCallback(() => {
+    if (!isHolding) return;
+    const holdDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
     setHoldCount(prev => prev + 1);
     setTotalHoldTime(prev => prev + holdDuration);
     setLongestHold(prev => Math.max(prev, holdDuration));
-  }, []);
+    setIsHolding(false);
+    holdStartTime.current = 0;
+  }, [isHolding]);
 
   const endSession = useCallback(async () => {
-    console.log('Ending session');
     if (!startTime) return;
+
+    // If we're holding when ending, record the hold
+    if (isHolding) {
+      endHold();
+    }
 
     setIsActive(false);
     setIsPaused(false);
+    setIsHolding(false);
     const duration = Math.round((Date.now() - startTime.getTime()) / 1000);
 
-    await sessionMutation.mutateAsync({
-      pattern: sequence.join("-"),
-      duration,
-      breathCount: currentCycle * sequence.length + currentPhase,
-      holdCount,
-      totalHoldTime,
-      longestHold
-    });
+    try {
+      await sessionMutation.mutateAsync({
+        pattern: sequence.join("-"),
+        duration,
+        breathCount: currentCycle * sequence.length + currentPhase,
+        holdCount,
+        totalHoldTime,
+        longestHold
+      });
+    } catch (error) {
+      console.error('Failed to save session:', error);
+    }
 
     setStartTime(null);
     setPausedTime(null);
     setElapsedTime(0);
     setCountdown(0);
     lastTickTime.current = 0;
-  }, [startTime, currentCycle, currentPhase, sequence, sessionMutation, holdCount, totalHoldTime, longestHold]);
+    holdStartTime.current = 0;
+  }, [startTime, currentCycle, currentPhase, sequence, sessionMutation, holdCount, totalHoldTime, longestHold, isHolding, endHold]);
 
   return {
     isActive,
     isPaused,
+    isHolding,
     currentPhase,
     currentCycle,
     elapsedTime,
@@ -212,9 +237,11 @@ export function useBreathing(sequence: number[]) {
     pauseSession,
     resumeSession,
     endSession,
+    startHold,
+    endHold,
     setTargetBreaths,
     setTargetDuration,
-    recordHold,
+    recordHold: endHold,
     holdStats: {
       holdCount,
       totalHoldTime,
