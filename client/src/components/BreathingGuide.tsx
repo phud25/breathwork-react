@@ -142,7 +142,8 @@ export function BreathingGuide({
     }
     setIsHolding(false);
     setHoldTime(0);
-    onResume();
+    // Reset to beginning of inhale phase
+    onResume(0); // Pass 0 to indicate we want to start from inhale phase
   };
 
   const handleBreathCountChange = (value: string) => {
@@ -471,7 +472,7 @@ interface BreathingGuideProps {
   sessionCompleted?: boolean;
   onStart: () => void;
   onPause: () => void;
-  onResume: () => void;
+  onResume: (phase:number) => void; //Modified to accept phase
   onStop: () => void;
   onToggleZen: () => void;
   onToggleSound: () => void;

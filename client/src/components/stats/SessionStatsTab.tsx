@@ -55,59 +55,60 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
   // First, find the active set if it exists
   const activeSet = sessionStats.sets.find(set => set.isActive);
 
-  // Then get the remaining sets and sort them in ascending order by ID
+  // Then get the remaining sets and sort them in descending order by ID
   const remainingSets = sessionStats.sets
     .filter(set => !set.isActive)
-    .sort((a, b) => a.id - b.id);
+    .sort((a, b) => b.id - a.id);
 
   // Combine active set (if exists) with sorted remaining sets
   const sortedSets = activeSet 
     ? [activeSet, ...remainingSets]
     : remainingSets;
 
-  // Calculate total breath time including current session
-  const totalBreathTime = sessionStats.totalBreathTime;
-
   return (
     <div className="space-y-6">
       {/* Live Set Display */}
       <ScrollArea className="h-[200px] rounded-lg border border-border/50 bg-white/5">
         <div className="p-4 space-y-4">
-          {sortedSets.map((set) => (
-            <div
-              key={set.id}
-              className={`p-3 rounded-lg bg-white/5 backdrop-blur-sm space-y-2 ${
-                set.isActive ? 'ring-1 ring-primary/30' : ''
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Set {set.id} - {set.pattern}</span>
-                {set.isActive && (
-                  <span className="text-xs text-primary-foreground/70 animate-pulse">
-                    Active
-                  </span>
-                )}
+          {sortedSets.map((set, index) => {
+            // Calculate the set number based on the total number of sets
+            const setNumber = sortedSets.length - index;
+            return (
+              <div
+                key={set.id}
+                className={`p-3 rounded-lg bg-white/5 backdrop-blur-sm space-y-2 ${
+                  set.isActive ? 'ring-1 ring-primary/30' : ''
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Set {setNumber} - {set.pattern}</span>
+                  {set.isActive && (
+                    <span className="text-xs text-primary-foreground/70 animate-pulse">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-4 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Breaths: </span>
+                    <span>{set.breathCount}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Holds: </span>
+                    <span>{set.holdCount}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Avg: </span>
+                    <span>{formatHoldTime(set.avgHoldTime)}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Best: </span>
+                    <span>{formatHoldTime(set.longestHold)}</span>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-4 gap-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Breaths: </span>
-                  <span>{set.breathCount}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Holds: </span>
-                  <span>{set.holdCount}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Avg: </span>
-                  <span>{formatHoldTime(set.avgHoldTime)}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Best: </span>
-                  <span>{formatHoldTime(set.longestHold)}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </ScrollArea>
 
@@ -127,7 +128,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Total Breath Time</p>
           <p className="text-2xl font-bold tracking-tight">
-            {formatTime(totalBreathTime)}
+            {formatTime(sessionStats.totalBreathTime)}
           </p>
         </div>
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">

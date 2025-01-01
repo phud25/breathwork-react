@@ -77,7 +77,7 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
         </div>
       </div>
 
-      {/* Calendar View */}
+      {/* Calendar View moved to bottom */}
       <div className="rounded-lg border border-border/50 bg-white/5 p-4">
         <Calendar
           mode="single"
