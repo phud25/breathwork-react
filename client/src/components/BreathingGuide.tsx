@@ -143,8 +143,8 @@ export function BreathingGuide({
     setIsHolding(false);
     setHoldTime(0);
 
-    // Force animation reset to smallest circle size when ending hold
-    const phase = 0; // Start at inhale phase
+    // Force animation reset to smallest circle size
+    const phase = 0;
     onResume(phase);
   };
 
@@ -213,7 +213,8 @@ export function BreathingGuide({
           scale: 1,
           transition: {
             duration: phaseDuration,
-            ease: "easeInOut"
+            ease: "easeInOut",
+            immediateRender: true
           }
         }
       };

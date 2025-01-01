@@ -61,7 +61,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
     .sort((a, b) => b.id - a.id);
 
   // Combine active set (if exists) with sorted remaining sets
-  const sortedSets = activeSet 
+  const sortedSets = activeSet
     ? [activeSet, ...remainingSets]
     : remainingSets;
 
@@ -113,17 +113,6 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
       </ScrollArea>
 
       {/* Session Summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Total Breaths</p>
-          <p className="text-2xl font-bold tracking-tight">{sessionStats.totalBreaths}</p>
-        </div>
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Total Holds</p>
-          <p className="text-2xl font-bold tracking-tight">{sessionStats.totalHoldCount}</p>
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Total Breath Time</p>
