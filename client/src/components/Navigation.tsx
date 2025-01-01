@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 import { useUser } from "@/hooks/use-user";
 
 const navItems = [
@@ -30,9 +30,13 @@ export function Navigation() {
     <header className="sticky top-0 z-50 w-full">
       <div className="container px-4 mx-auto">
         <nav className="h-[80px] flex items-center justify-between">
-          <span className="text-xl font-semibold text-[rgb(167,139,250)] truncate">
+          <Button
+            variant="ghost"
+            className="text-xl font-semibold text-[rgb(167,139,250)] truncate p-0 hover:bg-transparent"
+            onClick={() => window.location.href = '/'}
+          >
             {getHeaderText(location)}
-          </span>
+          </Button>
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>

@@ -96,7 +96,7 @@ export default function BreathPage() {
         )}>
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
-              <Card className="session-container bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
+              <Card className="session-container bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20 -mt-[5px]">
                 <CardContent className="p-4 md:p-6">
                   <BreathingGuide
                     pattern={breathingPatterns[selectedPattern]}

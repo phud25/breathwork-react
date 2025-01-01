@@ -27,7 +27,7 @@ export default function ProfilePage() {
       <main className="min-h-screen pt-[30px] px-4 pb-8 bg-background">
         <div className="container max-w-4xl mx-auto space-y-6">
           {/* User Info Section */}
-          <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20">
+          <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20 -mt-[5px]">
             <CardHeader>
               <CardTitle>Profile</CardTitle>
             </CardHeader>
