@@ -351,8 +351,13 @@ export function BreathingGuide({
             {isActive ? (
               <div className="text-center pointer-events-none select-none">
                 {isHolding ? (
-                  <div className="text-xl font-mono text-[#F5F5DC] font-bold">
-                    {formatHoldTime(holdTime)}
+                  <div className="flex flex-col items-center">
+                    <div className="text-xl font-mono text-[#F5F5DC] font-bold">
+                      {formatHoldTime(holdTime)}
+                    </div>
+                    <div className="text-xs text-[#F5F5DC] font-semibold mt-1">
+                      Hold
+                    </div>
                   </div>
                 ) : (
                   <>

@@ -153,8 +153,18 @@ export default function BreathPage() {
     totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0) + holdStats.holdCount,
     totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + elapsedTime,
     // Update total hold time to include both completed sets and current stats
-    totalHoldTime: sets.reduce((total, set) => total + (set.avgHoldTime * set.holdCount), 0) + holdStats.totalHoldTime
+    totalHoldTime: sets.reduce((total, set) => total + (set.holdCount * set.avgHoldTime), 0) + holdStats.totalHoldTime,
+    avgHoldTime: 0,
+    longestHold: Math.max(
+      ...sets.map(set => set.longestHold),
+      holdStats.longestHold
+    )
   };
+
+  // Calculate average hold time for the entire session
+  if (sessionStats.totalHoldCount > 0) {
+    sessionStats.avgHoldTime = Math.round(sessionStats.totalHoldTime / sessionStats.totalHoldCount);
+  }
 
   // Calculate daily stats including current session
   const totalBreaths = (stats?.totalBreaths || 0) + sessionStats.totalBreaths;
