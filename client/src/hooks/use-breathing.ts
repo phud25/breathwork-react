@@ -171,7 +171,7 @@ export function useBreathing(sequence: number[]) {
       setPausedTime(null);
     }
     // Reset animation timing
-    lastTickTime.current = 0;
+    lastTickTime.current = performance.now();
     // Reset countdown for the new phase
     setCountdown(sequence[phase]);
   }, [pausedTime, startTime, sequence]);
@@ -194,8 +194,9 @@ export function useBreathing(sequence: number[]) {
     holdStartTime.current = 0;
     // Force restart from beginning of inhale phase
     setCurrentPhase(0);
-    lastTickTime.current = 0;
+    lastTickTime.current = performance.now();
     setCountdown(sequence[0]);
+    setIsPaused(false);
   }, [isHolding, sequence]);
 
   const endSession = useCallback(async () => {

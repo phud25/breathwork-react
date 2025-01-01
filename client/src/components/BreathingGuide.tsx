@@ -142,10 +142,6 @@ export function BreathingGuide({
     }
     setIsHolding(false);
     setHoldTime(0);
-
-    // Force animation reset to smallest circle size
-    const phase = 0;
-    onResume(phase);
   };
 
   // Stop button handler that considers hold state
@@ -334,38 +330,21 @@ export function BreathingGuide({
               phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors],
               isHolding && "animate-pulse"
             )}
-            {...(isHolding ? {} : getPhaseAnimation())}
+            {...getPhaseAnimation()}
           />
-
-          {/* Add completion message */}
-          <AnimatePresence>
-            {sessionCompleted && !isActive && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-center whitespace-nowrap"
-              >
-                <motion.div
-                  className="px-4 py-2 rounded bg-black/50 text-white"
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  Session complete! Well done.<br />
-                  Click Start to go again...
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           <div
             className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform cursor-pointer hover:scale-105 animate-pulse"
             onClick={(e) => {
               e.stopPropagation();
-              if (isActive && !isHolding) {
-                isPaused ? onResume() : onPause();
+              if (isActive) {
+                if (isHolding) {
+                  endHold();
+                } else if (!isPaused) {
+                  onPause();
+                } else {
+                  onResume(0);
+                }
               }
             }}
           >
@@ -398,6 +377,27 @@ export function BreathingGuide({
               </Button>
             )}
           </div>
+          <AnimatePresence>
+            {sessionCompleted && !isActive && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-center whitespace-nowrap"
+              >
+                <motion.div
+                  className="px-4 py-2 rounded bg-black/50 text-white"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Session complete! Well done.<br />
+                  Click Start to go again...
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
