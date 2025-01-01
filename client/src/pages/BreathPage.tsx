@@ -8,7 +8,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 import { useBreathing } from "@/hooks/use-breathing";
 import { useSessionStats } from "@/hooks/use-sessions";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Play, Pause, Square, Maximize, Volume2, VolumeX, Hand } from "lucide-react";
 import { SetStatsTab } from "@/components/stats/SetStatsTab";
 import { SessionStatsTab } from "@/components/stats/SessionStatsTab";
 import { DailyStatsTab } from "@/components/stats/DailyStatsTab";
@@ -35,6 +36,13 @@ interface BreathingSet {
   isActive: boolean;
 }
 
+const scrollToTabs = () => {
+  const tabsElement = document.querySelector('.tabs-container');
+  if (tabsElement) {
+    tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
   const [isZenMode, setIsZenMode] = useState(false);
@@ -57,7 +65,10 @@ export default function BreathPage() {
     resumeSession,
     endSession,
     recordHold,
-    holdStats
+    holdStats,
+    isHolding,
+    startHold,
+    endHold,
   } = useBreathing(breathingPatterns[selectedPattern].sequence);
 
   // Reset session when navigating away and back
@@ -72,7 +83,7 @@ export default function BreathPage() {
     if (isActive) {
       const currentSet = sets.find(set => set.isActive);
       if (currentSet) {
-        setSets(prev => prev.map(set => 
+        setSets(prev => prev.map(set =>
           set.id === currentSet.id ? { ...set, isActive: false } : set
         ));
       }
@@ -97,7 +108,7 @@ export default function BreathPage() {
   }, [currentSetId, selectedPattern, startSession]);
 
   const handleEndSession = useCallback(() => {
-    setSets(prev => prev.map(set => 
+    setSets(prev => prev.map(set =>
       set.isActive ? {
         ...set,
         breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
@@ -141,30 +152,29 @@ export default function BreathPage() {
     totalHoldTime: holdStats.totalHoldTime
   };
 
-
   // Calculate daily stats including current session
-  const totalBreaths = (stats?.todayStats?.totalBreaths || 0) + sessionStats.totalBreaths;
-  const totalMinutes = (stats?.todayStats?.totalMinutes || 0) + Math.floor(elapsedTime / 60);
-  const totalHolds = (stats?.todayStats?.totalHolds || 0) + sessionStats.totalHoldCount;
-  const totalHoldTime = (stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime;
+  const totalBreaths = (stats?.totalBreaths || 0) + sessionStats.totalBreaths;
+  const totalMinutes = (stats?.totalMinutes || 0) + Math.floor(elapsedTime / 60);
+  const totalHolds = (stats?.totalHolds || 0) + sessionStats.totalHoldCount;
+  const totalHoldTime = (stats?.totalHoldTime || 0) + holdStats.totalHoldTime;
   const dailyAvgHold = totalHolds > 0
     ? Math.round(totalHoldTime / totalHolds)
     : 0;
 
   // Stats for DailyStatsTab
   const dailyStats = {
-    totalSessions: stats?.todayStats?.totalSessions || 0 + 1, //add current session
-    setsPerSession: ((stats?.todayStats?.totalSets || 0) + sets.length) / (stats?.todayStats?.totalSessions || 1 +1), //add current session
-    breathTime: (stats?.todayStats?.totalMinutes || 0) * 60 + elapsedTime,
-    holdDuration: (stats?.todayStats?.totalHoldTime || 0) + holdStats.totalHoldTime,
-    mostUsedPattern: "4-7-8 Relaxation", // TODO: Implement tracking
+    totalSessions: (stats?.totalSessions || 0) + 1,
+    setsPerSession: ((stats?.totalSets || 0) + sets.length) / ((stats?.totalSessions || 0) + 1),
+    breathTime: (stats?.totalMinutes || 0) * 60 + elapsedTime,
+    holdDuration: (stats?.totalHoldTime || 0) + holdStats.totalHoldTime,
+    mostUsedPattern: "4-7-8 Relaxation",
     bestPerformance: {
       pattern: "Box Breathing",
       score: 98,
     },
-    longestSession: (stats?.todayStats?.longestSession || 0) * 60 + elapsedTime, //add current session
+    longestSession: Math.max((stats?.longestSession || 0), elapsedTime),
     peakMetrics: {
-      longestHold: stats?.todayStats?.longestHold || 0 > holdStats.longestHold ? stats?.todayStats?.longestHold || 0 : holdStats.longestHold,
+      longestHold: Math.max(stats?.longestHold || 0, holdStats.longestHold),
       highestConsistency: 98,
     },
   };
@@ -172,10 +182,10 @@ export default function BreathPage() {
   // Stats for WeeklyStatsTab
   const weeklyStats = {
     activeDays: stats?.currentStreak || 0,
-    totalSessions: stats?.weeklyStats?.totalSessions || 0 + 1, //add current session
-    totalBreathTime: (stats?.weeklyStats?.totalMinutes || 0) * 60 + elapsedTime,
-    patternVariety: 4, // TODO: Implement tracking
-    dailySummaries: [], // TODO: Implement tracking
+    totalSessions: (stats?.totalSessions || 0) + 1,
+    totalBreathTime: (stats?.totalMinutes || 0) * 60 + elapsedTime,
+    patternVariety: 4,
+    dailySummaries: [],
   };
 
   return (
@@ -217,6 +227,61 @@ export default function BreathPage() {
                     onPatternChange={handlePatternChange}
                     onHoldComplete={handleHoldComplete}
                   />
+                  <div className="flex space-x-2 mt-4">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleToggleSound}
+                      className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20"
+                    >
+                      {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                    </Button>
+                    {isActive && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={isHolding ? endHold : startHold}
+                          className={cn(
+                            "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20",
+                            isHolding && "ring-2 ring-purple-500 ring-opacity-50"
+                          )}
+                        >
+                          <Hand className="h-4 w-4" />
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={isPaused ? resumeSession : pauseSession}
+                          className="h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20"
+                          disabled={isHolding}
+                        >
+                          {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                        </Button>
+
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={handleEndSession}
+                          className="h-[48px] control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20"
+                        >
+                          <Square className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleToggleZen}
+                      className={cn(
+                        "h-[48px] hover:bg-transparent control-icon bg-white/15 backdrop-blur-sm hover:bg-white/25 transition-all hover:shadow-lg hover:shadow-white/20",
+                        isZenMode ? "opacity-50 hover:opacity-100" : ""
+                      )}
+                    >
+                      <Maximize className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </ErrorBoundary>
@@ -227,7 +292,10 @@ export default function BreathPage() {
               isZenMode && "opacity-0 pointer-events-none"
             )}>
               <CardContent className="p-4 md:p-6">
-                <Tabs defaultValue="set" value={activeStatsTab} onValueChange={(value) => setActiveStatsTab(value as typeof activeStatsTab)}>
+                <Tabs defaultValue="set" value={activeStatsTab} onValueChange={(value) => {
+                  setActiveStatsTab(value as typeof activeStatsTab);
+                  scrollToTabs();
+                }} className="tabs-container">
                   <TabsList className="grid w-full grid-cols-4 mb-6">
                     <TabsTrigger
                       value="set"
