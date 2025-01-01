@@ -24,6 +24,17 @@ interface WeeklyStatsTabProps {
   isLoading?: boolean;
 }
 
+const formatTime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+
 export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
@@ -41,6 +52,39 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
 
   return (
     <div className="space-y-6">
+      {/* Weekly Chart */}
+      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+        {/* TODO: Implement weekly chart visualization */}
+        <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+          Weekly Progress Chart Coming Soon
+        </div>
+      </div>
+
+      {/* Weekly Totals */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground font-medium">Active Days</p>
+          <p className="text-2xl font-bold tracking-tight">{weeklyStats.activeDays}</p>
+        </div>
+        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground font-medium">Sessions</p>
+          <p className="text-2xl font-bold tracking-tight">{weeklyStats.totalSessions}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
+          <p className="text-2xl font-bold tracking-tight">
+            {formatTime(weeklyStats.totalBreathTime)}
+          </p>
+        </div>
+        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground font-medium">Patterns</p>
+          <p className="text-2xl font-bold tracking-tight">{weeklyStats.patternVariety}</p>
+        </div>
+      </div>
+
       {/* Calendar View */}
       <div className="rounded-lg border border-border/50 bg-white/5 p-4">
         <Calendar
@@ -68,10 +112,7 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
             </div>
             <div>
               <p className="text-muted-foreground">Breath Time</p>
-              <p className="font-medium">
-                {Math.floor(selectedSummary.breathTime / 60)}:
-                {(selectedSummary.breathTime % 60).toString().padStart(2, '0')}
-              </p>
+              <p className="font-medium">{formatTime(selectedSummary.breathTime)}</p>
             </div>
           </div>
           <div>
@@ -82,32 +123,6 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
           </div>
         </div>
       )}
-
-      {/* Weekly Totals */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Active Days</p>
-          <p className="text-2xl font-bold tracking-tight">{weeklyStats.activeDays}</p>
-        </div>
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Sessions</p>
-          <p className="text-2xl font-bold tracking-tight">{weeklyStats.totalSessions}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
-          <p className="text-2xl font-bold tracking-tight">
-            {Math.floor(weeklyStats.totalBreathTime / 60)}:
-            {(weeklyStats.totalBreathTime % 60).toString().padStart(2, '0')}
-          </p>
-        </div>
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Patterns</p>
-          <p className="text-2xl font-bold tracking-tight">{weeklyStats.patternVariety}</p>
-        </div>
-      </div>
     </div>
   );
 }

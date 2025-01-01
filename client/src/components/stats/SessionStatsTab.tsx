@@ -45,15 +45,24 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
     );
   }
 
+  // Sort sets to show active set first, then by descending ID
+  const sortedSets = [...sessionStats.sets].sort((a, b) => {
+    if (a.isActive && !b.isActive) return -1;
+    if (!a.isActive && b.isActive) return 1;
+    return b.id - a.id;
+  });
+
   return (
     <div className="space-y-6">
       {/* Live Set Display */}
       <ScrollArea className="h-[200px] rounded-lg border border-border/50 bg-white/5">
         <div className="p-4 space-y-4">
-          {sessionStats.sets.map((set) => (
+          {sortedSets.map((set) => (
             <div
               key={set.id}
-              className="p-3 rounded-lg bg-white/5 backdrop-blur-sm space-y-2"
+              className={`p-3 rounded-lg bg-white/5 backdrop-blur-sm space-y-2 ${
+                set.isActive ? 'ring-1 ring-primary/30' : ''
+              }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Set {set.id} - {set.pattern}</span>
@@ -106,9 +115,9 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
           </p>
         </div>
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Hold Time</p>
+          <p className="text-sm text-muted-foreground font-medium">Avg Hold Time</p>
           <p className="text-2xl font-bold tracking-tight">
-            {formatTime(sessionStats.totalHoldTime)}
+            {formatTime(sessionStats.totalHoldTime / (sessionStats.totalHoldCount || 1))}
           </p>
         </div>
       </div>
