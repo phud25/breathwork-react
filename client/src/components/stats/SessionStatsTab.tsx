@@ -20,6 +20,12 @@ interface SessionStats {
   totalHoldTime: number;
 }
 
+const formatHoldTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+
 const formatTime = (seconds: number) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -83,11 +89,11 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
                 </div>
                 <div>
                   <span className="text-muted-foreground">Avg: </span>
-                  <span>{formatTime(set.avgHoldTime)}</span>
+                  <span>{formatHoldTime(set.avgHoldTime)}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Best: </span>
-                  <span>{formatTime(set.longestHold)}</span>
+                  <span>{formatHoldTime(set.longestHold)}</span>
                 </div>
               </div>
             </div>
@@ -109,7 +115,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
 
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
+          <p className="text-sm text-muted-foreground font-medium">Total Breath Time</p>
           <p className="text-2xl font-bold tracking-tight">
             {formatTime(sessionStats.totalBreathTime)}
           </p>
@@ -117,7 +123,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Avg Hold Time</p>
           <p className="text-2xl font-bold tracking-tight">
-            {formatTime(sessionStats.totalHoldTime / (sessionStats.totalHoldCount || 1))}
+            {formatHoldTime(sessionStats.totalHoldTime / (sessionStats.totalHoldCount || 1))}
           </p>
         </div>
       </div>

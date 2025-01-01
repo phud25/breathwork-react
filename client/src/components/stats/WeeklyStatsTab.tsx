@@ -52,12 +52,14 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
 
   return (
     <div className="space-y-6">
-      {/* Weekly Chart */}
-      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-        {/* TODO: Implement weekly chart visualization */}
-        <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-          Weekly Progress Chart Coming Soon
-        </div>
+      {/* Calendar View */}
+      <div className="rounded-lg border border-border/50 bg-white/5 p-4">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          className="w-full"
+        />
       </div>
 
       {/* Weekly Totals */}
@@ -83,16 +85,6 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
           <p className="text-sm text-muted-foreground font-medium">Patterns</p>
           <p className="text-2xl font-bold tracking-tight">{weeklyStats.patternVariety}</p>
         </div>
-      </div>
-
-      {/* Calendar View */}
-      <div className="rounded-lg border border-border/50 bg-white/5 p-4">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          className="w-full"
-        />
       </div>
 
       {/* Selected Day Summary */}
