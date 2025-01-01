@@ -13,7 +13,7 @@ const navItems = [
 ];
 
 export function Navigation() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { logout } = useUser();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,8 +32,8 @@ export function Navigation() {
         <nav className="h-[80px] flex items-center justify-between">
           <Button
             variant="ghost"
-            className="text-xl font-semibold text-[rgb(167,139,250)] truncate p-0 hover:bg-transparent"
-            onClick={() => window.location.href = '/'}
+            className="text-xl font-semibold text-[rgb(167,139,250)] truncate p-0 hover:bg-transparent hover:text-[rgb(167,139,250)]"
+            onClick={() => setLocation('/')}
           >
             {getHeaderText(location)}
           </Button>
@@ -57,7 +57,7 @@ export function Navigation() {
                     }`}
                     onClick={() => {
                       setIsOpen(false);
-                      window.location.href = item.href;
+                      setLocation(item.href);
                     }}
                   >
                     {item.label}
