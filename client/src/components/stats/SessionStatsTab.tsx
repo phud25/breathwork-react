@@ -10,7 +10,7 @@ interface SessionSet {
   avgHoldTime: number;
   longestHold: number;
   isActive: boolean;
-  breathTime?: number; // Add breathTime to track individual set duration
+  breathTime?: number;
 }
 
 interface SessionStats {
@@ -52,12 +52,18 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
     );
   }
 
-  // Sort sets to show active set first, then by ascending ID for completed sets
-  const sortedSets = [...sessionStats.sets].sort((a, b) => {
-    if (a.isActive && !b.isActive) return -1;
-    if (!a.isActive && b.isActive) return 1;
-    return a.id - b.id; // Changed to ascending order
-  });
+  // First, find the active set if it exists
+  const activeSet = sessionStats.sets.find(set => set.isActive);
+
+  // Then get the remaining sets and sort them in ascending order by ID
+  const remainingSets = sessionStats.sets
+    .filter(set => !set.isActive)
+    .sort((a, b) => a.id - b.id);
+
+  // Combine active set (if exists) with sorted remaining sets
+  const sortedSets = activeSet 
+    ? [activeSet, ...remainingSets]
+    : remainingSets;
 
   // Calculate total breath time including current session
   const totalBreathTime = sessionStats.totalBreathTime;
