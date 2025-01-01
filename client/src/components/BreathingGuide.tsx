@@ -142,8 +142,10 @@ export function BreathingGuide({
     }
     setIsHolding(false);
     setHoldTime(0);
-    // Reset to beginning of inhale phase by setting scale to 0.3
-    onResume(0);
+
+    // Force animation reset to smallest circle size when ending hold
+    const phase = 0; // Start at inhale phase
+    onResume(phase);
   };
 
   // Stop button handler that considers hold state

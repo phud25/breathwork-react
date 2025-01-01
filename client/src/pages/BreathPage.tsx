@@ -125,6 +125,7 @@ export default function BreathPage() {
 
   const handleHoldComplete = (holdDuration: number) => {
     // After a hold completes, always start from inhale phase
+    // Force animation reset by passing phase 0
     resumeSession(0);
   };
 
@@ -149,10 +150,10 @@ export default function BreathPage() {
   const sessionStats = {
     sets,
     totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
-    totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0) + currentStats.holdCount,
-    // Add up breath time from all completed sets plus current session time
+    totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0) + holdStats.holdCount,
     totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + elapsedTime,
-    totalHoldTime: holdStats.totalHoldTime
+    // Update total hold time to include both completed sets and current stats
+    totalHoldTime: sets.reduce((total, set) => total + (set.avgHoldTime * set.holdCount), 0) + holdStats.totalHoldTime
   };
 
   // Calculate daily stats including current session
