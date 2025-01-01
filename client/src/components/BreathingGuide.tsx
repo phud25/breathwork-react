@@ -142,8 +142,8 @@ export function BreathingGuide({
     }
     setIsHolding(false);
     setHoldTime(0);
-    // Reset to beginning of inhale phase
-    onResume(0); // Pass 0 to indicate we want to start from inhale phase
+    // Reset to beginning of inhale phase by setting scale to 0.3
+    onResume(0);
   };
 
   // Stop button handler that considers hold state

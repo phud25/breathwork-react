@@ -64,15 +64,6 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
         </div>
       </div>
 
-      {/* Weekly Minutes Chart */}
-      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-        <p className="text-sm text-muted-foreground font-medium mb-4">Weekly Progress</p>
-        <div className="h-[200px] flex items-center justify-center">
-          {/* TODO: Add weekly minutes chart here */}
-          <p className="text-muted-foreground">Weekly progress visualization coming soon...</p>
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
