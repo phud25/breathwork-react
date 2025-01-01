@@ -9,6 +9,10 @@ import { cn } from "@/lib/utils";
 import { useBreathing } from "@/hooks/use-breathing";
 import { useSessionStats } from "@/hooks/use-sessions";
 import { Loader2 } from "lucide-react";
+import { SetStatsTab } from "@/components/stats/SetStatsTab";
+import { SessionStatsTab } from "@/components/stats/SessionStatsTab";
+import { DailyStatsTab } from "@/components/stats/DailyStatsTab";
+import { WeeklyStatsTab } from "@/components/stats/WeeklyStatsTab";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -27,6 +31,7 @@ export default function BreathPage() {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
   const [activeTab, setActiveTab] = useState<"session" | "daily">("session");
+  const [activeStatsTab, setActiveStatsTab] = useState<"set" | "session" | "daily" | "weekly">("set");
 
   const {
     isActive,
@@ -79,6 +84,57 @@ export default function BreathPage() {
     ? Math.round(totalHoldTime / totalHolds)
     : 0;
 
+  // Calculate current stats for the SetStatsTab
+  const currentStats = {
+    breathCount: sessionBreaths,
+    targetBreaths: 0, // TODO: Implement calculation
+    breathTime: elapsedTime,
+    holdCount: holdStats.holdCount,
+    avgHoldTime: sessionAvgHold,
+    bestHoldTime: holdStats.longestHold,
+    consistencyScore: 95, // TODO: Implement calculation
+    flowStateDuration: elapsedTime, // TODO: Implement calculation
+    avgCycleTime: 4.5, // TODO: Implement calculation
+    isOnTarget: true, // TODO: Implement calculation
+  };
+
+  // Session stats for SessionStatsTab
+  const sessionStats = {
+    currentSets: [], // TODO: Implement tracking
+    totalSets: currentCycle + 1,
+    totalBreathTime: elapsedTime,
+    totalHoldTime: holdStats.totalHoldTime,
+    patternsUsed: [breathingPatterns[selectedPattern].name],
+  };
+
+  // Stats for DailyStatsTab
+  const dailyStats = {
+    totalSessions: stats?.todayStats?.totalSessions || 0,
+    setsPerSession: (stats?.todayStats?.totalSets || 0) / (stats?.todayStats?.totalSessions || 1),
+    breathTime: (stats?.todayStats?.totalMinutes || 0) * 60,
+    holdDuration: stats?.todayStats?.totalHoldTime || 0,
+    mostUsedPattern: "4-7-8 Relaxation", // TODO: Implement tracking
+    bestPerformance: {
+      pattern: "Box Breathing",
+      score: 98,
+    },
+    longestSession: (stats?.todayStats?.longestSession || 0) * 60,
+    peakMetrics: {
+      longestHold: stats?.todayStats?.longestHold || 0,
+      highestConsistency: 98,
+    },
+  };
+
+  // Stats for WeeklyStatsTab
+  const weeklyStats = {
+    activeDays: stats?.currentStreak || 0,
+    totalSessions: stats?.weeklyStats?.totalSessions || 0,
+    totalBreathTime: (stats?.weeklyStats?.totalMinutes || 0) * 60,
+    patternVariety: 4, // TODO: Implement tracking
+    dailySummaries: [], // TODO: Implement tracking
+  };
+
+
   return (
     <div className={cn(
       "relative w-full max-w-[100vw] overflow-x-hidden",
@@ -128,109 +184,60 @@ export default function BreathPage() {
               isZenMode && "opacity-0 pointer-events-none"
             )}>
               <CardContent className="p-4 md:p-6">
-                <Tabs defaultValue="session" value={activeTab} onValueChange={(value) => setActiveTab(value as "session" | "daily")}>
-                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                <Tabs defaultValue="set" value={activeStatsTab} onValueChange={(value) => setActiveStatsTab(value as typeof activeStatsTab)}>
+                  <TabsList className="grid w-full grid-cols-4 mb-6">
                     <TabsTrigger 
-                      value="session" 
+                      value="set" 
                       className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
-                      Session Tracker
+                      Set
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="session"
+                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                    >
+                      Session
                     </TabsTrigger>
                     <TabsTrigger 
                       value="daily"
                       className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
                     >
-                      Daily Tracker
+                      Daily
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="weekly"
+                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                    >
+                      Weekly
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="session" className="mt-0 space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Breaths</p>
-                        <p className="text-3xl font-bold tracking-tight">{sessionBreaths}</p>
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
-                        <p className="text-3xl font-bold tracking-tight">
-                          {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="h-px bg-border/50 my-2" />
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Holds</p>
-                        <p className="text-3xl font-bold tracking-tight">{holdStats.holdCount}</p>
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Avg Hold</p>
-                        <p className="text-3xl font-bold tracking-tight">
-                          {Math.floor(sessionAvgHold / 60)}:{(sessionAvgHold % 60).toString().padStart(2, '0')}
-                        </p>
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Best Hold</p>
-                        <p className="text-3xl font-bold tracking-tight">
-                          {Math.floor(holdStats.longestHold / 60)}:{(holdStats.longestHold % 60).toString().padStart(2, '0')}
-                        </p>
-                      </div>
-                    </div>
+                  <TabsContent value="set" className="mt-0">
+                    <SetStatsTab
+                      currentStats={currentStats}
+                      isLoading={isLoadingStats}
+                    />
                   </TabsContent>
 
-                  <TabsContent value="daily" className="mt-0 space-y-6">
-                    <div className="grid grid-cols-2 gap-4 text-center">
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Total Breaths</p>
-                        {isLoadingStats ? (
-                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
-                        ) : (
-                          <p className="text-3xl font-bold tracking-tight">{totalBreaths}</p>
-                        )}
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Total Minutes</p>
-                        {isLoadingStats ? (
-                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
-                        ) : (
-                          <p className="text-3xl font-bold tracking-tight">
-                            {totalMinutes}:{(0).toString().padStart(2, '0')}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="h-px bg-border/50 my-2" />
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Total Holds</p>
-                        {isLoadingStats ? (
-                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
-                        ) : (
-                          <p className="text-3xl font-bold tracking-tight">{totalHolds}</p>
-                        )}
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Avg Hold</p>
-                        {isLoadingStats ? (
-                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
-                        ) : (
-                          <p className="text-3xl font-bold tracking-tight">
-                            {Math.floor(dailyAvgHold / 60)}:{(dailyAvgHold % 60).toString().padStart(2, '0')}
-                          </p>
-                        )}
-                      </div>
-                      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                        <p className="text-sm text-muted-foreground font-medium">Best Hold</p>
-                        {isLoadingStats ? (
-                          <Loader2 className="h-6 w-6 animate-spin mx-auto mt-2" />
-                        ) : (
-                          <p className="text-3xl font-bold tracking-tight">
-                            {Math.floor((stats?.todayStats?.longestHold || 0) / 60)}:
-                            {((stats?.todayStats?.longestHold || 0) % 60).toString().padStart(2, '0')}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                  <TabsContent value="session" className="mt-0">
+                    <SessionStatsTab
+                      sessionStats={sessionStats}
+                      isLoading={isLoadingStats}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="daily" className="mt-0">
+                    <DailyStatsTab
+                      dailyStats={dailyStats}
+                      isLoading={isLoadingStats}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="weekly" className="mt-0">
+                    <WeeklyStatsTab
+                      weeklyStats={weeklyStats}
+                      isLoading={isLoadingStats}
+                    />
                   </TabsContent>
                 </Tabs>
                 <div className="mt-8">
