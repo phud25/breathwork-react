@@ -130,8 +130,18 @@ export default function BreathPage() {
               <CardContent className="p-4 md:p-6">
                 <Tabs defaultValue="session" value={activeTab} onValueChange={(value) => setActiveTab(value as "session" | "daily")}>
                   <TabsList className="grid w-full grid-cols-2 mb-6">
-                    <TabsTrigger value="session">Session Tracker</TabsTrigger>
-                    <TabsTrigger value="daily">Daily Tracker</TabsTrigger>
+                    <TabsTrigger 
+                      value="session" 
+                      className="data-[state=active]:bg-[#050505]"
+                    >
+                      Session Tracker
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="daily"
+                      className="data-[state=active]:bg-[#050505]"
+                    >
+                      Daily Tracker
+                    </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="session" className="mt-0 space-y-6">

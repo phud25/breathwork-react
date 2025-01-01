@@ -389,7 +389,7 @@ export function BreathingGuide({
           "flex justify-between items-center text-sm mb-4 non-essential text-[rgb(167,139,250)]",
           isZenMode && "opacity-0 pointer-events-none"
         )}>
-          <div>Completed Breaths: {breathCount}</div>
+          <div>Breaths: {breathCount}</div>
           <div>Time: {formatTime(elapsed)}</div>
         </div>
 
