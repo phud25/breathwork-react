@@ -71,7 +71,6 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
       <ScrollArea className="h-[200px] rounded-lg border border-border/50 bg-white/5">
         <div className="p-4 space-y-4">
           {sortedSets.map((set, index) => {
-            // Calculate the set number based on the total number of sets
             const setNumber = sortedSets.length - index;
             return (
               <div
@@ -80,7 +79,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
                   set.isActive ? 'ring-1 ring-primary/30' : ''
                 }`}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium">Set {setNumber} - {set.pattern}</span>
                   {set.isActive && (
                     <span className="text-xs text-primary-foreground/70 animate-pulse">
@@ -88,22 +87,22 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-4 gap-2 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Breaths: </span>
-                    <span>{set.breathCount}</span>
+                <div className="grid grid-cols-4 gap-4 text-sm">
+                  <div className="flex flex-col items-center">
+                    <span className="text-muted-foreground text-xs mb-1">Breaths</span>
+                    <span className="font-medium">{set.breathCount}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Holds: </span>
-                    <span>{set.holdCount}</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-muted-foreground text-xs mb-1">Holds</span>
+                    <span className="font-medium">{set.holdCount}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Avg: </span>
-                    <span>{formatHoldTime(set.avgHoldTime)}</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-muted-foreground text-xs mb-1">Avg</span>
+                    <span className="font-medium">{formatHoldTime(set.avgHoldTime)}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Best: </span>
-                    <span>{formatHoldTime(set.longestHold)}</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-muted-foreground text-xs mb-1">Best</span>
+                    <span className="font-medium">{formatHoldTime(set.longestHold)}</span>
                   </div>
                 </div>
               </div>

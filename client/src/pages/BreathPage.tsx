@@ -47,6 +47,7 @@ export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
   const [activeStatsTab, setActiveStatsTab] = useState<"set" | "session" | "daily" | "weekly">("set");
   const [currentSetId, setCurrentSetId] = useState(1);
@@ -151,6 +152,10 @@ export default function BreathPage() {
     setIsSoundEnabled(prev => !prev);
   };
 
+  const handleToggleMusic = () => {
+    setIsMusicEnabled(prev => !prev);
+  };
+
   // Calculate current stats for the SetStatsTab
   const currentStats = {
     breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
@@ -242,6 +247,7 @@ export default function BreathPage() {
                     currentPhase={currentPhase}
                     isZenMode={isZenMode}
                     isSoundEnabled={isSoundEnabled}
+                    isMusicEnabled={isMusicEnabled} // Pass down the new prop
                     elapsed={elapsedTime}
                     breathCount={currentStats.breathCount}
                     countdown={countdown}
@@ -252,6 +258,7 @@ export default function BreathPage() {
                     onStop={handleEndSession}
                     onToggleZen={handleToggleZen}
                     onToggleSound={handleToggleSound}
+                    onToggleMusic={handleToggleMusic} // Pass down the new handler
                     onPatternChange={handlePatternChange}
                     onHoldComplete={handleHoldComplete}
                   />
@@ -272,25 +279,25 @@ export default function BreathPage() {
                   <TabsList className="grid w-full grid-cols-4 mb-6">
                     <TabsTrigger
                       value="set"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-purple-600/20 data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Set
                     </TabsTrigger>
                     <TabsTrigger
                       value="session"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-purple-600/20 data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Session
                     </TabsTrigger>
                     <TabsTrigger
                       value="daily"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-purple-600/20 data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Daily
                     </TabsTrigger>
                     <TabsTrigger
                       value="weekly"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-purple-600/20 data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Weekly
                     </TabsTrigger>
@@ -342,6 +349,7 @@ export default function BreathPage() {
                 currentPhase={currentPhase}
                 isZenMode={isZenMode}
                 isSoundEnabled={isSoundEnabled}
+                isMusicEnabled={isMusicEnabled} // Pass down the new prop
                 elapsed={elapsedTime}
                 breathCount={currentStats.breathCount}
                 countdown={countdown}
@@ -352,6 +360,7 @@ export default function BreathPage() {
                 onStop={handleEndSession}
                 onToggleZen={handleToggleZen}
                 onToggleSound={handleToggleSound}
+                onToggleMusic={handleToggleMusic} // Pass down the new handler
                 onPatternChange={handlePatternChange}
                 onHoldComplete={handleHoldComplete}
               />

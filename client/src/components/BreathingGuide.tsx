@@ -1,11 +1,17 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion, type AnimationProps } from "framer-motion";
-import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Maximize } from "lucide-react";
+import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Maximize, Music2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/hooks/use-audio";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -44,6 +50,32 @@ const getPhaseVariant = (patternName: string, phase: number) => {
   return "hold";
 };
 
+interface BreathingGuideProps {
+  pattern: {
+    name: string;
+    sequence: number[];
+  };
+  isActive: boolean;
+  currentPhase: number;
+  isPaused?: boolean;
+  isZenMode?: boolean;
+  isSoundEnabled?: boolean;
+  isMusicEnabled?: boolean;
+  elapsed: number;
+  breathCount: number;
+  countdown: number;
+  sessionCompleted?: boolean;
+  onStart: () => void;
+  onPause: () => void;
+  onResume: (phase: number) => void;
+  onStop: () => void;
+  onToggleZen: () => void;
+  onToggleSound: () => void;
+  onToggleMusic: () => void;
+  onPatternChange: (value: PatternType) => void;
+  onHoldComplete: (holdDuration: number) => void;
+}
+
 export function BreathingGuide({
   pattern,
   isActive,
@@ -51,6 +83,7 @@ export function BreathingGuide({
   isPaused = false,
   isZenMode = false,
   isSoundEnabled = false,
+  isMusicEnabled = false,
   elapsed,
   breathCount,
   countdown,
@@ -61,6 +94,7 @@ export function BreathingGuide({
   onStop,
   onToggleZen,
   onToggleSound,
+  onToggleMusic,
   onPatternChange,
   onHoldComplete
 }: BreathingGuideProps) {
@@ -72,7 +106,7 @@ export function BreathingGuide({
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
 
   const fixedVolume = 0.5; // Fixed volume at 50%
-  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
+  const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isMusicEnabled ? fixedVolume * 0.6 : 0 });
   const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? fixedVolume : 0 });
   const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume : 0 });
 
@@ -419,14 +453,41 @@ export function BreathingGuide({
         </div>
 
         <div className="flex items-center justify-center gap-[20px]">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
-          >
-            {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onToggleSound}
+                  className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
+                >
+                  {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle Breath Guidance</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onToggleMusic}
+                  className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
+                >
+                  <Music2 className={cn("h-4 w-4", !isMusicEnabled && "opacity-50")} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle Background Music</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           {isActive && (
             <>
@@ -479,28 +540,4 @@ export function BreathingGuide({
       </div>
     </div>
   );
-}
-
-interface BreathingGuideProps {
-  pattern: {
-    name: string;
-    sequence: number[];
-  };
-  isActive: boolean;
-  currentPhase: number;
-  isPaused?: boolean;
-  isZenMode?: boolean;
-  isSoundEnabled?: boolean;
-  elapsed: number;
-  breathCount: number;
-  countdown: number;
-  sessionCompleted?: boolean;
-  onStart: () => void;
-  onPause: () => void;
-  onResume: (phase: number) => void;
-  onStop: () => void;
-  onToggleZen: () => void;
-  onToggleSound: () => void;
-  onPatternChange: (value: PatternType) => void;
-  onHoldComplete: (holdDuration: number) => void;
 }
