@@ -265,32 +265,32 @@ export default function BreathPage() {
               isZenMode && "opacity-0 pointer-events-none"
             )}>
               <CardContent className="p-4 md:p-6">
-                <Tabs defaultValue="set" value={activeStatsTab} onValueChange={(value) => {
+                <Tabs value={activeStatsTab} onValueChange={(value) => {
                   setActiveStatsTab(value as typeof activeStatsTab);
                   scrollToTabs();
                 }} className="tabs-container">
                   <TabsList className="grid w-full grid-cols-4 mb-6">
                     <TabsTrigger
                       value="set"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-[#121212] data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Set
                     </TabsTrigger>
                     <TabsTrigger
                       value="session"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-[#121212] data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Session
                     </TabsTrigger>
                     <TabsTrigger
                       value="daily"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-[#121212] data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Daily
                     </TabsTrigger>
                     <TabsTrigger
                       value="weekly"
-                      className="data-[state=active]:bg-[#050505] data-[state=active]:text-[#F5F5DC]"
+                      className="data-[state=active]:bg-[#121212] data-[state=active]:text-[#F5F5DC] transition-colors"
                     >
                       Weekly
                     </TabsTrigger>

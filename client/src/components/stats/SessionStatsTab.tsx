@@ -90,20 +90,20 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Breaths: </span>
-                    <span>{set.breathCount}</span>
+                    <span className="text-muted-foreground">Breaths</span>
+                    <div className="mt-1">{set.breathCount}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Holds: </span>
-                    <span>{set.holdCount}</span>
+                    <span className="text-muted-foreground">Holds</span>
+                    <div className="mt-1">{set.holdCount}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Avg: </span>
-                    <span>{formatHoldTime(set.avgHoldTime)}</span>
+                    <span className="text-muted-foreground">Avg</span>
+                    <div className="mt-1">{formatHoldTime(set.avgHoldTime)}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Best: </span>
-                    <span>{formatHoldTime(set.longestHold)}</span>
+                    <span className="text-muted-foreground">Best</span>
+                    <div className="mt-1">{formatHoldTime(set.longestHold)}</div>
                   </div>
                 </div>
               </div>
