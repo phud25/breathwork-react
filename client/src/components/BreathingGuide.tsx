@@ -146,6 +146,22 @@ export function BreathingGuide({
     onResume(0); // Pass 0 to indicate we want to start from inhale phase
   };
 
+  // Stop button handler that considers hold state
+  const handleStop = () => {
+    if (isHolding) {
+      // If we're holding, first complete the hold
+      if (holdInterval) {
+        clearInterval(holdInterval);
+        setHoldInterval(null);
+      }
+      onHoldComplete(holdTime);
+      setIsHolding(false);
+      setHoldTime(0);
+    }
+    // Then end the session
+    onStop();
+  };
+
   const handleBreathCountChange = (value: string) => {
     const count = parseInt(value, 10);
     if (!isNaN(count) && count >= 1) {
@@ -432,7 +448,7 @@ export function BreathingGuide({
               <Button
                 variant="destructive"
                 size="icon"
-                onClick={onStop}
+                onClick={handleStop}
                 className="h-[48px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
               >
                 <Square className="h-4 w-4" />
@@ -473,7 +489,7 @@ interface BreathingGuideProps {
   sessionCompleted?: boolean;
   onStart: () => void;
   onPause: () => void;
-  onResume: (phase:number) => void;
+  onResume: (phase: number) => void;
   onStop: () => void;
   onToggleZen: () => void;
   onToggleSound: () => void;

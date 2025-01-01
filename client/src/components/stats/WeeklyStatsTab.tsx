@@ -64,6 +64,15 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
         </div>
       </div>
 
+      {/* Weekly Minutes Chart */}
+      <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+        <p className="text-sm text-muted-foreground font-medium mb-4">Weekly Progress</p>
+        <div className="h-[200px] flex items-center justify-center">
+          {/* TODO: Add weekly minutes chart here */}
+          <p className="text-muted-foreground">Weekly progress visualization coming soon...</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
@@ -77,45 +86,43 @@ export function WeeklyStatsTab({ weeklyStats, isLoading }: WeeklyStatsTabProps) 
         </div>
       </div>
 
-      {/* Calendar View */}
-      <div className="mt-6">
-        <div className="rounded-lg border border-border/50 bg-white/5 p-4">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className="w-full"
-          />
+      {/* Calendar View - Now positioned at the bottom */}
+      <div className="rounded-lg border border-border/50 bg-white/5 p-4">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          className="w-full"
+        />
 
-          {/* Selected Day Summary */}
-          {selectedSummary && (
-            <div className="mt-4 space-y-3">
-              <p className="font-medium">
-                {selectedSummary.date.toLocaleDateString(undefined, {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </p>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Sessions</p>
-                  <p className="font-medium">{selectedSummary.sessions}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Breath Time</p>
-                  <p className="font-medium">{formatTime(selectedSummary.breathTime)}</p>
-                </div>
+        {/* Selected Day Summary */}
+        {selectedSummary && (
+          <div className="mt-4 space-y-3">
+            <p className="font-medium">
+              {selectedSummary.date.toLocaleDateString(undefined, {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">Sessions</p>
+                <p className="font-medium">{selectedSummary.sessions}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Patterns Used</p>
-                <p className="text-sm font-medium">
-                  {selectedSummary.patterns.join(", ")}
-                </p>
+                <p className="text-muted-foreground">Breath Time</p>
+                <p className="font-medium">{formatTime(selectedSummary.breathTime)}</p>
               </div>
             </div>
-          )}
-        </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Patterns Used</p>
+              <p className="text-sm font-medium">
+                {selectedSummary.patterns.join(", ")}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
