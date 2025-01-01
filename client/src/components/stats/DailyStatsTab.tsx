@@ -6,17 +6,23 @@ interface DailyStats {
   setsPerSession: number;
   breathTime: number;
   holdDuration: number;
-  mostUsedPattern: string;
-  bestPerformance: {
-    pattern: string;
-    score: number;
-  };
   longestSession: number;
   peakMetrics: {
     longestHold: number;
     highestConsistency: number;
   };
 }
+
+const formatTime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
 
 interface DailyStatsTabProps {
   dailyStats: DailyStats;
@@ -42,7 +48,7 @@ export function DailyStatsTab({ dailyStats, isLoading }: DailyStatsTabProps) {
         </div>
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Sets/Session</p>
-          <p className="text-2xl font-bold tracking-tight">{dailyStats.setsPerSession}</p>
+          <p className="text-2xl font-bold tracking-tight">{dailyStats.setsPerSession.toFixed(1)}</p>
         </div>
       </div>
 
@@ -50,60 +56,34 @@ export function DailyStatsTab({ dailyStats, isLoading }: DailyStatsTabProps) {
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Breath Time</p>
           <p className="text-2xl font-bold tracking-tight">
-            {Math.floor(dailyStats.breathTime / 60)}:
-            {(dailyStats.breathTime % 60).toString().padStart(2, '0')}
+            {formatTime(dailyStats.breathTime)}
           </p>
         </div>
         <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
           <p className="text-sm text-muted-foreground font-medium">Hold Time</p>
           <p className="text-2xl font-bold tracking-tight">
-            {Math.floor(dailyStats.holdDuration / 60)}:
-            {(dailyStats.holdDuration % 60).toString().padStart(2, '0')}
+            {formatTime(dailyStats.holdDuration)}
           </p>
         </div>
       </div>
 
       {/* Pattern Breakdown */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-            <p className="text-sm text-muted-foreground font-medium">Top Pattern</p>
-            <p className="text-2xl font-bold tracking-tight">
-              {dailyStats.mostUsedPattern}
-            </p>
-          </div>
-          <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-            <p className="text-sm text-muted-foreground font-medium">Best Pattern</p>
-            <div>
-              <p className="text-2xl font-bold tracking-tight">
-                {dailyStats.bestPerformance.pattern}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {dailyStats.bestPerformance.score}%
-              </p>
-            </div>
-          </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground font-medium">Longest Session</p>
+          <p className="text-2xl font-bold tracking-tight">
+            {formatTime(dailyStats.longestSession)}
+          </p>
         </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-            <p className="text-sm text-muted-foreground font-medium">Longest Session</p>
-            <p className="text-2xl font-bold tracking-tight">
-              {Math.floor(dailyStats.longestSession / 60)}:
-              {(dailyStats.longestSession % 60).toString().padStart(2, '0')}
+        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+          <p className="text-sm text-muted-foreground font-medium">Peak Stats</p>
+          <div className="space-y-1">
+            <p className="text-sm">
+              Hold: {formatTime(dailyStats.peakMetrics.longestHold)}
             </p>
-          </div>
-          <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-            <p className="text-sm text-muted-foreground font-medium">Peak Stats</p>
-            <div className="space-y-1">
-              <p className="text-sm">
-                Hold: {Math.floor(dailyStats.peakMetrics.longestHold / 60)}:
-                {(dailyStats.peakMetrics.longestHold % 60).toString().padStart(2, '0')}
-              </p>
-              <p className="text-sm">
-                Consistency: {dailyStats.peakMetrics.highestConsistency}%
-              </p>
-            </div>
+            <p className="text-sm">
+              Consistency: {dailyStats.peakMetrics.highestConsistency}%
+            </p>
           </div>
         </div>
       </div>
