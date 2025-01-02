@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion, type AnimationProps } from "framer-motion";
-import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Maximize } from "lucide-react";
+import { Volume2, VolumeX, Square, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/hooks/use-audio";
@@ -225,16 +225,16 @@ export function BreathingGuide({
       "flex flex-col items-center justify-start transition-all duration-500",
       isZenMode ? "h-screen p-0" : ""
     )}>
-      <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle relative", isZenMode ? "h-full scale-120" : "mt-1 mb-1 scale-100")}>
+      <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle relative", isZenMode ? "h-full scale-120" : "mt-8 mb-8 scale-100")}>
         <div
-          className="relative w-[285px] h-[285px] flex items-center justify-center transition-transform duration-500"
+          className="relative w-[340px] h-[340px] flex items-center justify-center transition-transform duration-500"
           onClick={() => isHolding && endHold()}
         >
-          <div className="absolute w-[265px] h-[265px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20 transition-all duration-500" />
+          <div className="absolute w-[320px] h-[320px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20 transition-all duration-500" />
 
           <motion.div
             className={cn(
-              "absolute w-[265px] h-[265px] rounded-full bg-gradient-to-br",
+              "absolute w-[320px] h-[320px] rounded-full bg-gradient-to-br",
               phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors],
               isHolding && "animate-pulse"
             )}
@@ -242,7 +242,7 @@ export function BreathingGuide({
           />
 
           <div
-            className="relative w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform cursor-pointer hover:scale-105 animate-pulse"
+            className="relative w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform cursor-pointer hover:scale-105 animate-pulse"
             onClick={(e) => {
               e.stopPropagation();
               if (isActive) {
@@ -319,55 +319,32 @@ export function BreathingGuide({
         isZenMode ? "absolute bottom-8 opacity-100" : "opacity-100"
       )}>
         <div className={cn(
-          "flex justify-between items-center text-sm mb-4 non-essential text-[rgb(167,139,250)]",
+          "flex justify-between items-center text-sm mb-6 non-essential text-[rgb(167,139,250)]",
           isZenMode && "opacity-0 pointer-events-none"
         )}>
           <div>Breaths: {breathCount}</div>
           <div>Time: {formatTime(elapsed)}</div>
         </div>
 
-        <div className="flex items-center justify-center gap-[20px]">
+        <div className="flex items-center justify-center gap-6">
           <Button
             variant="outline"
             size="icon"
             onClick={onToggleSound}
-            className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
+            className="h-[68px] w-[68px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl"
           >
-            {isSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            {isSoundEnabled ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
           </Button>
 
           {isActive && (
             <>
               <Button
-                variant="outline"
-                size="icon"
-                onClick={isHolding ? endHold : startHold}
-                className={cn(
-                  "h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors",
-                  isHolding && "ring-2 ring-purple-500 ring-opacity-50"
-                )}
-              >
-                <Hand className="h-4 w-4" />
-              </Button>
-
-              {!isHolding && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={isPaused ? () => onResume(currentPhase) : onPause}
-                  className="h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
-                >
-                  {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-                </Button>
-              )}
-
-              <Button
                 variant="destructive"
                 size="icon"
                 onClick={handleStop}
-                className="h-[48px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors"
+                className="h-[68px] w-[68px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl"
               >
-                <Square className="h-4 w-4" />
+                <Square className="h-6 w-6" />
               </Button>
             </>
           )}
@@ -377,11 +354,11 @@ export function BreathingGuide({
             size="icon"
             onClick={onToggleZen}
             className={cn(
-              "h-[48px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors",
+              "h-[68px] w-[68px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl",
               isZenMode ? "opacity-50 hover:opacity-100" : ""
             )}
           >
-            <Maximize className="h-4 w-4" />
+            <Maximize className="h-6 w-6" />
           </Button>
         </div>
       </div>
