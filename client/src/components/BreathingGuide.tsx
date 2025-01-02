@@ -25,7 +25,7 @@ const getPhaseLabel = (patternName: string, phase: number) => {
   if (patternName === "2-4 Ha Breath") {
     return phase === 0 ? "Inhale" : "Ha";
   }
-  if (pattern.includes("2-2") || patternName === "Breath of Fire") {
+  if (patternName.includes("2-2") || patternName === "Breath of Fire") {
     return phase === 0 ? "Inhale" : "Exhale";
   }
   return phaseLabels[phase];
