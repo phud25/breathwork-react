@@ -13,6 +13,7 @@ import { SetStatsTab } from "@/components/stats/SetStatsTab";
 import { SessionStatsTab } from "@/components/stats/SessionStatsTab";
 import { DailyStatsTab } from "@/components/stats/DailyStatsTab";
 import { WeeklyStatsTab } from "@/components/stats/WeeklyStatsTab";
+import { PatternSelector } from "@/components/PatternSelector";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -236,27 +237,33 @@ export default function BreathPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
               <Card className="session-container bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20 -mt-[5px]">
-                <CardContent className="p-4 md:p-6">
-                  <BreathingGuide
-                    pattern={breathingPatterns[selectedPattern]}
-                    isActive={isActive}
-                    isPaused={isPaused}
-                    currentPhase={currentPhase}
-                    isZenMode={isZenMode}
-                    isSoundEnabled={isSoundEnabled}
-                    elapsed={elapsedTime}
-                    breathCount={currentStats.breathCount}
-                    countdown={countdown}
-                    sessionCompleted={sessionCompleted}
-                    onStart={handleStartSession}
-                    onPause={pauseSession}
-                    onResume={resumeSession}
-                    onStop={handleEndSession}
-                    onToggleZen={handleToggleZen}
-                    onToggleSound={handleToggleSound}
+                <CardContent className="p-0">
+                  <PatternSelector
+                    selectedPattern={selectedPattern}
                     onPatternChange={handlePatternChange}
-                    onHoldComplete={handleHoldComplete}
                   />
+                  <div className="p-4 md:p-6">
+                    <BreathingGuide
+                      pattern={breathingPatterns[selectedPattern]}
+                      isActive={isActive}
+                      isPaused={isPaused}
+                      currentPhase={currentPhase}
+                      isZenMode={isZenMode}
+                      isSoundEnabled={isSoundEnabled}
+                      elapsed={elapsedTime}
+                      breathCount={currentStats.breathCount}
+                      countdown={countdown}
+                      sessionCompleted={sessionCompleted}
+                      onStart={handleStartSession}
+                      onPause={pauseSession}
+                      onResume={resumeSession}
+                      onStop={handleEndSession}
+                      onToggleZen={handleToggleZen}
+                      onToggleSound={handleToggleSound}
+                      onPatternChange={handlePatternChange}
+                      onHoldComplete={handleHoldComplete}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </ErrorBoundary>
