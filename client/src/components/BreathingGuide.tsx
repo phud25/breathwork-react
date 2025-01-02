@@ -19,8 +19,6 @@ const formatTime = (seconds: number) => {
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
-const formatHoldTime = formatTime;
-
 const getPhaseLabel = (patternName: string, phase: number) => {
   if (patternName === "2-4 Ha Breath") {
     return phase === 0 ? "Inhale" : "Ha";
@@ -86,7 +84,6 @@ export function BreathingGuide({
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
   const holdStartTime = useRef<number>(0);
-  const wasHoldingBeforeZen = useRef<boolean>(false);
 
   const fixedVolume = 0.5;
   const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
@@ -168,17 +165,19 @@ export function BreathingGuide({
     setIsHolding(false);
     setHoldTime(0);
     holdStartTime.current = 0;
-    wasHoldingBeforeZen.current = false;
 
+    // Always restart from inhale phase
     onResume(0);
   };
 
   const handleZenToggle = () => {
-    if (isHolding) {
-      console.log('Toggling zen mode during hold at:', holdTime);
-      wasHoldingBeforeZen.current = true;
+    // Don't interrupt hold during zen mode toggle
+    if (!isHolding) {
+      onToggleZen();
+    } else {
+      // Just toggle zen mode without affecting hold state
+      onToggleZen();
     }
-    onToggleZen();
   };
 
   const handleStop = () => {
@@ -192,6 +191,14 @@ export function BreathingGuide({
     const phase = getPhaseVariant(pattern.name, currentPhase);
     const phaseDuration = pattern.sequence[currentPhase];
     const isPostInhale = currentPhase === 1;
+
+    // If holding, maintain the expanded state
+    if (isHolding) {
+      return {
+        initial: { scale: 1 },
+        animate: { scale: 1 }
+      };
+    }
 
     if (!isActive || isPaused) {
       return {
@@ -258,7 +265,10 @@ export function BreathingGuide({
       "flex flex-col items-center justify-start transition-all duration-500",
       isZenMode ? "h-screen p-0" : ""
     )}>
-      <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle relative", isZenMode ? "h-full scale-120" : "mt-6 mb-8 scale-100")}>
+      <div className={cn(
+        "flex items-center justify-center transition-all duration-500 breath-circle relative",
+        isZenMode ? "h-full scale-120" : "mt-6 mb-8 scale-100"
+      )}>
         <div
           className="relative w-[313px] h-[313px] flex items-center justify-center transition-transform duration-500"
           onClick={() => isHolding && endHold()}
@@ -286,6 +296,8 @@ export function BreathingGuide({
                 } else {
                   onResume(0);
                 }
+              } else {
+                onStart();
               }
             }}
           >
@@ -316,7 +328,6 @@ export function BreathingGuide({
             ) : (
               <Button
                 variant="ghost"
-                onClick={onStart}
                 className="text-sm text-[#F5F5DC] hover:text-[#F5F5DC]/80 hover:bg-transparent transition-all duration-200 group"
               >
                 <span className="relative inline-flex rounded-full animate-ping-slow">Start</span>
