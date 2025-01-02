@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion, type AnimationProps } from "framer-motion";
 import { Volume2, VolumeX, Maximize2, Pause, Play, Square, Hand, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/hooks/use-audio";
 
@@ -64,9 +62,6 @@ export function BreathingGuide({
   onPatternChange,
   onHoldComplete
 }: BreathingGuideProps) {
-  const [sessionType, setSessionType] = useState<"breaths" | "duration">("breaths");
-  const [breathCountState, setBreathCountState] = useState<number>(15);
-  const [durationInput, setDurationInput] = useState<string>("3:00");
   const [isHolding, setIsHolding] = useState(false);
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
@@ -160,21 +155,6 @@ export function BreathingGuide({
     onStop();
   };
 
-  const handleBreathCountChange = (value: string) => {
-    const count = parseInt(value, 10);
-    if (!isNaN(count) && count >= 1) {
-      setBreathCountState(count);
-    }
-  };
-
-  const durationOptions = Array.from({ length: 119 }, (_, i) => {
-    const totalSeconds = (i + 2) * 30;
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    const value = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    return { value, label: value };
-  });
-
   const getPhaseAnimation = (): AnimationProps => {
     const phase = getPhaseVariant(pattern.name, currentPhase);
     const phaseDuration = pattern.sequence[currentPhase];
@@ -245,78 +225,6 @@ export function BreathingGuide({
       "flex flex-col items-center justify-start transition-all duration-500",
       isZenMode ? "h-screen p-0" : ""
     )}>
-      <div className={cn(
-        "w-full max-w-[600px] mx-auto space-y-3 transition-all duration-500 non-essential",
-        isZenMode ? "opacity-0 pointer-events-none absolute" : "opacity-100 scale-100"
-      )}>
-        <Select
-          onValueChange={(value) => onPatternChange(value as PatternType)}
-          value={pattern.name === "2-2 Energized Focus" ? "22" :
-            pattern.name === "4-7-8 Relaxation" ? "478" :
-            pattern.name === "Box Breathing (4x4)" ? "box" :
-            pattern.name === "5-5-5 Triangle" ? "555" :
-            pattern.name === "2-4 Ha Breath" ? "24ha" :
-            pattern.name === "Breath of Fire" ? "fire" : "22"}
-        >
-          <SelectTrigger className="h-[48px] rounded-xl bg-white/10 border-slate-600 text-[#F5F5DC] hover:brightness-110 hover:border-primary/50 focus:border-primary/50 transition-all">
-            <SelectValue placeholder="Select Breathing Pattern" className="text-[#F5F5DC]" />
-          </SelectTrigger>
-          <SelectContent className="bg-slate-800 border-slate-600">
-            <SelectItem value="478" className="text-[#F5F5DC] hover:bg-primary/10">4-7-8 Relaxation</SelectItem>
-            <SelectItem value="box" className="text-[#F5F5DC] hover:bg-primary/10">Box Breathing (4x4)</SelectItem>
-            <SelectItem value="22" className="text-[#F5F5DC] hover:bg-primary/10">2-2 Energized Focus</SelectItem>
-            <SelectItem value="555" className="text-[#F5F5DC] hover:bg-primary/10">5-5-5 Triangle</SelectItem>
-            <SelectItem value="24ha" className="text-[#F5F5DC] hover:bg-primary/10">2-4 Ha Breath</SelectItem>
-            <SelectItem value="fire" className="text-[#F5F5DC] hover:bg-primary/10">Breath of Fire</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <div className="flex gap-[5%]">
-          <Select
-            value={sessionType}
-            onValueChange={(value) => setSessionType(value as "breaths" | "duration")}
-          >
-            <SelectTrigger className="h-[48px] rounded-xl bg-white/10 border-slate-600 hover:brightness-110 hover:border-primary/50 focus:border-primary/50 transition-all">
-              <SelectValue placeholder="Session Type" className="text-[#F5F5DC]" />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600">
-              <SelectItem value="breaths" className="text-[#F5F5DC] hover:bg-primary/10">By Breath Count</SelectItem>
-              <SelectItem value="duration" className="text-[#F5F5DC] hover:bg-primary/10">By Duration</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {sessionType === "duration" ? (
-            <Select
-              value={durationInput}
-              onValueChange={setDurationInput}
-            >
-              <SelectTrigger className="h-[48px] rounded-xl bg-white/10 border-slate-600 hover:brightness-110 hover:border-primary/50 focus:border-primary/50 transition-all">
-                <SelectValue placeholder="3:00" className="text-[#F5F5DC]" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600 max-h-[200px]">
-                {durationOptions.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="text-[#F5F5DC] hover:bg-primary/10"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <Input
-              type="number"
-              value={breathCountState}
-              onChange={(e) => handleBreathCountChange(e.target.value)}
-              className="w-[45%] h-[48px] rounded-xl text-center bg-white/10 border-slate-600 text-[#F5F5DC] hover:brightness-110 hover:border-primary/50 focus:border-primary/50 focus:ring-primary/50"
-              min={1}
-            />
-          )}
-        </div>
-      </div>
-
       <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle relative", isZenMode ? "h-full scale-120" : "mt-1 mb-1 scale-100")}>
         <div
           className="relative w-[285px] h-[285px] flex items-center justify-center transition-transform duration-500"
