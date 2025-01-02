@@ -175,18 +175,15 @@ export function BreathingGuide({
   // Handle zen mode toggle without interrupting hold
   const handleZenToggle = () => {
     if (isHolding) {
-      const holdDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
-      console.log('Current hold duration during zen toggle:', holdDuration);
+      console.log('Toggling zen mode during hold at:', holdTime);
     }
     onToggleZen();
   };
 
   const handleStop = () => {
     if (isHolding) {
-      // If we're holding, first complete the hold
       endHold();
     }
-    // Then end the session
     onStop();
   };
 
@@ -296,7 +293,7 @@ export function BreathingGuide({
                 {isHolding ? (
                   <div className="flex flex-col items-center">
                     <div className="text-xl font-mono text-[#F5F5DC] font-bold">
-                      {formatHoldTime(holdTime)}
+                      {formatTime(holdTime)}
                     </div>
                     <div className="text-xs text-[#F5F5DC] font-semibold mt-1">
                       Hold

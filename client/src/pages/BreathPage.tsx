@@ -48,7 +48,7 @@ const scrollToTabs = () => {
 
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
-  const [selectedDuration, setSelectedDuration] = useState(180); // 3:00 minutes default
+  const [selectedDuration, setSelectedDuration] = useState(180);
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
@@ -68,9 +68,7 @@ export default function BreathPage() {
     pauseSession,
     resumeSession,
     endSession,
-    recordHold,
     holdStats,
-    isHolding,
     startHold,
     endHold,
   } = useBreathing(breathingPatterns[selectedPattern].sequence);
