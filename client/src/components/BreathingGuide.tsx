@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/hooks/use-audio";
 
-type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
-
 const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
 
 const phaseColors = {
@@ -42,6 +40,29 @@ const getPhaseVariant = (patternName: string, phase: number) => {
   return "hold";
 };
 
+interface BreathingGuideProps {
+  pattern: {
+    name: string;
+    sequence: number[];
+  };
+  isActive: boolean;
+  currentPhase: number;
+  isPaused?: boolean;
+  isZenMode?: boolean;
+  isSoundEnabled?: boolean;
+  elapsed: number;
+  breathCount: number;
+  countdown: number;
+  sessionCompleted?: boolean;
+  onStart: () => void;
+  onPause: () => void;
+  onResume: (phase: number) => void;
+  onStop: () => void;
+  onToggleZen: () => void;
+  onToggleSound: () => void;
+  onHoldComplete: (holdDuration: number) => void;
+}
+
 export function BreathingGuide({
   pattern,
   isActive,
@@ -59,7 +80,6 @@ export function BreathingGuide({
   onStop,
   onToggleZen,
   onToggleSound,
-  onPatternChange,
   onHoldComplete
 }: BreathingGuideProps) {
   const [isHolding, setIsHolding] = useState(false);
@@ -387,28 +407,4 @@ export function BreathingGuide({
       </div>
     </div>
   );
-}
-
-interface BreathingGuideProps {
-  pattern: {
-    name: string;
-    sequence: number[];
-  };
-  isActive: boolean;
-  currentPhase: number;
-  isPaused?: boolean;
-  isZenMode?: boolean;
-  isSoundEnabled?: boolean;
-  elapsed: number;
-  breathCount: number;
-  countdown: number;
-  sessionCompleted?: boolean;
-  onStart: () => void;
-  onPause: () => void;
-  onResume: (phase: number) => void;
-  onStop: () => void;
-  onToggleZen: () => void;
-  onToggleSound: () => void;
-  onPatternChange: (value: PatternType) => void;
-  onHoldComplete: (holdDuration: number) => void;
 }
