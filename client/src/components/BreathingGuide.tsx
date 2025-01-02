@@ -88,6 +88,11 @@ export function BreathingGuide({
   onStartHold,
   onEndHold
 }: BreathingGuideProps) {
+  // Track animation state separately from breathing phase
+  const [animationPhase, setAnimationPhase] = useState(currentPhase);
+  const [animationScale, setAnimationScale] = useState(0.3);
+  const preHoldPhase = useRef(currentPhase);
+
   const fixedVolume = 0.5;
   const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
   const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? fixedVolume : 0 });
@@ -123,16 +128,37 @@ export function BreathingGuide({
   }, []);
 
   useEffect(() => {
-    if (!isSoundEnabled) {
-      backgroundMusic.setVolume(0);
-      breathSound.setVolume(0);
-      sessionAudio.setVolume(0);
-    } else {
+    if (isSoundEnabled) {
       backgroundMusic.setVolume(fixedVolume * 0.6);
       breathSound.setVolume(fixedVolume);
       sessionAudio.setVolume(fixedVolume);
+    } else {
+      backgroundMusic.setVolume(0);
+      breathSound.setVolume(0);
+      sessionAudio.setVolume(0);
     }
   }, [isSoundEnabled]);
+
+  // Track current phase for animation
+  useEffect(() => {
+    if (!isHolding) {
+      setAnimationPhase(currentPhase);
+      const phase = getPhaseVariant(pattern.name, currentPhase);
+      setAnimationScale(phase === "inhale" ? 1 : 0.3);
+    }
+  }, [currentPhase, isHolding, pattern.name]);
+
+  const handleStartHold = () => {
+    preHoldPhase.current = currentPhase;
+    onStartHold();
+  };
+
+  const handleEndHold = () => {
+    onEndHold();
+    // Force animation to inhale state
+    setAnimationScale(0.3);
+    setAnimationPhase(0);
+  };
 
   const handleZenToggle = () => {
     onToggleZen();
@@ -140,17 +166,19 @@ export function BreathingGuide({
 
   const handleStop = () => {
     if (isHolding) {
-      onEndHold();
+      handleEndHold();
     }
     onStop();
   };
 
   const getPhaseAnimation = (): AnimationProps => {
-    const phase = getPhaseVariant(pattern.name, currentPhase);
-    const phaseDuration = pattern.sequence[currentPhase];
-    const isPostInhale = currentPhase === 1;
+    if (!isActive || isPaused) {
+      return {
+        initial: { scale: 0.3 },
+        animate: { scale: 0.3 }
+      };
+    }
 
-    // If holding, maintain the expanded state
     if (isHolding) {
       return {
         initial: { scale: 1 },
@@ -158,12 +186,8 @@ export function BreathingGuide({
       };
     }
 
-    if (!isActive || isPaused) {
-      return {
-        initial: { scale: 0.3 },
-        animate: { scale: 0.3 }
-      };
-    }
+    const phaseDuration = pattern.sequence[currentPhase];
+    const phase = getPhaseVariant(pattern.name, currentPhase);
 
     if (pattern.name === "Breath of Fire") {
       return {
@@ -206,9 +230,10 @@ export function BreathingGuide({
       };
     }
 
+    // Hold phases
     return {
-      initial: { scale: isPostInhale ? 1 : 0.3 },
-      animate: { scale: isPostInhale ? 1 : 0.3 }
+      initial: { scale: currentPhase === 1 ? 1 : 0.3 },
+      animate: { scale: currentPhase === 1 ? 1 : 0.3 }
     };
   };
 
@@ -223,14 +248,14 @@ export function BreathingGuide({
       )}>
         <div
           className="relative w-[313px] h-[313px] flex items-center justify-center transition-transform duration-500"
-          onClick={() => isHolding && onEndHold()}
+          onClick={() => isHolding && handleEndHold()}
         >
           <div className="absolute w-[291px] h-[291px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20 transition-all duration-500" />
 
           <motion.div
             className={cn(
               "absolute w-[291px] h-[291px] rounded-full bg-gradient-to-br",
-              phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors],
+              phaseColors[getPhaseVariant(pattern.name, animationPhase) as keyof typeof phaseColors],
               isHolding && "animate-pulse"
             )}
             {...getPhaseAnimation()}
@@ -242,7 +267,7 @@ export function BreathingGuide({
               e.stopPropagation();
               if (isActive) {
                 if (isHolding) {
-                  onEndHold();
+                  handleEndHold();
                 } else if (!isPaused) {
                   onPause();
                 } else {
@@ -336,7 +361,7 @@ export function BreathingGuide({
           <Button
             variant="outline"
             size="icon"
-            onClick={isHolding ? onEndHold : onStartHold}
+            onClick={isHolding ? handleEndHold : handleStartHold}
             disabled={!isActive}
             className={cn(
               "h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",
