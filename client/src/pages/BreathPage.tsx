@@ -48,6 +48,7 @@ const scrollToTabs = () => {
 
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<PatternType>("22");
+  const [selectedDuration, setSelectedDuration] = useState(180); // 3:00 minutes default
   const [isZenMode, setIsZenMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const { data: stats, isLoading: isLoadingStats } = useSessionStats();
@@ -95,6 +96,10 @@ export default function BreathPage() {
     setSelectedPattern(value);
     setCurrentSetId(prev => prev + 1);
   }, [isActive, endSession, sets, elapsedTime]);
+
+  const handleDurationChange = useCallback((duration: number) => {
+    setSelectedDuration(duration);
+  }, []);
 
   const handleStartSession = useCallback(() => {
     const newSet: BreathingSet = {
@@ -241,6 +246,8 @@ export default function BreathPage() {
                   <PatternSelector
                     selectedPattern={selectedPattern}
                     onPatternChange={handlePatternChange}
+                    selectedDuration={selectedDuration}
+                    onDurationChange={handleDurationChange}
                   />
                   <div className="p-4 md:p-6">
                     <BreathingGuide
