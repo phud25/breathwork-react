@@ -87,17 +87,6 @@ export function PatternSelector({
 
   return (
     <div className="border-b border-purple-500/20">
-      {/* Labels */}
-      <div className="flex px-4 pt-2">
-        <div className="flex-1">
-          <span className="text-xs text-muted-foreground font-medium">Breath Pattern</span>
-        </div>
-        <div className="w-[120px]">
-          <span className="text-xs text-muted-foreground font-medium">Duration</span>
-        </div>
-      </div>
-
-      {/* Selectors */}
       <div className="flex items-center justify-between">
         <Sheet open={isPatternOpen} onOpenChange={setIsPatternOpen}>
           <SheetTrigger asChild>
