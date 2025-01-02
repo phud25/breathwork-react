@@ -196,10 +196,10 @@ export default function BreathPage() {
     )
   };
 
-  // Calculate average hold time for the entire session
-  if (sessionStats.totalHoldCount > 0) {
-    sessionStats.avgHoldTime = Math.round(sessionStats.totalHoldTime / sessionStats.totalHoldCount);
-  }
+  // Calculate total stats for the session
+  sessionStats.avgHoldTime = sessionStats.totalHoldCount > 0
+    ? Math.round(sessionStats.totalHoldTime / sessionStats.totalHoldCount)
+    : 0;
 
   // Calculate daily stats including current session
   const dailyStats = {

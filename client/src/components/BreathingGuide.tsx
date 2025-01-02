@@ -86,6 +86,7 @@ export function BreathingGuide({
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
   const holdStartTime = useRef<number>(0);
+  const wasHoldingBeforeZen = useRef<boolean>(false);
 
   const fixedVolume = 0.5;
   const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
@@ -167,15 +168,15 @@ export function BreathingGuide({
     setIsHolding(false);
     setHoldTime(0);
     holdStartTime.current = 0;
+    wasHoldingBeforeZen.current = false;
 
-    // Force restart from beginning of inhale phase
     onResume(0);
   };
 
-  // Handle zen mode toggle without interrupting hold
   const handleZenToggle = () => {
     if (isHolding) {
       console.log('Toggling zen mode during hold at:', holdTime);
+      wasHoldingBeforeZen.current = true;
     }
     onToggleZen();
   };
@@ -208,7 +209,7 @@ export function BreathingGuide({
             duration: 0.3,
             ease: "linear",
             type: "keyframes",
-            times: [0, 1], // No intermediate states
+            times: [0, 1],
           }
         }
       };
