@@ -202,7 +202,7 @@ export default function BreathPage() {
     totalSessions: (stats?.totalSessions || 0) + 1,
     setsPerSession: ((stats?.totalSets || 0) + sets.length) / ((stats?.totalSessions || 0) + 1),
     breathTime: (stats?.totalMinutes || 0) * 60 + elapsedTime,
-    holdDuration: (stats?.totalHoldTime || 0) + holdStats.totalHoldTime,
+    holdDuration: totalHoldTime,
     mostUsedPattern: "4-7-8 Relaxation",
     bestPerformance: {
       pattern: "Box Breathing",
@@ -221,7 +221,15 @@ export default function BreathPage() {
     totalSessions: (stats?.totalSessions || 0) + 1,
     totalBreathTime: (stats?.totalMinutes || 0) * 60 + elapsedTime,
     patternVariety: 4,
-    dailySummaries: [],
+    dailySummaries: [{
+      date: new Date(),
+      sessions: 1,
+      breathTime: elapsedTime,
+      patterns: [breathingPatterns[selectedPattern].name],
+      holdCount: holdStats.holdCount,
+      avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
+      longestHold: holdStats.longestHold
+    }],
   };
 
   return (

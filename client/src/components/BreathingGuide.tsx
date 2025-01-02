@@ -159,7 +159,12 @@ export function BreathingGuide({
     setHoldTime(0);
   };
 
-  // Stop button handler that considers hold state
+  // Handle zen mode toggle without interrupting hold
+  const handleZenToggle = () => {
+    // Only toggle zen mode, maintain current hold state
+    onToggleZen();
+  };
+
   const handleStop = () => {
     if (isHolding) {
       // If we're holding, first complete the hold
@@ -386,7 +391,7 @@ export function BreathingGuide({
           <Button
             variant="outline"
             size="icon"
-            onClick={onToggleZen}
+            onClick={handleZenToggle}
             className={cn(
               "h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",
               isZenMode ? "opacity-50 hover:opacity-100" : ""
