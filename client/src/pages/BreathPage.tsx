@@ -13,8 +13,6 @@ import { SetStatsTab } from "@/components/stats/SetStatsTab";
 import { SessionStatsTab } from "@/components/stats/SessionStatsTab";
 import { DailyStatsTab } from "@/components/stats/DailyStatsTab";
 import { WeeklyStatsTab } from "@/components/stats/WeeklyStatsTab";
-import { PatternSelector } from "@/components/PatternSelector";
-import { DurationPicker } from "@/components/DurationPicker";
 
 type PatternType = "478" | "box" | "22" | "555" | "24ha" | "fire";
 
@@ -53,7 +51,6 @@ export default function BreathPage() {
   const [activeStatsTab, setActiveStatsTab] = useState<"set" | "session" | "daily" | "weekly">("set");
   const [currentSetId, setCurrentSetId] = useState(1);
   const [sets, setSets] = useState<BreathingSet[]>([]);
-  const [targetDuration, setTargetDuration] = useState<number | null>(null); // Added state for duration
 
   const {
     isActive,
@@ -234,16 +231,6 @@ export default function BreathPage() {
           "container max-w-4xl mx-auto space-y-5 transition-all duration-500",
           isZenMode && "opacity-0 pointer-events-none absolute"
         )}>
-          <div className="space-y-4">
-            <PatternSelector
-              selected={selectedPattern}
-              onSelect={handlePatternChange}
-            />
-            <DurationPicker
-              value={targetDuration || 180}
-              onChange={(duration) => setTargetDuration(duration)}
-            />
-          </div>
           <div className="grid md:grid-cols-2 gap-6">
             <ErrorBoundary>
               <Card className="session-container bg-gradient-to-br from-purple-600/20 to-purple-800/10 backdrop-blur-sm shadow-lg shadow-purple-900/10 border-purple-500/20 -mt-[5px]">
