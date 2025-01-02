@@ -8,7 +8,6 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
 import { useBreathing } from "@/hooks/use-breathing";
 import { useSessionStats } from "@/hooks/use-sessions";
-import { Loader2 } from "lucide-react";
 import { SetStatsTab } from "@/components/stats/SetStatsTab";
 import { SessionStatsTab } from "@/components/stats/SessionStatsTab";
 import { DailyStatsTab } from "@/components/stats/DailyStatsTab";
@@ -59,6 +58,7 @@ export default function BreathPage() {
   const {
     isActive,
     isPaused,
+    isHolding,
     currentPhase,
     currentCycle,
     elapsedTime,
@@ -114,7 +114,6 @@ export default function BreathPage() {
   }, [currentSetId, selectedPattern, startSession]);
 
   const handleEndSession = useCallback(() => {
-    // Add logging to verify hold stats
     console.log('Current hold stats:', holdStats);
     console.log('Current sets:', sets);
 
@@ -143,11 +142,10 @@ export default function BreathPage() {
     setCurrentSetId(prev => prev + 1);
   }, [currentCycle, currentPhase, selectedPattern, holdStats, endSession, elapsedTime]);
 
-  const handleHoldComplete = (holdDuration: number) => {
+  const handleHoldComplete = useCallback((holdDuration: number) => {
     console.log('Hold completed with duration:', holdDuration);
     console.log('Current hold stats:', holdStats);
 
-    // Update the current set's hold metrics
     setSets(prev => prev.map(set =>
       set.isActive ? {
         ...set,
@@ -156,7 +154,7 @@ export default function BreathPage() {
         longestHold: Math.max(holdStats.longestHold, holdDuration),
       } : set
     ));
-  };
+  }, [holdStats]);
 
   const handleToggleZen = () => {
     setIsZenMode(prev => !prev);
@@ -189,8 +187,7 @@ export default function BreathPage() {
     totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
     totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0),
     totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + elapsedTime,
-    totalHoldTime: sets.reduce((total, set) =>
-      total + (set.holdCount * set.avgHoldTime), 0),
+    totalHoldTime: holdStats.totalHoldTime,
     avgHoldTime: 0,
     longestHold: Math.max(
       ...sets.map(set => set.longestHold),
@@ -276,8 +273,11 @@ export default function BreathPage() {
                       onStop={handleEndSession}
                       onToggleZen={handleToggleZen}
                       onToggleSound={handleToggleSound}
-                      onPatternChange={handlePatternChange}
                       onHoldComplete={handleHoldComplete}
+                      isHolding={isHolding}
+                      currentHoldTime={holdStats.currentHoldTime}
+                      onStartHold={startHold}
+                      onEndHold={endHold}
                     />
                   </div>
                 </CardContent>
@@ -291,7 +291,6 @@ export default function BreathPage() {
             )}>
               <CardContent className="p-4 md:p-6">
                 <Tabs value={activeStatsTab} onValueChange={(value) => {
-                  // Always scroll, even if it's the same tab as currently selected
                   scrollToTabs();
                   setActiveStatsTab(value as typeof activeStatsTab);
                 }} className="tabs-container">
@@ -378,8 +377,11 @@ export default function BreathPage() {
                 onStop={handleEndSession}
                 onToggleZen={handleToggleZen}
                 onToggleSound={handleToggleSound}
-                onPatternChange={handlePatternChange}
                 onHoldComplete={handleHoldComplete}
+                isHolding={isHolding}
+                currentHoldTime={holdStats.currentHoldTime}
+                onStartHold={startHold}
+                onEndHold={endHold}
               />
             </div>
           </div>

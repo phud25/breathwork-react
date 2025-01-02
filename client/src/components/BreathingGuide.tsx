@@ -59,6 +59,10 @@ interface BreathingGuideProps {
   onToggleZen: () => void;
   onToggleSound: () => void;
   onHoldComplete: (holdDuration: number) => void;
+  isHolding: boolean;
+  currentHoldTime: number;
+  onStartHold: () => void;
+  onEndHold: () => void;
 }
 
 export function BreathingGuide({
@@ -78,13 +82,12 @@ export function BreathingGuide({
   onStop,
   onToggleZen,
   onToggleSound,
-  onHoldComplete
+  onHoldComplete,
+  isHolding,
+  currentHoldTime,
+  onStartHold,
+  onEndHold
 }: BreathingGuideProps) {
-  const [isHolding, setIsHolding] = useState(false);
-  const [holdTime, setHoldTime] = useState(0);
-  const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
-  const holdStartTime = useRef<number>(0);
-
   const fixedVolume = 0.5;
   const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
   const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? fixedVolume : 0 });
@@ -113,9 +116,6 @@ export function BreathingGuide({
 
   useEffect(() => {
     return () => {
-      if (holdInterval) {
-        clearInterval(holdInterval);
-      }
       backgroundMusic.stop();
       breathSound.stop();
       sessionAudio.stop();
@@ -134,55 +134,13 @@ export function BreathingGuide({
     }
   }, [isSoundEnabled]);
 
-  const startHold = () => {
-    if (!isActive || isHolding) return;
-    console.log('Starting hold...');
-    setIsHolding(true);
-    holdStartTime.current = Date.now();
-    onPause();
-    const interval = setInterval(() => {
-      setHoldTime(prev => prev + 1);
-    }, 1000);
-    setHoldInterval(interval);
-
-    if (isSoundEnabled) {
-      backgroundMusic.play();
-      sessionAudio.play();
-    }
-  };
-
-  const endHold = () => {
-    if (!isHolding) return;
-    const holdDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
-    console.log('Ending hold with duration:', holdDuration);
-
-    if (holdInterval) {
-      clearInterval(holdInterval);
-      setHoldInterval(null);
-    }
-
-    onHoldComplete(holdTime);
-    setIsHolding(false);
-    setHoldTime(0);
-    holdStartTime.current = 0;
-
-    // Always restart from inhale phase
-    onResume(0);
-  };
-
   const handleZenToggle = () => {
-    // Don't interrupt hold during zen mode toggle
-    if (!isHolding) {
-      onToggleZen();
-    } else {
-      // Just toggle zen mode without affecting hold state
-      onToggleZen();
-    }
+    onToggleZen();
   };
 
   const handleStop = () => {
     if (isHolding) {
-      endHold();
+      onEndHold();
     }
     onStop();
   };
@@ -229,8 +187,7 @@ export function BreathingGuide({
           scale: 1,
           transition: {
             duration: phaseDuration,
-            ease: "easeInOut",
-            immediateRender: true
+            ease: "easeInOut"
           }
         }
       };
@@ -251,12 +208,7 @@ export function BreathingGuide({
 
     return {
       initial: { scale: isPostInhale ? 1 : 0.3 },
-      animate: {
-        scale: isPostInhale ? 1 : 0.3,
-        transition: {
-          duration: phaseDuration
-        }
-      }
+      animate: { scale: isPostInhale ? 1 : 0.3 }
     };
   };
 
@@ -271,7 +223,7 @@ export function BreathingGuide({
       )}>
         <div
           className="relative w-[313px] h-[313px] flex items-center justify-center transition-transform duration-500"
-          onClick={() => isHolding && endHold()}
+          onClick={() => isHolding && onEndHold()}
         >
           <div className="absolute w-[291px] h-[291px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20 transition-all duration-500" />
 
@@ -290,7 +242,7 @@ export function BreathingGuide({
               e.stopPropagation();
               if (isActive) {
                 if (isHolding) {
-                  endHold();
+                  onEndHold();
                 } else if (!isPaused) {
                   onPause();
                 } else {
@@ -306,7 +258,7 @@ export function BreathingGuide({
                 {isHolding ? (
                   <div className="flex flex-col items-center">
                     <div className="text-xl font-mono text-[#F5F5DC] font-bold">
-                      {formatTime(holdTime)}
+                      {formatTime(currentHoldTime)}
                     </div>
                     <div className="text-xs text-[#F5F5DC] font-semibold mt-1">
                       Hold
@@ -334,6 +286,7 @@ export function BreathingGuide({
               </Button>
             )}
           </div>
+
           <AnimatePresence>
             {sessionCompleted && !isActive && (
               <motion.div
@@ -383,7 +336,7 @@ export function BreathingGuide({
           <Button
             variant="outline"
             size="icon"
-            onClick={isHolding ? endHold : startHold}
+            onClick={isHolding ? onEndHold : onStartHold}
             disabled={!isActive}
             className={cn(
               "h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",

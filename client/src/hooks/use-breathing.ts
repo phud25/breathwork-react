@@ -11,17 +11,19 @@ export function useBreathing(sequence: number[]) {
   const [pausedTime, setPausedTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [countdown, setCountdown] = useState(0);
-  const [targetBreaths, setTargetBreaths] = useState<number | null>(null);
-  const [targetDuration, setTargetDuration] = useState<number | null>(null);
   const [sessionCompleted, setSessionCompleted] = useState(false);
+
+  // Hold-specific state
   const [holdCount, setHoldCount] = useState(0);
   const [totalHoldTime, setTotalHoldTime] = useState(0);
   const [longestHold, setLongestHold] = useState(0);
+  const [currentHoldTime, setCurrentHoldTime] = useState(0);
+  const holdStartTime = useRef<number>(0);
+  const holdInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // Refs for timing precision
+  // Animation frame reference
   const lastTickTime = useRef<number>(0);
   const animationFrameId = useRef<number>();
-  const holdStartTime = useRef<number>(0);
 
   const queryClient = useQueryClient();
 
@@ -52,24 +54,60 @@ export function useBreathing(sequence: number[]) {
     },
   });
 
-  // Check if session should end based on targets
-  useEffect(() => {
-    if (!isActive) return;
+  // Start hold tracking
+  const startHold = useCallback(() => {
+    if (!isActive || isHolding) return;
 
-    const breathCount = currentCycle * sequence.length + currentPhase;
-    if (targetBreaths && breathCount >= targetBreaths) {
-      setSessionCompleted(true);
-      endSession();
-      return;
+    console.log('Starting hold...');
+    setIsHolding(true);
+    setIsPaused(true);
+    holdStartTime.current = Date.now();
+    setCurrentHoldTime(0);
+
+    // Start the hold timer
+    holdInterval.current = setInterval(() => {
+      const currentDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
+      setCurrentHoldTime(currentDuration);
+    }, 100); // Update more frequently for smoother display
+  }, [isActive, isHolding]);
+
+  // End hold and update metrics
+  const endHold = useCallback(() => {
+    if (!isHolding) return;
+
+    const holdDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
+    console.log('Ending hold with duration:', holdDuration);
+
+    // Clear the hold interval
+    if (holdInterval.current) {
+      clearInterval(holdInterval.current);
+      holdInterval.current = null;
     }
 
-    if (targetDuration && elapsedTime >= targetDuration) {
-      setSessionCompleted(true);
-      endSession();
-      return;
-    }
-  }, [currentCycle, currentPhase, elapsedTime, targetBreaths, targetDuration, isActive]);
+    // Update hold metrics
+    setHoldCount(prev => prev + 1);
+    setTotalHoldTime(prev => prev + holdDuration);
+    setLongestHold(prev => Math.max(prev, holdDuration));
+    setCurrentHoldTime(0);
 
+    // Reset hold state
+    setIsHolding(false);
+    holdStartTime.current = 0;
+
+    // Force restart from beginning of inhale phase
+    setCurrentPhase(0);
+    setIsPaused(false);
+    lastTickTime.current = performance.now();
+    setCountdown(sequence[0]);
+
+    console.log('Updated hold metrics:', {
+      count: holdCount + 1,
+      totalTime: totalHoldTime + holdDuration,
+      longest: Math.max(longestHold, holdDuration)
+    });
+  }, [isHolding, sequence, holdCount, totalHoldTime, longestHold]);
+
+  // Sequence progression
   const progressSequence = useCallback(() => {
     if (!isActive || isPaused || isHolding) return;
 
@@ -81,11 +119,10 @@ export function useBreathing(sequence: number[]) {
       return prev + 1;
     });
 
-    // Set the countdown for the next phase
     setCountdown(sequence[currentPhase]);
   }, [isActive, isPaused, isHolding, sequence.length, currentPhase, sequence]);
 
-  // High precision timer using requestAnimationFrame
+  // High precision timer
   useEffect(() => {
     const updateTimer = () => {
       if (!isActive || isPaused || isHolding) return;
@@ -96,7 +133,7 @@ export function useBreathing(sequence: number[]) {
       }
 
       const delta = now - lastTickTime.current;
-      if (delta >= 1000) { // 1 second has passed
+      if (delta >= 1000) {
         setCountdown((prev) => {
           if (prev <= 1) {
             progressSequence();
@@ -137,6 +174,15 @@ export function useBreathing(sequence: number[]) {
     return () => clearInterval(timer);
   }, [isActive, isPaused, startTime, pausedTime]);
 
+  // Cleanup intervals on unmount
+  useEffect(() => {
+    return () => {
+      if (holdInterval.current) {
+        clearInterval(holdInterval.current);
+      }
+    };
+  }, []);
+
   const startSession = useCallback(() => {
     setIsActive(true);
     setIsPaused(false);
@@ -151,6 +197,7 @@ export function useBreathing(sequence: number[]) {
     setHoldCount(0);
     setTotalHoldTime(0);
     setLongestHold(0);
+    setCurrentHoldTime(0);
     lastTickTime.current = 0;
     holdStartTime.current = 0;
   }, [sequence]);
@@ -164,60 +211,20 @@ export function useBreathing(sequence: number[]) {
     setIsPaused(false);
     setIsHolding(false);
     setCurrentPhase(phase);
-    // Reset timing state
+
     if (pausedTime && startTime) {
       const pauseDuration = Date.now() - pausedTime.getTime();
       setStartTime(new Date(startTime.getTime() + pauseDuration));
       setPausedTime(null);
     }
-    // Reset animation timing
+
     lastTickTime.current = performance.now();
-    // Reset countdown for the new phase
     setCountdown(sequence[phase]);
-  }, [pausedTime, startTime, sequence]);
-
-  const startHold = useCallback(() => {
-    if (!isActive || isHolding) return;
-    console.log('Starting hold...');
-    setIsHolding(true);
-    setIsPaused(true);
-    holdStartTime.current = Date.now();
-  }, [isActive, isHolding]);
-
-  const endHold = useCallback(() => {
-    if (!isHolding) return;
-    const holdDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
-    console.log('Ending hold with duration:', holdDuration);
-    console.log('Previous hold stats:', { 
-      count: holdCount, 
-      totalTime: totalHoldTime, 
-      longest: longestHold 
-    });
-
-    setHoldCount(prev => prev + 1);
-    setTotalHoldTime(prev => prev + holdDuration);
-    setLongestHold(prev => Math.max(prev, holdDuration));
-    setIsHolding(false);
-
-    // Reset hold timing state
-    holdStartTime.current = 0;
-    // Force restart from beginning of inhale phase
-    setCurrentPhase(0);
-    lastTickTime.current = performance.now();
-    setCountdown(sequence[0]);
-    setIsPaused(false);
-
-    console.log('Updated hold stats:', { 
-      count: holdCount + 1, 
-      totalTime: totalHoldTime + holdDuration, 
-      longest: Math.max(longestHold, holdDuration) 
-    });
-  }, [isHolding, sequence, holdCount, totalHoldTime, longestHold]);
+  }, [pausedTime, startTime, sequence, currentPhase]);
 
   const endSession = useCallback(async () => {
     if (!startTime) return;
 
-    // If we're holding when ending, record the hold
     if (isHolding) {
       endHold();
     }
@@ -225,6 +232,7 @@ export function useBreathing(sequence: number[]) {
     setIsActive(false);
     setIsPaused(false);
     setIsHolding(false);
+
     const duration = Math.round((Date.now() - startTime.getTime()) / 1000);
 
     try {
@@ -246,7 +254,11 @@ export function useBreathing(sequence: number[]) {
     setCountdown(0);
     lastTickTime.current = 0;
     holdStartTime.current = 0;
-  }, [startTime, currentCycle, currentPhase, sequence, sessionMutation, holdCount, totalHoldTime, longestHold, isHolding, endHold]);
+  }, [
+    startTime, currentCycle, currentPhase, sequence,
+    sessionMutation, holdCount, totalHoldTime, longestHold,
+    isHolding, endHold
+  ]);
 
   return {
     isActive,
@@ -263,13 +275,11 @@ export function useBreathing(sequence: number[]) {
     endSession,
     startHold,
     endHold,
-    setTargetBreaths,
-    setTargetDuration,
-    recordHold: endHold,
     holdStats: {
       holdCount,
       totalHoldTime,
-      longestHold
+      longestHold,
+      currentHoldTime
     }
   };
 }
