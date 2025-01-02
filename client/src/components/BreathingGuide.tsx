@@ -222,19 +222,22 @@ export function BreathingGuide({
 
   return (
     <div className={cn(
-      "flex flex-col items-center justify-start transition-all duration-500",
-      isZenMode ? "h-screen p-0" : ""
+      "flex flex-col items-center justify-start w-[90%] max-w-[800px] mx-auto transition-all duration-500",
+      isZenMode ? "h-screen p-0" : "py-6"
     )}>
-      <div className={cn("flex items-center justify-center transition-all duration-500 breath-circle relative", isZenMode ? "h-full scale-120" : "mt-8 mb-8 scale-100")}>
+      <div className={cn(
+        "flex items-center justify-center transition-all duration-500 breath-circle relative",
+        isZenMode ? "h-full scale-120" : "mt-4 mb-6 scale-100"
+      )}>
         <div
-          className="relative w-[340px] h-[340px] flex items-center justify-center transition-transform duration-500"
+          className="relative w-[310px] h-[310px] flex items-center justify-center transition-transform duration-500 sm:w-[280px] sm:h-[280px]"
           onClick={() => isHolding && endHold()}
         >
-          <div className="absolute w-[320px] h-[320px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20 transition-all duration-500" />
+          <div className="absolute w-[290px] h-[290px] rounded-full bg-gradient-to-br from-purple-600/30 to-purple-800/20 shadow-lg shadow-purple-900/20 transition-all duration-500 sm:w-[260px] sm:h-[260px]" />
 
           <motion.div
             className={cn(
-              "absolute w-[320px] h-[320px] rounded-full bg-gradient-to-br",
+              "absolute w-[290px] h-[290px] rounded-full bg-gradient-to-br sm:w-[260px] sm:h-[260px]",
               phaseColors[getPhaseVariant(pattern.name, currentPhase) as keyof typeof phaseColors],
               isHolding && "animate-pulse"
             )}
@@ -242,7 +245,7 @@ export function BreathingGuide({
           />
 
           <div
-            className="relative w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform cursor-pointer hover:scale-105 animate-pulse"
+            className="relative w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-primary flex items-center justify-center shadow-lg transition-transform cursor-pointer hover:scale-105 animate-pulse sm:w-20 sm:h-20"
             onClick={(e) => {
               e.stopPropagation();
               if (isActive) {
@@ -315,7 +318,7 @@ export function BreathingGuide({
       </div>
 
       <div className={cn(
-        "w-full max-w-[600px] transition-all duration-500 controls",
+        "w-full transition-all duration-500 controls",
         isZenMode ? "absolute bottom-8 opacity-100" : "opacity-100"
       )}>
         <div className={cn(
@@ -326,27 +329,25 @@ export function BreathingGuide({
           <div>Time: {formatTime(elapsed)}</div>
         </div>
 
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex items-center justify-center gap-4">
           <Button
             variant="outline"
             size="icon"
             onClick={onToggleSound}
-            className="h-[68px] w-[68px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl"
+            className="h-[60px] w-[60px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl sm:h-[52px] sm:w-[52px]"
           >
-            {isSoundEnabled ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
+            {isSoundEnabled ? <Volume2 className="h-6 w-6 sm:h-5 sm:w-5" /> : <VolumeX className="h-6 w-6 sm:h-5 sm:w-5" />}
           </Button>
 
           {isActive && (
-            <>
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={handleStop}
-                className="h-[68px] w-[68px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl"
-              >
-                <Square className="h-6 w-6" />
-              </Button>
-            </>
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={handleStop}
+              className="h-[60px] w-[60px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl sm:h-[52px] sm:w-[52px]"
+            >
+              <Square className="h-6 w-6 sm:h-5 sm:w-5" />
+            </Button>
           )}
 
           <Button
@@ -354,11 +355,11 @@ export function BreathingGuide({
             size="icon"
             onClick={onToggleZen}
             className={cn(
-              "h-[68px] w-[68px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl",
+              "h-[60px] w-[60px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-2xl sm:h-[52px] sm:w-[52px]",
               isZenMode ? "opacity-50 hover:opacity-100" : ""
             )}
           >
-            <Maximize className="h-6 w-6" />
+            <Maximize className="h-6 w-6 sm:h-5 sm:w-5" />
           </Button>
         </div>
       </div>
