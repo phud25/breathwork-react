@@ -61,7 +61,8 @@ const durationOptions = Array.from({ length: 119 }, (_, i) => {
   const seconds = totalSeconds % 60;
   return {
     value: totalSeconds,
-    label: `${minutes}:${seconds.toString().padStart(2, '0')} Minutes`
+    label: `${minutes}:${seconds.toString().padStart(2, '0')} Minutes`,
+    displayValue: `${minutes}:${seconds.toString().padStart(2, '0')}`
   };
 });
 
@@ -85,101 +86,114 @@ export function PatternSelector({
   const currentDuration = durationOptions.find(d => d.value === selectedDuration) || durationOptions[5]; // 3:00 default
 
   return (
-    <div className="flex items-center justify-between border-b border-purple-500/20">
-      <Sheet open={isPatternOpen} onOpenChange={setIsPatternOpen}>
-        <SheetTrigger asChild>
-          <Button 
-            variant="ghost" 
-            className="flex-1 justify-between h-14 px-4 hover:bg-white/5 rounded-none"
-          >
-            <span className="text-lg font-medium text-[rgb(167,139,250)]">
-              {currentPattern?.name}
-            </span>
-            <ChevronDown className="h-4 w-4 text-[rgb(167,139,250)]" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent 
-          side="bottom" 
-          className="h-[85vh] bg-background/95 backdrop-blur-md border-t border-purple-500/20"
-        >
-          <SheetHeader>
-            <SheetTitle className="text-[rgb(167,139,250)]">Select Breathing Pattern</SheetTitle>
-            <SheetDescription>
-              Choose a pattern that matches your current needs
-            </SheetDescription>
-          </SheetHeader>
-          <ScrollArea className="h-[calc(85vh-120px)] mt-6">
-            <div className="grid gap-4 pr-4">
-              {patterns.map((pattern) => (
-                <Card
-                  key={pattern.id}
-                  className={cn(
-                    "cursor-pointer transition-all border-purple-500/20 hover:border-purple-500/40",
-                    pattern.id === selectedPattern && "ring-1 ring-purple-500/30 bg-purple-500/5"
-                  )}
-                  onClick={() => {
-                    onPatternChange(pattern.id);
-                    setIsPatternOpen(false);
-                  }}
-                >
-                  <CardContent className="p-4">
-                    <div className="font-medium mb-1">{pattern.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {pattern.description}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
+    <div className="border-b border-purple-500/20">
+      {/* Labels */}
+      <div className="flex px-4 pt-2">
+        <div className="flex-1">
+          <span className="text-xs text-muted-foreground font-medium">Breath Pattern</span>
+        </div>
+        <div className="w-[120px]">
+          <span className="text-xs text-muted-foreground font-medium">Duration</span>
+        </div>
+      </div>
 
-      <Sheet open={isDurationOpen} onOpenChange={setIsDurationOpen}>
-        <SheetTrigger asChild>
-          <Button 
-            variant="ghost" 
-            className="h-14 px-4 hover:bg-white/5 rounded-none border-l border-purple-500/20"
+      {/* Selectors */}
+      <div className="flex items-center justify-between">
+        <Sheet open={isPatternOpen} onOpenChange={setIsPatternOpen}>
+          <SheetTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="flex-1 justify-between h-14 px-4 hover:bg-white/5 rounded-none"
+            >
+              <span className="text-lg font-medium text-[rgb(167,139,250)] truncate max-w-[280px]">
+                {currentPattern?.name}
+              </span>
+              <ChevronDown className="h-4 w-4 text-[rgb(167,139,250)] ml-2 flex-shrink-0" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent 
+            side="bottom" 
+            className="h-[85vh] bg-background/95 backdrop-blur-md border-t border-purple-500/20"
           >
-            <span className="text-lg font-medium text-[rgb(167,139,250)]">
-              {currentDuration.label}
-            </span>
-            <ChevronDown className="ml-2 h-4 w-4 text-[rgb(167,139,250)]" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent 
-          side="bottom" 
-          className="h-[85vh] bg-background/95 backdrop-blur-md border-t border-purple-500/20"
-        >
-          <SheetHeader>
-            <SheetTitle className="text-[rgb(167,139,250)]">Select Duration</SheetTitle>
-            <SheetDescription>
-              Choose how long you want to practice
-            </SheetDescription>
-          </SheetHeader>
-          <ScrollArea className="h-[calc(85vh-120px)] mt-6">
-            <div className="grid gap-4 pr-4">
-              {durationOptions.map((duration) => (
-                <Card
-                  key={duration.value}
-                  className={cn(
-                    "cursor-pointer transition-all border-purple-500/20 hover:border-purple-500/40",
-                    duration.value === selectedDuration && "ring-1 ring-purple-500/30 bg-purple-500/5"
-                  )}
-                  onClick={() => {
-                    onDurationChange?.(duration.value);
-                    setIsDurationOpen(false);
-                  }}
-                >
-                  <CardContent className="p-4">
-                    <div className="font-medium">{duration.label}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
+            <SheetHeader>
+              <SheetTitle className="text-[rgb(167,139,250)]">Select Breathing Pattern</SheetTitle>
+              <SheetDescription>
+                Choose a pattern that matches your current needs
+              </SheetDescription>
+            </SheetHeader>
+            <ScrollArea className="h-[calc(85vh-120px)] mt-6">
+              <div className="grid gap-4 pr-4">
+                {patterns.map((pattern) => (
+                  <Card
+                    key={pattern.id}
+                    className={cn(
+                      "cursor-pointer transition-all border-purple-500/20 hover:border-purple-500/40",
+                      pattern.id === selectedPattern && "ring-1 ring-purple-500/30 bg-purple-500/5"
+                    )}
+                    onClick={() => {
+                      onPatternChange(pattern.id);
+                      setIsPatternOpen(false);
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="font-medium mb-1 line-clamp-2">{pattern.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {pattern.description}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
+
+        <Sheet open={isDurationOpen} onOpenChange={setIsDurationOpen}>
+          <SheetTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="w-[120px] h-14 px-4 hover:bg-white/5 rounded-none border-l border-purple-500/20"
+            >
+              <span className="text-lg font-medium text-[rgb(167,139,250)]">
+                {currentDuration.displayValue}
+              </span>
+              <ChevronDown className="ml-2 h-4 w-4 text-[rgb(167,139,250)]" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent 
+            side="bottom" 
+            className="h-[85vh] bg-background/95 backdrop-blur-md border-t border-purple-500/20"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-[rgb(167,139,250)]">Select Duration</SheetTitle>
+              <SheetDescription>
+                Choose how long you want to practice
+              </SheetDescription>
+            </SheetHeader>
+            <ScrollArea className="h-[calc(85vh-120px)] mt-6">
+              <div className="grid gap-4 pr-4">
+                {durationOptions.map((duration) => (
+                  <Card
+                    key={duration.value}
+                    className={cn(
+                      "cursor-pointer transition-all border-purple-500/20 hover:border-purple-500/40",
+                      duration.value === selectedDuration && "ring-1 ring-purple-500/30 bg-purple-500/5"
+                    )}
+                    onClick={() => {
+                      onDurationChange?.(duration.value);
+                      setIsDurationOpen(false);
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="font-medium">{duration.label}</div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
+      </div>
     </div>
   );
 }
