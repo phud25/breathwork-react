@@ -125,7 +125,7 @@ export default function BreathPage() {
         avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
         longestHold: holdStats.longestHold,
         isActive: false,
-        breathTime: elapsedTime,
+        breathTime: elapsedTime // Ensure we capture the final breath time
       } : set
     ));
 
@@ -167,7 +167,7 @@ export default function BreathPage() {
   // Current stats for the SetStatsTab - Updated with real-time hold metrics
   const currentStats = {
     breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
-    breathTime: elapsedTime,
+    breathTime: isActive ? elapsedTime : (sets.find(set => set.isActive)?.breathTime || 0),
     holdCount: holdStats.holdCount,
     avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
     bestHoldTime: holdStats.longestHold
@@ -177,16 +177,16 @@ export default function BreathPage() {
   const sessionStats = {
     sets: sets.map(set => ({
       ...set,
-      // For active set, use current hold stats
       holdCount: set.isActive ? holdStats.holdCount : set.holdCount,
       avgHoldTime: set.isActive && holdStats.holdCount > 0
         ? Math.round(holdStats.totalHoldTime / holdStats.holdCount)
         : set.avgHoldTime,
-      longestHold: set.isActive ? holdStats.longestHold : set.longestHold
+      longestHold: set.isActive ? holdStats.longestHold : set.longestHold,
+      breathTime: set.isActive ? elapsedTime : set.breathTime // Ensure active set shows current time
     })),
     totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
     totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0),
-    totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + elapsedTime,
+    totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + (isActive ? elapsedTime : 0),
     totalHoldTime: holdStats.totalHoldTime,
     avgHoldTime: 0,
     longestHold: Math.max(
