@@ -39,7 +39,9 @@ interface BreathingSet {
 const scrollToTabs = () => {
   const tabsElement = document.querySelector('.tabs-container');
   if (tabsElement) {
-    tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 };
 
@@ -266,13 +268,8 @@ export default function BreathPage() {
             )}>
               <CardContent className="p-4 md:p-6">
                 <Tabs value={activeStatsTab} onValueChange={(value) => {
-                  // Always scroll, even if it's the same tab
-                  const tabsElement = document.querySelector('.tabs-container');
-                  if (tabsElement) {
-                    setTimeout(() => {
-                      tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                  }
+                  // Always scroll, even if it's the same tab as currently selected
+                  scrollToTabs();
                   setActiveStatsTab(value as typeof activeStatsTab);
                 }} className="tabs-container">
                   <TabsList className="grid w-full grid-cols-4 mb-6">
