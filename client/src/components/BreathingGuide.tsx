@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion, type AnimationProps } from "framer-motion";
 import { Volume2, VolumeX, Square, Maximize, Hand } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,8 +85,9 @@ export function BreathingGuide({
   const [isHolding, setIsHolding] = useState(false);
   const [holdTime, setHoldTime] = useState(0);
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null);
+  const holdStartTime = useRef<number>(0);
 
-  const fixedVolume = 0.5; // Fixed volume at 50%
+  const fixedVolume = 0.5;
   const backgroundMusic = useAudio('/audio/meditation-bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume * 0.6 : 0 });
   const breathSound = useAudio('/audio/breath-sound.mp3', { volume: isSoundEnabled ? fixedVolume : 0 });
   const sessionAudio = useAudio('/audio/2-2bg.mp3', { loop: true, volume: isSoundEnabled ? fixedVolume : 0 });
@@ -114,6 +115,9 @@ export function BreathingGuide({
 
   useEffect(() => {
     return () => {
+      if (holdInterval) {
+        clearInterval(holdInterval);
+      }
       backgroundMusic.stop();
       breathSound.stop();
       sessionAudio.stop();
@@ -134,7 +138,9 @@ export function BreathingGuide({
 
   const startHold = () => {
     if (!isActive || isHolding) return;
+    console.log('Starting hold...');
     setIsHolding(true);
+    holdStartTime.current = Date.now();
     onPause();
     const interval = setInterval(() => {
       setHoldTime(prev => prev + 1);
@@ -148,33 +154,37 @@ export function BreathingGuide({
   };
 
   const endHold = () => {
+    if (!isHolding) return;
+    const holdDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
+    console.log('Ending hold with duration:', holdDuration);
+
     if (holdInterval) {
       clearInterval(holdInterval);
       setHoldInterval(null);
     }
-    if (isHolding) {
-      onHoldComplete(holdTime);
-    }
+
+    onHoldComplete(holdTime);
     setIsHolding(false);
     setHoldTime(0);
+    holdStartTime.current = 0;
+
+    // Force restart from beginning of inhale phase
+    onResume(0);
   };
 
   // Handle zen mode toggle without interrupting hold
   const handleZenToggle = () => {
-    // Only toggle zen mode, maintain current hold state
+    if (isHolding) {
+      const holdDuration = Math.round((Date.now() - holdStartTime.current) / 1000);
+      console.log('Current hold duration during zen toggle:', holdDuration);
+    }
     onToggleZen();
   };
 
   const handleStop = () => {
     if (isHolding) {
       // If we're holding, first complete the hold
-      if (holdInterval) {
-        clearInterval(holdInterval);
-        setHoldInterval(null);
-      }
-      onHoldComplete(holdTime);
-      setIsHolding(false);
-      setHoldTime(0);
+      endHold();
     }
     // Then end the session
     onStop();

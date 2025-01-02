@@ -146,9 +146,16 @@ export default function BreathPage() {
   }, [currentCycle, currentPhase, selectedPattern, holdStats, endSession, elapsedTime]);
 
   const handleHoldComplete = (holdDuration: number) => {
-    // After a hold completes, always start from inhale phase
-    // Force animation reset by passing phase 0
-    resumeSession(0);
+    console.log('Hold completed with duration:', holdDuration);
+    // Update the current set's hold metrics
+    setSets(prev => prev.map(set =>
+      set.isActive ? {
+        ...set,
+        holdCount: holdStats.holdCount,
+        avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
+        longestHold: holdStats.longestHold,
+      } : set
+    ));
   };
 
   const handleToggleZen = () => {
@@ -159,7 +166,7 @@ export default function BreathPage() {
     setIsSoundEnabled(prev => !prev);
   };
 
-  // Calculate current stats for the SetStatsTab
+  // Current stats for the SetStatsTab
   const currentStats = {
     breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
     breathTime: elapsedTime,
@@ -170,12 +177,20 @@ export default function BreathPage() {
 
   // Calculate session totals with combined breath time from all sets
   const sessionStats = {
-    sets,
+    sets: sets.map(set => ({
+      ...set,
+      // If it's the active set, use current hold stats
+      holdCount: set.isActive ? holdStats.holdCount : set.holdCount,
+      avgHoldTime: set.isActive && holdStats.holdCount > 0
+        ? Math.round(holdStats.totalHoldTime / holdStats.holdCount)
+        : set.avgHoldTime,
+      longestHold: set.isActive ? holdStats.longestHold : set.longestHold
+    })),
     totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
     totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0) + holdStats.holdCount,
     totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + elapsedTime,
-    // Update total hold time to include both completed sets and current stats
-    totalHoldTime: sets.reduce((total, set) => total + (set.holdCount * set.avgHoldTime), 0) + holdStats.totalHoldTime,
+    totalHoldTime: sets.reduce((total, set) =>
+      total + (set.holdCount * set.avgHoldTime), 0) + holdStats.totalHoldTime,
     avgHoldTime: 0,
     longestHold: Math.max(
       ...sets.map(set => set.longestHold),
@@ -189,28 +204,14 @@ export default function BreathPage() {
   }
 
   // Calculate daily stats including current session
-  const totalBreaths = (stats?.totalBreaths || 0) + sessionStats.totalBreaths;
-  const totalMinutes = (stats?.totalMinutes || 0) + Math.floor(elapsedTime / 60);
-  const totalHolds = (stats?.totalHolds || 0) + sessionStats.totalHoldCount;
-  const totalHoldTime = (stats?.totalHoldTime || 0) + holdStats.totalHoldTime;
-  const dailyAvgHold = totalHolds > 0
-    ? Math.round(totalHoldTime / totalHolds)
-    : 0;
-
-  // Stats for DailyStatsTab
   const dailyStats = {
     totalSessions: (stats?.totalSessions || 0) + 1,
     setsPerSession: ((stats?.totalSets || 0) + sets.length) / ((stats?.totalSessions || 0) + 1),
     breathTime: (stats?.totalMinutes || 0) * 60 + elapsedTime,
-    holdDuration: totalHoldTime,
-    mostUsedPattern: "4-7-8 Relaxation",
-    bestPerformance: {
-      pattern: "Box Breathing",
-      score: 98,
-    },
+    holdDuration: (stats?.totalHoldTime || 0) + sessionStats.totalHoldTime,
     longestSession: Math.max((stats?.longestSession || 0), elapsedTime),
     peakMetrics: {
-      longestHold: Math.max(stats?.longestHold || 0, holdStats.longestHold),
+      longestHold: Math.max(stats?.longestHold || 0, sessionStats.longestHold),
       highestConsistency: 98,
     },
   };
