@@ -117,6 +117,7 @@ export default function BreathPage() {
     console.log('Current hold stats:', holdStats);
     console.log('Current sets:', sets);
 
+    // Update the current set with final metrics
     setSets(prev => prev.map(set =>
       set.isActive ? {
         ...set,
@@ -125,7 +126,7 @@ export default function BreathPage() {
         avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
         longestHold: holdStats.longestHold,
         isActive: false,
-        breathTime: elapsedTime // Ensure we capture the final breath time
+        breathTime: elapsedTime // Store final breath time
       } : set
     ));
 
@@ -164,16 +165,16 @@ export default function BreathPage() {
     setIsSoundEnabled(prev => !prev);
   };
 
-  // Current stats for the SetStatsTab - Updated with real-time hold metrics
+  // Current stats for the SetStatsTab - Updated with preserved time
   const currentStats = {
     breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
-    breathTime: isActive ? elapsedTime : (sets.find(set => set.isActive)?.breathTime || 0),
+    breathTime: elapsedTime, // This will now return final time when session is not active
     holdCount: holdStats.holdCount,
     avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
     bestHoldTime: holdStats.longestHold
   };
 
-  // Calculate session totals
+  // Calculate session totals with preserved times
   const sessionStats = {
     sets: sets.map(set => ({
       ...set,
@@ -182,11 +183,11 @@ export default function BreathPage() {
         ? Math.round(holdStats.totalHoldTime / holdStats.holdCount)
         : set.avgHoldTime,
       longestHold: set.isActive ? holdStats.longestHold : set.longestHold,
-      breathTime: set.isActive ? elapsedTime : set.breathTime // Ensure active set shows current time
+      breathTime: set.isActive ? elapsedTime : set.breathTime // Use preserved time
     })),
     totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
     totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0),
-    totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0) + (isActive ? elapsedTime : 0),
+    totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0),
     totalHoldTime: holdStats.totalHoldTime,
     avgHoldTime: 0,
     longestHold: Math.max(
@@ -195,7 +196,6 @@ export default function BreathPage() {
     )
   };
 
-  // Update average hold time
   sessionStats.avgHoldTime = sessionStats.totalHoldCount > 0
     ? Math.round(sessionStats.totalHoldTime / sessionStats.totalHoldCount)
     : 0;

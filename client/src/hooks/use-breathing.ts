@@ -10,6 +10,7 @@ export function useBreathing(sequence: number[]) {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [pausedTime, setPausedTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [finalTime, setFinalTime] = useState(0);
   const [countdown, setCountdown] = useState(0);
   const [sessionCompleted, setSessionCompleted] = useState(false);
 
@@ -166,7 +167,9 @@ export function useBreathing(sequence: number[]) {
       timer = setInterval(() => {
         if (startTime) {
           const pausedDuration = pausedTime ? (Date.now() - pausedTime.getTime()) : 0;
-          setElapsedTime(Math.round((Date.now() - startTime.getTime() - pausedDuration) / 1000));
+          const currentElapsed = Math.round((Date.now() - startTime.getTime() - pausedDuration) / 1000);
+          setElapsedTime(currentElapsed);
+          setFinalTime(currentElapsed); // Update final time continuously
         }
       }, 1000);
     }
@@ -192,6 +195,7 @@ export function useBreathing(sequence: number[]) {
     setStartTime(new Date());
     setPausedTime(null);
     setElapsedTime(0);
+    setFinalTime(0);
     setCountdown(sequence[0]);
     setSessionCompleted(false);
     setHoldCount(0);
@@ -229,16 +233,18 @@ export function useBreathing(sequence: number[]) {
       endHold();
     }
 
+    const finalDuration = Math.round((Date.now() - startTime.getTime()) / 1000);
+    setFinalTime(finalDuration); // Store final time before ending
+    setElapsedTime(finalDuration);
+
     setIsActive(false);
     setIsPaused(false);
     setIsHolding(false);
 
-    const duration = Math.round((Date.now() - startTime.getTime()) / 1000);
-
     try {
       await sessionMutation.mutateAsync({
         pattern: sequence.join("-"),
-        duration,
+        duration: finalDuration,
         breathCount: currentCycle * sequence.length + currentPhase,
         holdCount,
         totalHoldTime,
@@ -250,7 +256,6 @@ export function useBreathing(sequence: number[]) {
 
     setStartTime(null);
     setPausedTime(null);
-    setElapsedTime(0);
     setCountdown(0);
     lastTickTime.current = 0;
     holdStartTime.current = 0;
@@ -266,7 +271,7 @@ export function useBreathing(sequence: number[]) {
     isHolding,
     currentPhase,
     currentCycle,
-    elapsedTime,
+    elapsedTime: isActive ? elapsedTime : finalTime, // Return final time when session is not active
     countdown,
     sessionCompleted,
     startSession,
