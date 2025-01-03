@@ -19,6 +19,7 @@ interface SessionStats {
   totalHoldCount: number;
   totalBreathTime: number;
   totalHoldTime: number;
+  avgHoldTime: number;
 }
 
 const formatTime = (seconds: number) => {
@@ -131,7 +132,13 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
 
       {/* Session Totals Card */}
       <Card className="bg-purple-600/10 backdrop-blur-sm border-purple-500/20">
-        <div className="grid grid-cols-4 gap-4 p-4">
+        <div className="grid grid-cols-5 gap-4 p-4">
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground font-medium mb-1">Breaths</p>
+            <p className="text-lg font-bold tracking-tight">
+              {sessionStats.totalBreaths}
+            </p>
+          </div>
           <div className="text-center">
             <p className="text-sm text-muted-foreground font-medium mb-1">Total Time</p>
             <p className="text-lg font-bold tracking-tight">
@@ -139,7 +146,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
             </p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-muted-foreground font-medium mb-1">Total Holds</p>
+            <p className="text-sm text-muted-foreground font-medium mb-1">Holds</p>
             <p className="text-lg font-bold tracking-tight">
               {sessionStats.totalHoldCount}
             </p>
@@ -147,7 +154,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
           <div className="text-center">
             <p className="text-sm text-muted-foreground font-medium mb-1">Avg Hold</p>
             <p className="text-lg font-bold tracking-tight">
-              {formatTime(sessionStats.totalHoldTime / (sessionStats.totalHoldCount || 1))}
+              {formatTime(sessionStats.avgHoldTime)}
             </p>
           </div>
           <div className="text-center">
