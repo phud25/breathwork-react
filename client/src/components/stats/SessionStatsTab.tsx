@@ -21,12 +21,6 @@ interface SessionStats {
   totalHoldTime: number;
 }
 
-const formatHoldTime = (seconds: number) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
-
 const formatTime = (seconds: number) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -68,65 +62,99 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
   return (
     <div className="space-y-6">
       {/* Live Set Display */}
-      <ScrollArea className="h-[200px] rounded-lg border border-border/50 bg-white/5">
+      <ScrollArea className="h-[300px] rounded-lg border border-border/50">
         <div className="p-4 space-y-4">
           {sortedSets.map((set, index) => {
             // Calculate the set number based on the total number of sets
             const setNumber = sortedSets.length - index;
             return (
-              <div
+              <Card
                 key={set.id}
-                className={`p-3 rounded-lg bg-white/5 backdrop-blur-sm space-y-2 ${
+                className={`overflow-hidden bg-white/5 backdrop-blur-sm transition-all ${
                   set.isActive ? 'ring-1 ring-primary/30' : ''
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Set {setNumber} - {set.pattern}</span>
+                {/* Pattern Header */}
+                <div className="px-4 py-3 border-b border-border/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Set {setNumber}</span>
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-sm font-medium">{set.pattern}</span>
+                  </div>
                   {set.isActive && (
                     <span className="text-xs text-primary-foreground/70 animate-pulse">
                       Active
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-4 gap-2 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Breaths</span>
-                    <div className="mt-1">{set.breathCount}</div>
+
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-6 gap-1 p-4">
+                  {/* Breaths */}
+                  <div className="text-center">
+                    <span className="text-xs text-muted-foreground font-medium block mb-1">Breaths</span>
+                    <span className="text-sm font-semibold">{set.breathCount}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Holds</span>
-                    <div className="mt-1">{set.holdCount}</div>
+
+                  {/* Breath Time */}
+                  <div className="text-center">
+                    <span className="text-xs text-muted-foreground font-medium block mb-1">Time</span>
+                    <span className="text-sm font-semibold">{formatTime(set.breathTime || 0)}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Avg</span>
-                    <div className="mt-1">{formatHoldTime(set.avgHoldTime)}</div>
+
+                  {/* Holds */}
+                  <div className="text-center">
+                    <span className="text-xs text-muted-foreground font-medium block mb-1">Holds</span>
+                    <span className="text-sm font-semibold">{set.holdCount}</span>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Best</span>
-                    <div className="mt-1">{formatHoldTime(set.longestHold)}</div>
+
+                  {/* Avg Hold */}
+                  <div className="text-center">
+                    <span className="text-xs text-muted-foreground font-medium block mb-1">Avg Hold</span>
+                    <span className="text-sm font-semibold">{formatTime(set.avgHoldTime)}</span>
+                  </div>
+
+                  {/* Best Hold */}
+                  <div className="text-center">
+                    <span className="text-xs text-muted-foreground font-medium block mb-1">Best Hold</span>
+                    <span className="text-sm font-semibold">{formatTime(set.longestHold)}</span>
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
       </ScrollArea>
 
-      {/* Session Summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Total Breath Time</p>
-          <p className="text-2xl font-bold tracking-tight">
-            {formatTime(sessionStats.totalBreathTime)}
-          </p>
+      {/* Session Totals Card */}
+      <Card className="bg-purple-600/10 backdrop-blur-sm border-purple-500/20">
+        <div className="grid grid-cols-4 gap-4 p-4">
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground font-medium mb-1">Total Time</p>
+            <p className="text-lg font-bold tracking-tight">
+              {formatTime(sessionStats.totalBreathTime)}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground font-medium mb-1">Total Holds</p>
+            <p className="text-lg font-bold tracking-tight">
+              {sessionStats.totalHoldCount}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground font-medium mb-1">Avg Hold</p>
+            <p className="text-lg font-bold tracking-tight">
+              {formatTime(sessionStats.totalHoldTime / (sessionStats.totalHoldCount || 1))}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground font-medium mb-1">Best Hold</p>
+            <p className="text-lg font-bold tracking-tight">
+              {formatTime(Math.max(...sessionStats.sets.map(s => s.longestHold)))}
+            </p>
+          </div>
         </div>
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Avg Hold Time</p>
-          <p className="text-2xl font-bold tracking-tight">
-            {formatHoldTime(sessionStats.totalHoldTime / (sessionStats.totalHoldCount || 1))}
-          </p>
-        </div>
-      </div>
+      </Card>
     </div>
   );
 }
