@@ -168,32 +168,38 @@ export default function BreathPage() {
   // Current stats for the SetStatsTab - Updated with preserved time
   const currentStats = {
     breathCount: currentCycle * breathingPatterns[selectedPattern].sequence.length + (currentPhase > 0 ? currentPhase : 0),
-    breathTime: elapsedTime, // This will now return final time when session is not active
+    breathTime: elapsedTime,
     holdCount: holdStats.holdCount,
     avgHoldTime: holdStats.holdCount > 0 ? Math.round(holdStats.totalHoldTime / holdStats.holdCount) : 0,
     bestHoldTime: holdStats.longestHold
   };
 
-  // Calculate session totals with preserved times
+  // Calculate session totals with preserved times and real-time updates
   const sessionStats = {
     sets: sets.map(set => ({
       ...set,
+      breathCount: set.isActive ? currentStats.breathCount : set.breathCount,
       holdCount: set.isActive ? holdStats.holdCount : set.holdCount,
       avgHoldTime: set.isActive && holdStats.holdCount > 0
         ? Math.round(holdStats.totalHoldTime / holdStats.holdCount)
         : set.avgHoldTime,
       longestHold: set.isActive ? holdStats.longestHold : set.longestHold,
-      breathTime: set.isActive ? elapsedTime : set.breathTime // Use preserved time
+      breathTime: set.isActive ? elapsedTime : set.breathTime
     })),
-    totalBreaths: sets.reduce((total, set) => total + set.breathCount, 0) + currentStats.breathCount,
-    totalHoldCount: sets.reduce((total, set) => total + set.holdCount, 0),
-    totalBreathTime: sets.reduce((total, set) => total + (set.breathTime || 0), 0),
+    totalBreaths: sets.reduce((total, set) => 
+      total + (set.isActive ? currentStats.breathCount : set.breathCount), 
+      0
+    ),
+    totalHoldCount: sets.reduce((total, set) => 
+      total + (set.isActive ? holdStats.holdCount : set.holdCount), 
+      0
+    ),
+    totalBreathTime: sets.reduce((total, set) => 
+      total + (set.isActive ? elapsedTime : (set.breathTime || 0)), 
+      0
+    ),
     totalHoldTime: holdStats.totalHoldTime,
-    avgHoldTime: 0,
-    longestHold: Math.max(
-      ...sets.map(set => set.longestHold),
-      holdStats.longestHold
-    )
+    avgHoldTime: 0
   };
 
   sessionStats.avgHoldTime = sessionStats.totalHoldCount > 0

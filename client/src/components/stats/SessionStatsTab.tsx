@@ -20,12 +20,22 @@ interface SessionStats {
   totalHoldCount: number;
   totalBreathTime: number;
   totalHoldTime: number;
+  avgHoldTime: number;
 }
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+
+// Function to simplify pattern name by removing timing numbers
+const simplifyPatternName = (pattern: string) => {
+  return pattern
+    .replace(/\(\d+x\d+\)/g, '') // Remove (4x4) style
+    .replace(/\d+-\d+(-\d+)?/g, '') // Remove 4-7-8 or 2-2 style numbers
+    .replace(/\s+/g, ' ') // Clean up extra spaces
+    .trim();
 };
 
 interface SessionStatsTabProps {
@@ -63,7 +73,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
           {/* Header Row */}
           <div className="table-header-group text-xs font-medium sticky top-0 bg-background/95 backdrop-blur-sm z-10">
             <div className="table-row border-b border-purple-500/20">
-              <div className="table-cell p-3 text-left">Set & Pattern</div>
+              <div className="table-cell p-3 text-left">Set - Pattern</div>
               <div className="table-cell p-3 text-right">Breaths</div>
               <div className="table-cell p-3 text-right">Time</div>
               <div className="table-cell p-3 text-right">Holds</div>
@@ -77,6 +87,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
             <AnimatePresence>
               {sortedSets.map((set, index) => {
                 const setNumber = sortedSets.length - index;
+                const simplifiedPattern = simplifyPatternName(set.pattern);
                 return (
                   <motion.div
                     key={set.id}
@@ -89,14 +100,21 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
                     }`}
                   >
                     <div className="table-cell p-3 font-medium">
-                      Set {setNumber} - {set.pattern}
+                      {setNumber} - {simplifiedPattern}
                       {set.isActive && (
                         <span className="ml-2 text-xs text-purple-300 animate-pulse">
                           Active
                         </span>
                       )}
                     </div>
-                    <div className="table-cell p-3 text-right font-mono">{set.breathCount}</div>
+                    <motion.div 
+                      className="table-cell p-3 text-right font-mono"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: set.isActive ? [0.5, 1] : 1 }}
+                      transition={{ duration: 0.2, repeat: set.isActive ? Infinity : 0 }}
+                    >
+                      {set.breathCount}
+                    </motion.div>
                     <div className="table-cell p-3 text-right font-mono">{formatTime(set.breathTime || 0)}</div>
                     <div className="table-cell p-3 text-right font-mono">{set.holdCount}</div>
                     <div className="table-cell p-3 text-right font-mono">{formatTime(set.avgHoldTime)}</div>
