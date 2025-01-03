@@ -70,26 +70,29 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
             return (
               <Card
                 key={set.id}
-                className={`overflow-hidden bg-white/5 backdrop-blur-sm transition-all ${
+                className={`overflow-hidden bg-white/5 backdrop-blur-sm transition-all relative ${
                   set.isActive ? 'ring-1 ring-primary/30' : ''
                 }`}
               >
+                {set.isActive && (
+                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-primary/20 backdrop-blur-sm">
+                    <span className="text-xs text-primary-foreground/70 font-medium animate-pulse">
+                      Active
+                    </span>
+                  </div>
+                )}
+
                 {/* Pattern Header */}
-                <div className="px-4 py-3 border-b border-border/10 flex items-center justify-between">
+                <div className="px-4 py-3 border-b border-border/10">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Set {setNumber}</span>
                     <span className="text-muted-foreground">•</span>
                     <span className="text-sm font-medium">{set.pattern}</span>
                   </div>
-                  {set.isActive && (
-                    <span className="text-xs text-primary-foreground/70 animate-pulse">
-                      Active
-                    </span>
-                  )}
                 </div>
 
                 {/* Metrics Grid */}
-                <div className="grid grid-cols-6 gap-1 p-4">
+                <div className="grid grid-cols-5 gap-4 p-4">
                   {/* Breaths */}
                   <div className="text-center">
                     <span className="text-xs text-muted-foreground font-medium block mb-1">Breaths</span>
