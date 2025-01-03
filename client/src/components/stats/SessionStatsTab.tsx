@@ -21,20 +21,9 @@ interface SessionStats {
   totalHoldTime: number;
 }
 
-const formatHoldTime = (seconds: number) => {
+const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
-
-const formatTime = (seconds: number) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  }
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
@@ -67,64 +56,74 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
 
   return (
     <div className="space-y-6">
-      {/* Live Set Display */}
+      {/* Session Sets Table */}
       <ScrollArea className="h-[200px] rounded-lg border border-border/50 bg-white/5">
-        <div className="p-4 space-y-4">
-          {sortedSets.map((set, index) => {
-            // Calculate the set number based on the total number of sets
-            const setNumber = sortedSets.length - index;
-            return (
-              <div
-                key={set.id}
-                className={`p-3 rounded-lg bg-white/5 backdrop-blur-sm space-y-2 ${
-                  set.isActive ? 'ring-1 ring-primary/30' : ''
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Set {setNumber} - {set.pattern}</span>
-                  {set.isActive && (
-                    <span className="text-xs text-primary-foreground/70 animate-pulse">
-                      Active
-                    </span>
-                  )}
+        <div className="min-w-full table">
+          {/* Header Row */}
+          <div className="table-header-group text-xs font-medium text-muted-foreground">
+            <div className="table-row border-b border-purple-500/20">
+              <div className="table-cell p-2 text-left">Set & Pattern</div>
+              <div className="table-cell p-2 text-right">Breaths</div>
+              <div className="table-cell p-2 text-right">Time</div>
+              <div className="table-cell p-2 text-right">Holds</div>
+              <div className="table-cell p-2 text-right">Avg Hold</div>
+              <div className="table-cell p-2 text-right">Best Hold</div>
+            </div>
+          </div>
+
+          {/* Data Rows */}
+          <div className="table-row-group">
+            {sortedSets.map((set, index) => {
+              // Calculate the set number based on the total number of sets
+              const setNumber = sortedSets.length - index;
+              return (
+                <div
+                  key={set.id}
+                  className={`table-row border-b border-border/10 text-sm ${
+                    set.isActive ? 'bg-purple-500/5' : ''
+                  }`}
+                >
+                  <div className="table-cell p-2 font-medium">
+                    Set {setNumber} - {set.pattern}
+                    {set.isActive && (
+                      <span className="ml-2 text-xs text-primary-foreground/70 animate-pulse">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <div className="table-cell p-2 text-right">{set.breathCount}</div>
+                  <div className="table-cell p-2 text-right">{formatTime(set.breathTime || 0)}</div>
+                  <div className="table-cell p-2 text-right">{set.holdCount}</div>
+                  <div className="table-cell p-2 text-right">{formatTime(set.avgHoldTime)}</div>
+                  <div className="table-cell p-2 text-right">{formatTime(set.longestHold)}</div>
                 </div>
-                <div className="grid grid-cols-4 gap-2 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Breaths</span>
-                    <div className="mt-1">{set.breathCount}</div>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Holds</span>
-                    <div className="mt-1">{set.holdCount}</div>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Avg</span>
-                    <div className="mt-1">{formatHoldTime(set.avgHoldTime)}</div>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Best</span>
-                    <div className="mt-1">{formatHoldTime(set.longestHold)}</div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </ScrollArea>
 
-      {/* Session Summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Total Breath Time</p>
-          <p className="text-2xl font-bold tracking-tight">
-            {formatTime(sessionStats.totalBreathTime)}
-          </p>
-        </div>
-        <div className="p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-          <p className="text-sm text-muted-foreground font-medium">Avg Hold Time</p>
-          <p className="text-2xl font-bold tracking-tight">
-            {formatHoldTime(sessionStats.totalHoldTime / (sessionStats.totalHoldCount || 1))}
-          </p>
+      {/* Session Totals */}
+      <div className="rounded-lg border border-border/50 bg-white/5 backdrop-blur-sm">
+        <div className="min-w-full table">
+          <div className="table-row-group">
+            <div className="table-row text-sm font-medium">
+              <div className="table-cell p-3 text-left">Session Totals</div>
+              <div className="table-cell p-3 text-right">{sessionStats.totalBreaths}</div>
+              <div className="table-cell p-3 text-right">{formatTime(sessionStats.totalBreathTime)}</div>
+              <div className="table-cell p-3 text-right">{sessionStats.totalHoldCount}</div>
+              <div className="table-cell p-3 text-right">
+                {formatTime(
+                  sessionStats.totalHoldCount > 0
+                    ? Math.round(sessionStats.totalHoldTime / sessionStats.totalHoldCount)
+                    : 0
+                )}
+              </div>
+              <div className="table-cell p-3 text-right">
+                {formatTime(Math.max(...sessionStats.sets.map(set => set.longestHold)))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
