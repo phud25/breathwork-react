@@ -66,7 +66,6 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
       <ScrollArea className="h-[300px] rounded-lg border border-border/50">
         <div className="p-4 space-y-4">
           {sortedSets.map((set, index) => {
-            // Calculate the set number based on the total number of sets
             const setNumber = sortedSets.length - index;
             return (
               <Card
@@ -134,7 +133,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
       <Card className="bg-purple-600/10 backdrop-blur-sm border-purple-500/20">
         <div className="grid grid-cols-5 gap-4 p-4">
           <div className="text-center">
-            <p className="text-sm text-muted-foreground font-medium mb-1">Breaths</p>
+            <p className="text-sm text-muted-foreground font-medium mb-1">Total Breaths</p>
             <p className="text-lg font-bold tracking-tight">
               {sessionStats.totalBreaths}
             </p>
@@ -146,7 +145,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
             </p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-muted-foreground font-medium mb-1">Holds</p>
+            <p className="text-sm text-muted-foreground font-medium mb-1">Total Holds</p>
             <p className="text-lg font-bold tracking-tight">
               {sessionStats.totalHoldCount}
             </p>
@@ -160,7 +159,7 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
           <div className="text-center">
             <p className="text-sm text-muted-foreground font-medium mb-1">Best Hold</p>
             <p className="text-lg font-bold tracking-tight">
-              {formatTime(Math.max(...sessionStats.sets.map(s => s.longestHold)))}
+              {formatTime(sessionStats.longestHold)}
             </p>
           </div>
         </div>
