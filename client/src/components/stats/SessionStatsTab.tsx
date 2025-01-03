@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
 
 interface SessionSet {
   id: number;
@@ -73,13 +72,13 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
         <div className="min-w-full table">
           {/* Header Row */}
           <div className="table-header-group text-xs font-medium sticky top-0 bg-background/95 backdrop-blur-sm z-10">
-            <div className="table-row border-b border-purple-500/20 h-10">
-              <div className="table-cell p-3 text-left w-[40%]">Set - Pattern</div>
-              <div className="table-cell p-3 text-right w-[15%]">Breaths</div>
-              <div className="table-cell p-3 text-right w-[15%]">Time</div>
-              <div className="table-cell p-3 text-right w-[15%]">Holds</div>
-              <div className="table-cell p-3 text-right w-[15%]">Avg Hold</div>
-              <div className="table-cell p-3 text-right w-[15%]">Best Hold</div>
+            <div className="table-row border-b border-purple-500/20">
+              <div className="table-cell p-3 text-left">Set - Pattern</div>
+              <div className="table-cell p-3 text-right">Breaths</div>
+              <div className="table-cell p-3 text-right">Time</div>
+              <div className="table-cell p-3 text-right">Holds</div>
+              <div className="table-cell p-3 text-right">Avg Hold</div>
+              <div className="table-cell p-3 text-right">Best Hold</div>
             </div>
           </div>
 
@@ -96,28 +95,30 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.2 }}
-                    className={cn(
-                      "table-row border-b border-purple-500/10 text-sm transition-colors h-10",
+                    className={`table-row border-b border-purple-500/10 text-sm transition-colors ${
                       set.isActive ? 'bg-purple-500/10' : 'hover:bg-purple-500/5'
-                    )}
+                    }`}
                   >
-                    <div className="table-cell p-3 font-medium w-[40%] align-middle">
-                      <div className="flex items-center">
-                        <span className="whitespace-nowrap truncate">
-                          {setNumber} - {simplifiedPattern}
-                          {set.isActive && (
-                            <span className="ml-2 text-xs text-purple-300">
-                              Active
-                            </span>
-                          )}
+                    <div className="table-cell p-3 font-medium">
+                      {setNumber} - {simplifiedPattern}
+                      {set.isActive && (
+                        <span className="ml-2 text-xs text-purple-300 animate-pulse">
+                          Active
                         </span>
-                      </div>
+                      )}
                     </div>
-                    <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{set.breathCount}</div>
-                    <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{formatTime(set.breathTime || 0)}</div>
-                    <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{set.holdCount}</div>
-                    <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{formatTime(set.avgHoldTime)}</div>
-                    <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{formatTime(set.longestHold)}</div>
+                    <motion.div 
+                      className="table-cell p-3 text-right font-mono"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: set.isActive ? [0.5, 1] : 1 }}
+                      transition={{ duration: 0.2, repeat: set.isActive ? Infinity : 0 }}
+                    >
+                      {set.breathCount}
+                    </motion.div>
+                    <div className="table-cell p-3 text-right font-mono">{formatTime(set.breathTime || 0)}</div>
+                    <div className="table-cell p-3 text-right font-mono">{set.holdCount}</div>
+                    <div className="table-cell p-3 text-right font-mono">{formatTime(set.avgHoldTime)}</div>
+                    <div className="table-cell p-3 text-right font-mono">{formatTime(set.longestHold)}</div>
                   </motion.div>
                 );
               })}
@@ -130,19 +131,19 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
       <div className="rounded-lg border border-purple-500/20 bg-purple-500/10 shadow-inner">
         <div className="min-w-full table">
           <div className="table-row-group">
-            <div className="table-row text-sm font-medium h-10">
-              <div className="table-cell p-3 text-left w-[40%] align-middle">Session Totals</div>
-              <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{sessionStats.totalBreaths}</div>
-              <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{formatTime(sessionStats.totalBreathTime)}</div>
-              <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">{sessionStats.totalHoldCount}</div>
-              <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">
+            <div className="table-row text-sm font-medium">
+              <div className="table-cell p-3 text-left">Session Totals</div>
+              <div className="table-cell p-3 text-right font-mono">{sessionStats.totalBreaths}</div>
+              <div className="table-cell p-3 text-right font-mono">{formatTime(sessionStats.totalBreathTime)}</div>
+              <div className="table-cell p-3 text-right font-mono">{sessionStats.totalHoldCount}</div>
+              <div className="table-cell p-3 text-right font-mono">
                 {formatTime(
                   sessionStats.totalHoldCount > 0
                     ? Math.round(sessionStats.totalHoldTime / sessionStats.totalHoldCount)
                     : 0
                 )}
               </div>
-              <div className="table-cell p-3 text-right w-[15%] font-mono align-middle">
+              <div className="table-cell p-3 text-right font-mono">
                 {formatTime(Math.max(...sessionStats.sets.map(set => set.longestHold)))}
               </div>
             </div>
