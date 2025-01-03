@@ -20,6 +20,7 @@ interface SessionStats {
   totalBreathTime: number;
   totalHoldTime: number;
   avgHoldTime: number;
+  longestHold: number;
 }
 
 const formatTime = (seconds: number) => {
@@ -71,14 +72,16 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
               <Card
                 key={set.id}
                 className={`overflow-hidden bg-white/5 backdrop-blur-sm transition-all relative ${
-                  set.isActive ? 'ring-1 ring-primary/30' : ''
+                  set.isActive ? 'ring-1 ring-purple-500/30' : ''
                 }`}
               >
                 {set.isActive && (
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-primary/20 backdrop-blur-sm">
-                    <span className="text-xs text-primary-foreground/70 font-medium animate-pulse">
-                      Active
+                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
                     </span>
+                    <span className="text-xs font-medium text-purple-300">Active</span>
                   </div>
                 )}
 
