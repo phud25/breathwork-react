@@ -348,55 +348,58 @@ export function BreathingGuide({
           <div>Time: {formatTime(elapsed)}</div>
         </div>
 
-        <div className="flex items-center justify-center gap-[20px]">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleSound}
-            className="h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl"
-          >
-            {isSoundEnabled ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
-          </Button>
+        <div className={cn(
+            "flex items-center justify-center gap-[24px]",
+            "mt-auto px-6"
+          )}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onToggleSound}
+              className="h-[52px] w-[52px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl"
+            >
+              {isSoundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </Button>
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={isHolding ? handleEndHold : handleStartHold}
-            disabled={!isActive}
-            className={cn(
-              "h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",
-              isHolding && "ring-2 ring-purple-500 ring-opacity-50",
-              !isActive && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <Hand className="h-6 w-6" />
-          </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={isHolding ? handleEndHold : handleStartHold}
+              disabled={!isActive}
+              className={cn(
+                "h-[60px] w-[60px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl",
+                isHolding && "ring-2 ring-purple-500/50 shadow-lg shadow-purple-500/20",
+                !isActive && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <Hand className="h-6 w-6" />
+            </Button>
 
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={handleStop}
-            disabled={!isActive}
-            className={cn(
-              "h-[56px] w-[56px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",
-              !isActive && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <Square className="h-6 w-6" />
-          </Button>
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={handleStop}
+              disabled={!isActive}
+              className={cn(
+                "h-[60px] w-[60px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl",
+                !isActive && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <Square className="h-6 w-6" />
+            </Button>
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleZenToggle}
-            className={cn(
-              "h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",
-              isZenMode ? "opacity-50 hover:opacity-100" : ""
-            )}
-          >
-            <Maximize className="h-6 w-6" />
-          </Button>
-        </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleZenToggle}
+              className={cn(
+                "h-[52px] w-[52px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",
+                isZenMode ? "opacity-50 hover:opacity-100" : ""
+              )}
+            >
+              <Maximize className="h-5 w-5" />
+            </Button>
+          </div>
       </div>
     </div>
   );

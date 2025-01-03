@@ -75,10 +75,16 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
                 }`}
               >
                 {set.isActive && (
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-primary/20 backdrop-blur-sm">
-                    <span className="text-xs text-primary-foreground/70 font-medium animate-pulse">
-                      Active
-                    </span>
+                  <div className="absolute top-2 right-2 z-10">
+                    <div className="relative flex items-center">
+                      <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500/30 to-purple-600/30 blur-sm" />
+                      <div className="relative px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 to-purple-600/20 backdrop-blur-sm border border-purple-500/30">
+                        <div className="absolute left-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" />
+                        <span className="text-xs text-purple-100/90 font-medium pl-3">
+                          Active
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
 
