@@ -27,6 +27,14 @@ const formatTime = (seconds: number) => {
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
+const simplifyPatternName = (pattern: string) => {
+  // Remove timing patterns like (2-2) and other technical details
+  return pattern
+    .replace(/\(\d+x?\d*\)/g, '')  // Remove (4x4) or (2-2)
+    .replace(/\d+-\d+-\d+|\d+-\d+/g, '') // Remove patterns like 4-7-8 or 2-2
+    .trim();
+};
+
 interface SessionStatsTabProps {
   sessionStats: SessionStats;
   isLoading?: boolean;
@@ -57,12 +65,12 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
   return (
     <div className="space-y-6">
       {/* Session Sets Table */}
-      <ScrollArea className="h-[200px] rounded-lg border border-border/50 bg-white/5">
+      <ScrollArea className="h-[200px] rounded-lg border border-purple-500/20 bg-white/5">
         <div className="min-w-full table">
           {/* Header Row */}
           <div className="table-header-group text-xs font-medium text-muted-foreground">
             <div className="table-row border-b border-purple-500/20">
-              <div className="table-cell p-2 text-left">Set & Pattern</div>
+              <div className="table-cell p-2 text-left whitespace-nowrap">Set · Pattern</div>
               <div className="table-cell p-2 text-right">Breaths</div>
               <div className="table-cell p-2 text-right">Time</div>
               <div className="table-cell p-2 text-right">Holds</div>
@@ -74,28 +82,42 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
           {/* Data Rows */}
           <div className="table-row-group">
             {sortedSets.map((set, index) => {
-              // Calculate the set number based on the total number of sets
               const setNumber = sortedSets.length - index;
+              const simplifiedPattern = simplifyPatternName(set.pattern);
               return (
                 <div
                   key={set.id}
-                  className={`table-row border-b border-border/10 text-sm ${
+                  className={`table-row border-b border-purple-500/10 text-sm transition-colors ${
                     set.isActive ? 'bg-purple-500/5' : ''
                   }`}
                 >
                   <div className="table-cell p-2 font-medium">
-                    Set {setNumber} - {set.pattern}
-                    {set.isActive && (
-                      <span className="ml-2 text-xs text-primary-foreground/70 animate-pulse">
-                        Active
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <span className="text-right min-w-[20px]">{setNumber}</span>
+                      <span className="text-muted-foreground">·</span>
+                      <span className="flex-1">{simplifiedPattern}</span>
+                      {set.isActive && (
+                        <span className="text-xs text-primary-foreground/70 animate-pulse ml-2">
+                          Active
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="table-cell p-2 text-right">{set.breathCount}</div>
-                  <div className="table-cell p-2 text-right">{formatTime(set.breathTime || 0)}</div>
-                  <div className="table-cell p-2 text-right">{set.holdCount}</div>
-                  <div className="table-cell p-2 text-right">{formatTime(set.avgHoldTime)}</div>
-                  <div className="table-cell p-2 text-right">{formatTime(set.longestHold)}</div>
+                  <div className="table-cell p-2 text-right">
+                    {set.breathCount}
+                  </div>
+                  <div className="table-cell p-2 text-right">
+                    {formatTime(set.breathTime || 0)}
+                  </div>
+                  <div className="table-cell p-2 text-right">
+                    {set.holdCount}
+                  </div>
+                  <div className="table-cell p-2 text-right">
+                    {formatTime(set.avgHoldTime)}
+                  </div>
+                  <div className="table-cell p-2 text-right">
+                    {formatTime(set.longestHold)}
+                  </div>
                 </div>
               );
             })}
@@ -104,11 +126,11 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
       </ScrollArea>
 
       {/* Session Totals */}
-      <div className="rounded-lg border border-border/50 bg-white/5 backdrop-blur-sm">
+      <div className="rounded-lg border border-purple-500/20 bg-purple-500/5 backdrop-blur-sm">
         <div className="min-w-full table">
           <div className="table-row-group">
             <div className="table-row text-sm font-medium">
-              <div className="table-cell p-3 text-left">Session Totals</div>
+              <div className="table-cell p-3 text-left">Totals</div>
               <div className="table-cell p-3 text-right">{sessionStats.totalBreaths}</div>
               <div className="table-cell p-3 text-right">{formatTime(sessionStats.totalBreathTime)}</div>
               <div className="table-cell p-3 text-right">{sessionStats.totalHoldCount}</div>
