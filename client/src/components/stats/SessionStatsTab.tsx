@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SessionSet {
   id: number;
@@ -55,71 +56,76 @@ export function SessionStatsTab({ sessionStats, isLoading }: SessionStatsTabProp
     : remainingSets;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Session Sets Table */}
-      <ScrollArea className="h-[200px] rounded-lg border border-border/50 bg-white/5">
+      <ScrollArea className="h-[220px] rounded-lg border border-purple-500/20 bg-white/5">
         <div className="min-w-full table">
           {/* Header Row */}
-          <div className="table-header-group text-xs font-medium text-muted-foreground">
+          <div className="table-header-group text-xs font-medium sticky top-0 bg-background/95 backdrop-blur-sm z-10">
             <div className="table-row border-b border-purple-500/20">
-              <div className="table-cell p-2 text-left">Set & Pattern</div>
-              <div className="table-cell p-2 text-right">Breaths</div>
-              <div className="table-cell p-2 text-right">Time</div>
-              <div className="table-cell p-2 text-right">Holds</div>
-              <div className="table-cell p-2 text-right">Avg Hold</div>
-              <div className="table-cell p-2 text-right">Best Hold</div>
+              <div className="table-cell p-3 text-left">Set & Pattern</div>
+              <div className="table-cell p-3 text-right">Breaths</div>
+              <div className="table-cell p-3 text-right">Time</div>
+              <div className="table-cell p-3 text-right">Holds</div>
+              <div className="table-cell p-3 text-right">Avg Hold</div>
+              <div className="table-cell p-3 text-right">Best Hold</div>
             </div>
           </div>
 
           {/* Data Rows */}
           <div className="table-row-group">
-            {sortedSets.map((set, index) => {
-              // Calculate the set number based on the total number of sets
-              const setNumber = sortedSets.length - index;
-              return (
-                <div
-                  key={set.id}
-                  className={`table-row border-b border-border/10 text-sm ${
-                    set.isActive ? 'bg-purple-500/5' : ''
-                  }`}
-                >
-                  <div className="table-cell p-2 font-medium">
-                    Set {setNumber} - {set.pattern}
-                    {set.isActive && (
-                      <span className="ml-2 text-xs text-primary-foreground/70 animate-pulse">
-                        Active
-                      </span>
-                    )}
-                  </div>
-                  <div className="table-cell p-2 text-right">{set.breathCount}</div>
-                  <div className="table-cell p-2 text-right">{formatTime(set.breathTime || 0)}</div>
-                  <div className="table-cell p-2 text-right">{set.holdCount}</div>
-                  <div className="table-cell p-2 text-right">{formatTime(set.avgHoldTime)}</div>
-                  <div className="table-cell p-2 text-right">{formatTime(set.longestHold)}</div>
-                </div>
-              );
-            })}
+            <AnimatePresence>
+              {sortedSets.map((set, index) => {
+                const setNumber = sortedSets.length - index;
+                return (
+                  <motion.div
+                    key={set.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className={`table-row border-b border-purple-500/10 text-sm transition-colors ${
+                      set.isActive ? 'bg-purple-500/10' : 'hover:bg-purple-500/5'
+                    }`}
+                  >
+                    <div className="table-cell p-3 font-medium">
+                      Set {setNumber} - {set.pattern}
+                      {set.isActive && (
+                        <span className="ml-2 text-xs text-purple-300 animate-pulse">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <div className="table-cell p-3 text-right font-mono">{set.breathCount}</div>
+                    <div className="table-cell p-3 text-right font-mono">{formatTime(set.breathTime || 0)}</div>
+                    <div className="table-cell p-3 text-right font-mono">{set.holdCount}</div>
+                    <div className="table-cell p-3 text-right font-mono">{formatTime(set.avgHoldTime)}</div>
+                    <div className="table-cell p-3 text-right font-mono">{formatTime(set.longestHold)}</div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         </div>
       </ScrollArea>
 
       {/* Session Totals */}
-      <div className="rounded-lg border border-border/50 bg-white/5 backdrop-blur-sm">
+      <div className="rounded-lg border border-purple-500/20 bg-purple-500/10 shadow-inner">
         <div className="min-w-full table">
           <div className="table-row-group">
             <div className="table-row text-sm font-medium">
               <div className="table-cell p-3 text-left">Session Totals</div>
-              <div className="table-cell p-3 text-right">{sessionStats.totalBreaths}</div>
-              <div className="table-cell p-3 text-right">{formatTime(sessionStats.totalBreathTime)}</div>
-              <div className="table-cell p-3 text-right">{sessionStats.totalHoldCount}</div>
-              <div className="table-cell p-3 text-right">
+              <div className="table-cell p-3 text-right font-mono">{sessionStats.totalBreaths}</div>
+              <div className="table-cell p-3 text-right font-mono">{formatTime(sessionStats.totalBreathTime)}</div>
+              <div className="table-cell p-3 text-right font-mono">{sessionStats.totalHoldCount}</div>
+              <div className="table-cell p-3 text-right font-mono">
                 {formatTime(
                   sessionStats.totalHoldCount > 0
                     ? Math.round(sessionStats.totalHoldTime / sessionStats.totalHoldCount)
                     : 0
                 )}
               </div>
-              <div className="table-cell p-3 text-right">
+              <div className="table-cell p-3 text-right font-mono">
                 {formatTime(Math.max(...sessionStats.sets.map(set => set.longestHold)))}
               </div>
             </div>
