@@ -349,16 +349,16 @@ export function BreathingGuide({
         </div>
 
         <div className={cn(
-            "flex items-center justify-center gap-[24px]",
-            "mt-auto px-6"
+            "flex items-center justify-center gap-[16px]", //Reduced gap
+            "mt-auto px-6 w-full max-w-[400px] mx-auto" //Container constraints update
           )}>
             <Button
               variant="outline"
               size="icon"
               onClick={onToggleSound}
-              className="h-[52px] w-[52px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl"
+              className="h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl"
             >
-              {isSoundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+              {isSoundEnabled ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
             </Button>
 
             <Button
@@ -367,25 +367,33 @@ export function BreathingGuide({
               onClick={isHolding ? handleEndHold : handleStartHold}
               disabled={!isActive}
               className={cn(
-                "h-[60px] w-[60px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl",
+                "h-[64px] w-[64px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl",
                 isHolding && "ring-2 ring-purple-500/50 shadow-lg shadow-purple-500/20",
                 !isActive && "opacity-50 cursor-not-allowed"
               )}
             >
-              <Hand className="h-6 w-6" />
+              <Hand className="h-7 w-7" />
             </Button>
 
             <Button
-              variant="destructive"
+              variant={isActive ? "destructive" : "outline"}
               size="icon"
-              onClick={handleStop}
-              disabled={!isActive}
+              onClick={isActive ? handleStop : onStart}
               className={cn(
-                "h-[60px] w-[60px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl",
-                !isActive && "opacity-50 cursor-not-allowed"
+                "h-[64px] w-[64px] control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl group",
+                !isActive && "hover:scale-105"
               )}
             >
-              <Square className="h-6 w-6" />
+              {isActive ? (
+                <Square className="h-7 w-7 transition-transform duration-200" />
+              ) : (
+                <div className="relative">
+                  <div className="absolute inset-0 animate-ping-slow opacity-50">
+                    <div className="h-7 w-7 rounded-full bg-purple-500/20" />
+                  </div>
+                  <Square className="h-7 w-7 transition-transform duration-200 rotate-45" />
+                </div>
+              )}
             </Button>
 
             <Button
@@ -393,11 +401,11 @@ export function BreathingGuide({
               size="icon"
               onClick={handleZenToggle}
               className={cn(
-                "h-[52px] w-[52px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-colors rounded-xl",
+                "h-[56px] w-[56px] hover:bg-transparent control-icon bg-white/25 backdrop-blur-sm hover:bg-white/35 transition-all duration-200 rounded-xl",
                 isZenMode ? "opacity-50 hover:opacity-100" : ""
               )}
             >
-              <Maximize className="h-5 w-5" />
+              <Maximize className="h-6 w-6" />
             </Button>
           </div>
       </div>
